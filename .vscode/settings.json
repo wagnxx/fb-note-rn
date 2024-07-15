@@ -1,0 +1,45 @@
+{
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "eslint.alwaysShowStatus": true,
+    "prettier.requireConfig": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.options": {
+        "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+        ]
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "tailwindCSS.includeLanguages": {
+        "typescript": "javascript",
+        "typescriptreact": "javascript",
+        "javascript": "javascriptreact",
+        "javascriptreact": "javascriptreact",
+        "html": "html",
+        "css": "css",
+        "scss": "scss",
+        "vue": "vue"
+    },
+    "files.associations": {
+        "*.ts": "typescriptreact",
+        "*.tsx": "typescriptreact"
+    },
+    "tailwindCSS.experimental.classRegex": [
+        "tw`([^`]*)",
+        "tw\\(([^)]*)\\)",
+        "tw\\.[^`]+`([^`]*)"
+    ]
+}
