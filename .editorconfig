@@ -1,0 +1,5 @@
+root = true
+# Specify the tab width
+
+[*]
+tab_width = 2 
