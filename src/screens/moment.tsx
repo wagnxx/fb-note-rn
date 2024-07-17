@@ -24,7 +24,6 @@ export default function Moment({ navigation }) {
         setlist(data)
       })
       .catch(err => {
-        console.log()
         console.log('\x1b[31m%s\x1b[0m', 'get all note err:::', err)
       })
   }, [])
@@ -36,7 +35,7 @@ export default function Moment({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 4 }}
       >
-        {list?.length > 0 &&
+        {list?.length > 0 ? (
           list.map((item, index) => (
             <View
               style={tw`flex-row items-center justify-between mt-2`}
@@ -64,7 +63,10 @@ export default function Moment({ navigation }) {
                 <EyeIcon size={30} color={theme.colors.secondary} />
               </TouchableOpacity>
             </View>
-          ))}
+          ))
+        ) : (
+          <Text>Null data</Text>
+        )}
       </ScrollView>
     </View>
   )

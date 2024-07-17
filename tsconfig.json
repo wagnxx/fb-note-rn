@@ -5,7 +5,14 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@env": [
+        "./.env"
       ]
     }
-  }
+  },
+  "include": [
+    "src",
+    "env.d.ts"
+  ]
 }

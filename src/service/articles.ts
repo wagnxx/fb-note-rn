@@ -58,15 +58,13 @@ export const getAllPublishedNotes = () => {
     ['title', 'id', 'createTime', 'createId'],
     [
       where('title', '>', ''),
-      where('content', '>', ''),
+      // where('content', '>', ''),
       where('published', '==', true),
-      // orderBy('title', 'asc'),
+      orderBy('title', 'asc'),
       // orderBy('content', 'asc'),
-      // orderBy('createTime', 'asc'),
+      orderBy('createTime', 'asc'),
     ],
-  ).then(arr => {
-    return arr.sort((a, b) => a?.createTime - b?.createTime > 0)
-  })
+  )
 }
 
 export const deleteNotes = (ids: string[]) => deleteDocsByIds(COL_ARTICLES, ids)

@@ -15,6 +15,7 @@ const config = {
   resolver: {
     extraNodeModules: {
       '@': path.resolve(__dirname, 'src'),
+      '@env': path.resolve(__dirname, './.env'),
     },
   },
 }
