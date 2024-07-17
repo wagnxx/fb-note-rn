@@ -5,13 +5,29 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
-import { EyeIcon, UserCircleIcon } from 'react-native-heroicons/outline'
-import { Button, useTheme } from 'react-native-paper'
+import { EyeIcon } from 'react-native-heroicons/outline'
+import { useTheme } from 'react-native-paper'
+import { getAllPublishedNotes } from '../service/articles'
+import { transFBDate2Local } from '@/utils/utilsDate'
 
 export default function Moment({ navigation }) {
   const theme = useTheme()
+
+  const [list, setlist] = useState([])
+
+  useEffect(() => {
+    getAllPublishedNotes()
+      .then(data => {
+        console.log('note data:::::', data)
+        setlist(data)
+      })
+      .catch(err => {
+        console.log()
+        console.log('\x1b[31m%s\x1b[0m', 'get all note err:::', err)
+      })
+  }, [])
 
   return (
     <View style={[{ backgroundColor: theme.colors.background }, tw`flex-1`]}>
@@ -20,25 +36,35 @@ export default function Moment({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 4 }}
       >
-        <View style={tw`flex-row items-center justify-between mt-2`}>
-          {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
-          <View>
-            <Text
-              style={[
-                {
-                  color: theme.colors.onBackground,
-                },
-                theme.fonts.titleMedium,
-              ]}
+        {list?.length > 0 &&
+          list.map((item, index) => (
+            <View
+              style={tw`flex-row items-center justify-between mt-2`}
+              key={index}
             >
-              This is published note
-            </Text>
-            <Text style={[{ color: theme.colors.secondary }]}>2024.12.01</Text>
-          </View>
-          <TouchableOpacity onPress={() => navigation.navigate('DetailScreen')}>
-            <EyeIcon size={30} color={theme.colors.secondary} />
-          </TouchableOpacity>
-        </View>
+              {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
+              <View>
+                <Text
+                  style={[
+                    {
+                      color: theme.colors.onBackground,
+                    },
+                    theme.fonts.titleMedium,
+                  ]}
+                >
+                  {item.title}
+                </Text>
+                <Text style={[{ color: theme.colors.secondary }]}>
+                  {transFBDate2Local(item.createTime)}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('DetailScreen')}
+              >
+                <EyeIcon size={30} color={theme.colors.secondary} />
+              </TouchableOpacity>
+            </View>
+          ))}
       </ScrollView>
     </View>
   )
