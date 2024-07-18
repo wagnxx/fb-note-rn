@@ -22,13 +22,12 @@ import firebaseAuth from '@react-native-firebase/auth'
 
 const auth = firebaseAuth()
 
-const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } =
-  auth
+const { createUserWithEmailAndPassword, signOut } = auth
 
 // 用户登录
 const loginUser = async (email: string, password: string) => {
   try {
-    await signInWithEmailAndPassword(email, password)
+    await auth.signInWithEmailAndPassword(email, password)
     console.log('User logged in successfully.')
     return true
   } catch (error) {

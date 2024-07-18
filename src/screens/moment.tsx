@@ -6,14 +6,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { EyeIcon } from 'react-native-heroicons/outline'
 import { useTheme } from 'react-native-paper'
 import { getAllPublishedNotes } from '../service/articles'
 import { transFBDate2Local } from '@/utils/utilsDate'
+import { ScreenFCType, ScrennTypeEnum } from '@/types/screen'
 
-export default function Moment({ navigation }) {
+const Moment: ScreenFCType<ScrennTypeEnum.Moment> = ({ navigation, route }) => {
   const theme = useTheme()
 
   const [list, setlist] = useState([])
@@ -87,3 +88,4 @@ export default function Moment({ navigation }) {
     </View>
   )
 }
+export default Moment

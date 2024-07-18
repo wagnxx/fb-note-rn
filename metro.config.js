@@ -17,6 +17,7 @@ const config = {
       '@': path.resolve(__dirname, 'src'),
       '@env': path.resolve(__dirname, './.env'),
     },
+    sourceExts: ['js', 'jsx', 'ts', 'tsx', 'json', 'd.ts'],
   },
 }
 

@@ -5,16 +5,17 @@
  * @format
  */
 
-import React from 'react'
+import React, { FC } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { HomeIcon, TagIcon, UserIcon } from 'react-native-heroicons/outline'
 import Moment from './moment'
 import Tag from './tag'
 import My from './my'
+import { ScrennTypeEnum } from '@/types/screen'
 
 const Tab = createBottomTabNavigator()
 
-function HomeTabs(): React.JSX.Element {
+const HomeTabs = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -23,16 +24,16 @@ function HomeTabs(): React.JSX.Element {
       }}
     >
       <Tab.Screen
-        name="moment"
+        name={ScrennTypeEnum.Moment}
         component={Moment}
         options={{ tabBarIcon: HomeIcon }}
       />
       <Tab.Screen
-        name="tag"
+        name="Tag"
         component={Tag}
         options={{ tabBarIcon: TagIcon }}
       />
-      <Tab.Screen name="my" component={My} options={{ tabBarIcon: UserIcon }} />
+      <Tab.Screen name="My" component={My} options={{ tabBarIcon: UserIcon }} />
     </Tab.Navigator>
   )
 }

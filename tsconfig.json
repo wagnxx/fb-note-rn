@@ -3,16 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@env": [
-        "./.env"
-      ]
+      "@/*": ["src/*"],
+      "@env": ["./.env"]
     }
   },
-  "include": [
-    "src",
-    "env.d.ts"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/types/*", "env.d.ts"]
 }

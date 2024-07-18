@@ -3,9 +3,8 @@
     [
       "module-resolver",
       {
-        "root": [
-          "./"
-        ],
+        "root": ["./"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json", ".d.ts"],
         "alias": {
           "@": "./src"
         }

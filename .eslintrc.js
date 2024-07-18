@@ -3,7 +3,10 @@ module.exports = {
   extends: [
     'eslint:recommended',
     '@react-native',
-    'plugin:prettier/recommended',
+
+    'plugin:@typescript-eslint/recommended',
+    'prettier', // 确保 ESLint 配置中的规则不会与 Prettier 规则冲突
+    'plugin:prettier/recommended', // 自动启用 Prettier 插件，并将 Prettier 规则作为 ESLint 错误
   ],
   plugins: ['prettier'],
   rules: {
@@ -22,10 +25,13 @@ module.exports = {
     //     useTabs: false,
     //   },
     // ],
+    'prettier/prettier': 'error',
+
+    // 其他 ESLint 规则
     // quotes: ['error', 'single'], // 使用单引号
 
-    indent: ['error', 2, { SwitchCase: 1 }], // 缩进为 2 个空格，SwitchCase 缩进也为 2
-    // 'no-tabs': 'off',
+    indent: ['error', 2, { SwitchCase: 2 }], // 缩进为 2 个空格，SwitchCase 缩进也为 2
+    'no-tabs': 'off',
     'keyword-spacing': ['error', { before: true, after: true }], // 冒号后面必须有一个空格
     // 'space-before-function-paren': ['error', 'always'], // 函数名与括号之间有一个空格
     'space-before-function-paren': 0,
