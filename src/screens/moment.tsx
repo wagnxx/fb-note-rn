@@ -17,7 +17,6 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
     setLoading(true)
     getAllPublishedNotes()
       .then(data => {
-        console.log('note data:::::', data)
         setlist(data)
       })
       .catch(err => {

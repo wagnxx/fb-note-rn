@@ -1,0 +1,253 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Microsoft Yahei";
+  background: #fafafa;
+}
+ul,
+ol {
+  list-style: none;
+}
+.container {
+  min-width: 320px;
+  max-width: 750px;
+  margin: 0 auto;
+  background-color: #fafafa;
+}
+img {
+  width: 100%;
+  display: block;
+}
+.cl:after {
+  content: "\200B";
+  display: block;
+  height: 0;
+  clear: both;
+}
+.cl {
+  /* *zoom: 1; */
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+body {
+  font-size: 0.38667rem !important;
+  color: #333;
+}
+.main {
+  padding: 0 0.01333333rem;
+  font-size: .8em;
+}
+/*我的个人中心开始*/
+.my-main {
+  font-size: 0.4rem;
+}
+.my-main-top {
+  height: 3.12rem;
+  background: url(../images/wd-bg.png) no-repeat;
+  background-size: contain;
+  box-sizing: border-box;
+  padding: 0.57333333rem 0.49333333rem;
+  color: #fff;
+}
+.my-main-top .my-logo {
+  width: 1.92rem;
+  height: 1.92rem;
+  display: block;
+  float: left;
+}
+.my-main-top .my-msg {
+  float: left;
+  margin-left: 0.45333333rem;
+  margin-top: 0.62666667rem;
+  font-size: 0.45333333rem;
+}
+.my-main-top .go-login {
+  float: right;
+  margin-top: 0.62666667rem;
+  width: 0.33333333rem;
+  height: 0.64rem;
+}
+.my-main-bot .my-list {
+  padding: 0 0.50666667rem;
+  height: 1.26666667rem;
+  line-height: 1.26666667rem;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+}
+.my-main-bot .my-list .list-logo {
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-top: 0.33333333rem;
+  margin-right: 0.50666667rem;
+  display: block;
+  float: left;
+}
+.my-main-bot .my-list .list-logo img {
+  display: block;
+}
+.my-main-bot .my-list .list-go-sun {
+  float: right;
+  width: 0.26666667rem;
+  height: 0.48rem;
+  display: block;
+  margin-top: 0.38666667rem;
+}
+.my-main-bot .my-list .list-go-sun img {
+  display: block;
+}
+/*我的个人中心结束*/
+/*我的登录窗口开始*/
+.login-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.login-mask .form {
+  width: 7.06666667rem;
+  height: 6.65333333rem;
+  background: #fff;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  top: 5.04rem;
+  padding: 0.50666667rem;
+  box-sizing: border-box;
+}
+.login-mask .form .form-tit {
+  font-size: 0.42666667rem;
+}
+.login-mask .form form .inputGroup {
+  height: 1.04rem;
+  border: 1px solid #e5e5e5;
+  margin: 0.54666667rem 0;
+  padding: 0.24rem;
+  box-sizing: border-box;
+}
+.login-mask .form form .inputGroup .input-logo {
+  width: 0.4rem;
+  height: 0.53333333rem;
+  display: block;
+  float: left;
+}
+.login-mask .form form .inputGroup .input-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.login-mask .form form .inputGroup .input-box {
+  float: left;
+  height: 100%;
+  box-sizing: border-box;
+}
+.login-mask .form form .inputGroup .input-box input {
+  display: block;
+  width: 5.06666667rem;
+  height: 100%;
+  text-indent: 0.4rem;
+  float: left;
+  box-sizing: border-box;
+  outline: none;
+  border-color: transparent;
+  font-size: 1.1em;
+}
+.login-mask .form form .inputGroup .input-box .ver-input {
+  width: 2.66666667rem;
+}
+.login-mask .form form .inputGroup .ver-btn {
+  height: 120%;
+  width: 2.14666667rem;
+  display: block;
+  float: right;
+  text-align: center;
+  border-left: 1px solid #e5e5e5;
+  line-height: 168%;
+  margin-top: -0.05333333rem;
+}
+.login-mask .form form .inputGroup:nth-child(3) {
+  background: #00aff4;
+  padding: 0;
+}
+.login-mask .form form .inputGroup:nth-child(3) input {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #fff;
+}
+/*我的登录窗口结束*/
+/*我的资料开始*/
+.my-info {
+  padding: 0 0.2rem;
+  font-size: 0.4rem;
+}
+.my-info .info-list {
+  height: 1.26666667rem;
+  line-height: 1.26666667rem;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+}
+.my-info .info-list .info-tit {
+  float: left;
+}
+.my-info .info-list .info-todo {
+  width: 70%;
+  height: 100%;
+  background: #fafafa;
+}
+.my-info .info-list .info-todo .input-type {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #fafafa;
+  text-align: right;
+  font-size: 1em;
+  border: none;
+  outline: none;
+}
+.my-info .info-list .info-todo .select-type {
+  width: 2.66666667rem;
+  height: 100%;
+  float: right;
+  padding-right: 0.72rem;
+  box-sizing: border-box;
+  text-align: right;
+  color: #808080;
+  position: relative;
+}
+.my-info .info-list .info-todo .select-type::after {
+  position: absolute;
+  content: "";
+  display: block;
+  width: 0.42666667rem;
+  height: 0.32rem;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  right: 1px;
+  background: url(../images/triangle-down.png) no-repeat center;
+  background-size: contain;
+}
+.my-info a.info-btn {
+  width: 5.6rem;
+  height: 1.04rem;
+  line-height: 1.04rem;
+  display: block;
+  margin: 1rem auto 0;
+  text-align: center;
+  color: #fff;
+  background: #00acee;
+  border-radius: 0.30666667rem;
+}
+/*我的资料结束*/

@@ -1,16 +1,6 @@
-import {
-  addDocToCol,
-  deleteDocsByIds,
-  getDocData,
-  getFieldValues,
-} from '@/firebase/db'
+import { addDocToCol, deleteDocsByIds, getDocData, getFieldValues } from '@/firebase/db'
 import { auth } from '@/firebase/auth'
-import {
-  FieldValue,
-  orderBy,
-  serverTimestamp,
-  where,
-} from '@react-native-firebase/firestore'
+import { FieldValue, orderBy, serverTimestamp, where } from '@react-native-firebase/firestore'
 
 const COL_ARTICLES = 'articles'
 

@@ -1,0 +1,20 @@
+body {
+  font-size: 0.41333rem !important;
+}
+header {
+  height: 1.70667rem;
+  line-height: 1.70667rem;
+  padding: 0 0.18666667rem;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  text-align: center;
+  position: relative;
+  letter-spacing: 2px;
+}
+header .header-back {
+  position: absolute;
+  border: 1px solid;
+  left: 0.18666667rem;
+  top: 3px;
+  font-size: .9em;
+}

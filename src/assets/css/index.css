@@ -1,0 +1,285 @@
+/* @import url('~@/assets/css/index.css'); */
+* {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    line-height: 180%;
+    font-size: 0.38667rem !important;
+    font-family: "Microsoft Yahei";
+    background-color: #f6f8fa;
+  }
+  ul,
+  ol {
+    list-style: none;
+  }
+  .container {
+    min-width: 320px;
+    max-width: 750px;
+    margin: 0 auto;
+    background-color: #fff;
+  }
+  img {
+    width: 100%;
+  }
+  .cl:after {
+    content: "\200B";
+    display: block;
+    height: 0;
+    clear: both;
+  }
+  .cl {
+    /* *zoom: 1; */
+  }
+  .fl {
+    float: left;
+  }
+  .fr {
+    float: right;
+  }
+  .main {
+    padding: 0 0.4rem 1.73333333rem;
+  }
+  .loan-barnner {
+    width: 100%;
+    overflow: hidden;
+  }
+  .loan-entry {
+    padding: 1% 0.37333333rem;
+    box-shadow: -1px -1px 1px #ddd;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    margin: 0.13333333rem 0;
+  }
+  .loan-entry-lists {
+    display: flex;
+    padding: 0.33333333rem 0;
+  }
+  .loan-entry-lists-item {
+    flex: 1;
+    box-sizing: border-box;
+  }
+  .loan-entry-lists-item img {
+    width: 1.13333rem;
+    height: 1.13333rem;
+    border-radius: 100%;
+  }
+  .loan-entry-lists-item-r {
+    line-height: 128%;
+    padding-left: 0.33333333rem;
+  }
+  .loan-entry-lists-item-r a {
+    letter-spacing: 1px;
+  }
+  .loan-entry-lists-item-r p {
+    color: #808080;
+    font-size: .8em;
+  }
+  .loan-companys {
+    font-size: 0.38667rem;
+  }
+  .loan-companys .conpanys-listGroup {
+    margin: 0.33333333rem 0;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-top {
+    border-bottom: 1px solid #ddd;
+    height: 0.8rem;
+    line-height: 0.8rem;
+    padding-bottom: 0.13333333rem;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-top .conpanyLogo {
+    width: 0.66666667rem;
+    display: inline-block;
+    vertical-align: top;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-top .conpanyLogo > img {
+    width: 100%;
+    vertical-align: middle;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-top .characteristic {
+    width: 1.25333333rem;
+    height: 0.72rem;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot {
+    color: #fe3a39;
+    padding: 0.13333333rem 0;
+    line-height: 145%;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-l {
+    padding-right: 0.53333333rem;
+    padding-top: 0.09333333rem;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-l .mon {
+    font-size: 1.2em;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-l p {
+    font-size: .9em;
+    color: #808080;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-m {
+    font-size: .8em;
+    color: #707070;
+    border-left: 1px solid #ddd;
+    line-height: 127%;
+    padding-left: 0.50666667rem;
+    margin-top: 0.10666667rem;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-r a {
+    font-size: .85em;
+    border-radius: 30px;
+    margin-top: 0.33333333rem;
+    display: inline-block;
+    vertical-align: middle;
+    border: 2px solid;
+    padding: 0.05333333rem 0.12rem;
+  }
+  .loan-companys .conpanys-listGroup .conpanys-bot .conpanys-bot-r a img {
+    width: .5em;
+    vertical-align: middle;
+    margin-left: 0.10666667rem;
+  }
+  /* 极速贷款开始 */
+  .speed-loan {
+    padding: 0 0.4rem;
+  }
+  .speed-loan .speed-loan-item {
+    margin: 0.33333333rem 0;
+    padding: 0.13333333rem 0;
+    color: #fff;
+    border-radius: 0.32rem;
+  }
+  .speed-loan .speed-loan-item-l {
+    width: 3.42666667rem;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 0.37333333rem 0;
+    line-height: 125%;
+    position: relative;
+  }
+  .speed-loan .speed-loan-item-l a > img {
+    width: 1.57333333rem;
+  }
+  .speed-loan .speed-loan-item-l::after {
+    width: 0.53333333rem;
+    height: 0.44rem;
+    content: "";
+    position: absolute;
+    top: -0.24rem;
+    left: 0.21333333rem;
+    background: url("@/assets/images/js-logo.png") no-repeat;
+    background-size: 100%;
+  }
+  .speed-loan .speed-loan-item1 {
+    background: #3c98ff;
+  }
+  .speed-loan .speed-loan-item2 {
+    background: #fd5064;
+  }
+  .speed-loan .speed-loan-item3 {
+    background: #4fc72f;
+  }
+  .speed-loan .speed-loan-item4 {
+    background: #b47cd9;
+  }
+  .speed-loan .speed-loan-item-r {
+    margin: 0.37333333rem 0;
+  }
+  .speed-loan .speed-loan-item-r h3 {
+    margin-bottom: 0.33333333rem;
+    font-weight: 500;
+  }
+  .speed-loan .speed-loan-item-r h3 font {
+    font-size: .75em;
+    margin-left: 0.13333333rem;
+  }
+  .speed-loan .speed-loan-item-r p img {
+    width: 0.22666667rem;
+  }
+  /* 极速贷款结束 */
+  /* footer */
+  footer {
+    min-width: 320px;
+    max-width: 750px;
+    margin: 0 auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #ddd;
+    display: flex;
+    background: #fff;
+    font-size: .70em;
+    color: #777;
+    padding-top: 0.2rem;
+  }
+  footer .foot-item {
+    flex: 1;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 156%;
+  }
+  footer .foot-item img {
+    width: 0.74666667rem;
+    height: 0.72rem;
+  }
+  footer .foot-item .act_blue {
+    color: #00acee;
+  }
+  /* footer */
+  /* 金额类型开始 */
+  .loan-mon {
+    display: flex;
+    height: 1.2rem;
+    line-height: 1.2rem;
+    border-bottom: 1px solid #ddd;
+  }
+  .loan-mon-item {
+    flex: 1;
+  }
+  .loan-mon-item img {
+    width: 0.48rem;
+    border-radius: 100%;
+    vertical-align: middle;
+  }
+  .loan-mon-item img.logo-left {
+    margin-left: 0.66666667rem;
+  }
+  .loan-mon-item img.logo-right {
+    width: 0.24rem;
+    margin-left: 0.33333333rem;
+    margin-bottom: 0.06666667rem;
+  }
+  .loan-mon-item img[src="images/logo-lx.png"] {
+    border-radius: 0;
+    width: 0.4rem;
+  }
+  .loan-mon-item .loan-mon-tit {
+    margin-left: 0.30666667rem;
+  }
+  /* 金额类型结束 */
+  /* 排序方法开始 */
+  .loan-sort {
+    padding: 0.06666667rem 0;
+  }
+  .loan-sort ul {
+    display: flex;
+  }
+  .loan-sort ul li {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+  .loan-sort ul .act_red::after {
+    background: #fe3a39;
+    width: 40%;
+    height: 2px;
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.13333333rem;
+    margin: 0 auto;
+  }
+  /* 排序方法开始 */
+  

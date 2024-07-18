@@ -1,0 +1,217 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  line-height: 180%;
+  font-family: "Microsoft Yahei";
+  font-size: 0.38667rem !important;
+  background-color: #f6f8fa;
+}
+ul,
+ol {
+  list-style: none;
+}
+.container {
+  min-width: 320px;
+  max-width: 750px;
+  margin: 0 auto;
+  background-color: #fff;
+}
+img {
+  width: 100%;
+}
+.cl:after {
+  content: "\200B";
+  display: block;
+  height: 0;
+  clear: both;
+}
+.cl {
+  /* *zoom: 1; */
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+.main {
+  padding: 0 0.4rem;
+}
+/*申请开始*/
+.detail-top {
+  height: 4.66667rem;
+  background: #3c4652;
+  color: #fff;
+  padding: 0.49333333rem 0.4rem 0;
+  position: relative;
+}
+.detail-top .detail-logo {
+  height: 1.02667rem;
+  line-height: 1.02667rem;
+  padding: 0;
+}
+.detail-top .detail-logo img {
+  width: 1.04rem;
+  display: inline-block;
+  vertical-align: top;
+  border-radius: 100%;
+}
+.detail-top .detail-logo-name {
+  margin-left: 0.30667rem;
+}
+.detail-top .characteristic {
+  height: 1rem;
+  line-height: 1rem;
+}
+.detail-top .characteristic font {
+  margin: 0 0.37333333rem;
+  font-size: 0.8em;
+}
+.detail-top .choice-box {
+  width: 8.48rem;
+  height: 4.72rem;
+  padding: 0.17333333rem 0.33333333rem;
+  position: absolute;
+  background: #fff;
+  border-radius: 0.2rem;
+  box-shadow: 1px 1px 1px #ddd ;
+  top: 2.78666667rem;
+  color: #333;
+}
+.detail-top .choice-box > span {
+  color: #999;
+}
+.detail-top .choice-box-mes {
+  display: flex;
+  color: #333;
+  margin-top: 0.48rem;
+}
+.detail-top .choice-box-mes-item {
+  flex: 1;
+  text-align: center;
+}
+.detail-top .choice-box-mes-item > span {
+  font-size: 1.21em;
+}
+.detail-top .choice-box-mes-item:nth-child(2) {
+  position: relative;
+}
+.detail-top .choice-box-mes-item:nth-child(2) ::after {
+  width: 2px;
+  height: 0.69333333rem;
+  display: block;
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  background: #ddd;
+}
+.detail-top .choice-box-mes-item:nth-child(2) ::before {
+  width: 2px;
+  height: 0.69333333rem;
+  display: block;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  background: #ddd;
+}
+.detail-top .choice-box .check-box {
+  display: flex;
+  margin-top: 0.8rem;
+}
+.detail-top .choice-box .check-box .check-item {
+  flex: 1;
+  padding: 0.10666667rem;
+}
+.detail-top .choice-box .check-box .check-item-inner {
+  border: 1px solid #ddd;
+  height: 0.73333333rem;
+  border-radius: 0.16rem;
+  padding: 0 0.24rem;
+}
+.detail-top .choice-box .check-box .check-item-inner input {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.69333333rem;
+  height: 0.70666667rem;
+  margin-right: 0.2rem;
+  text-align: right;
+  font-size: 1.13em;
+  border: none;
+  outline: none;
+}
+.detail-top .choice-box .check-box .check-item-inner #timg_long {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.69333333rem;
+  height: 0.70666667rem;
+  margin-right: 0.2rem;
+  text-align: right;
+  padding-right: .5em;
+  position: relative;
+}
+.detail-top .choice-box .check-box .check-item-inner #timg_long::after {
+  content: "";
+  display: block;
+  width: 0.21333333rem;
+  height: 0.24rem;
+  background: url(../images/logo-down.png) no-repeat;
+  background-size: contain;
+  background-position: 0 -0.02666667rem;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  right: -0.30666667rem;
+}
+.detail-top .choice-box .check-box .check-item-inner .yuan {
+  color: #999;
+}
+h3 {
+  color: #333;
+  font-size: 1.1em;
+}
+.application-process {
+  margin-top: 2.8rem;
+}
+.application-process ul {
+  margin-top: 0.53333333rem;
+}
+.application-process ul li {
+  float: left;
+  text-align: center;
+  line-height: 150%;
+}
+.application-process ul li > img {
+  width: 0.92rem;
+  display: inline-block;
+}
+.application-instruction p {
+  color: #808080;
+}
+.application-instruction hr {
+  margin: 0.33333333rem 0;
+  height: 1px;
+  background: #e6e6e6;
+  border: none;
+}
+footer {
+  text-align: center;
+  background: #ff4645;
+  color: #fff;
+  height: 1.52rem;
+  line-height: 1.52rem;
+  margin-top: 0.58666667rem;
+}
+.bg-gray {
+  background: #fafafa;
+  height: 0.37333333rem;
+}
+/*申请页结束*/
