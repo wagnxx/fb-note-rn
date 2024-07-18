@@ -7,8 +7,15 @@ import NodeDetail from '@/components/node-detail'
 import { AuthContext } from '@/context/auth-provider'
 import { ActivityIndicator, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
+import { ScrennTypeEnum } from '@/types/screen'
 
 const Stack = createStackNavigator()
+
+
+
+
+
+
 
 export default function AuthNavigator() {
   const theme = useTheme()
@@ -31,7 +38,7 @@ export default function AuthNavigator() {
     >
       {user ? (
         <>
-          <Stack.Screen name="HomeTabs" component={HomeTabs} />
+          <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
           <Stack.Screen name="NodeDetail" component={NodeDetail} />
         </>
       ) : (

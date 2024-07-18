@@ -1,5 +1,3 @@
-// firebase.js
-// import { initializeApp } from '@react-native-firebase/app'
 import firebase from '@react-native-firebase/app'
 import { getFirestore } from '@react-native-firebase/firestore'
 import {
@@ -30,12 +28,7 @@ let app
 if (!firebase.apps.length) {
   app = firebase.initializeApp(firebaseConfig)
 }
-console.log('firebase app length:::::::::::', firebase.apps.length)
+console.log('Initialize Firebase succesfully ,firebase app length:::::::::::', firebase.apps.length)
 
 const db = getFirestore()
-// export const db = {}
 export { firebase, app, db }
-
-// Initialize Firebase
-// export const app = firebase.initializeApp(firebaseConfig)
-//

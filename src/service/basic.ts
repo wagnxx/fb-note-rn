@@ -1,10 +1,4 @@
-import {
-  addDocToCol,
-  getDocsByCondition,
-  getFieldValues,
-  DocumentData,
-  db,
-} from '@/firebase/db'
+import { addDocToCol, getDocsByCondition, getFieldValues, DocumentData } from '@/firebase/db'
 
 /**
  * 
@@ -43,10 +37,7 @@ export type Tag = {
 }
 
 // 创建文件夹
-export const createFolder = async (
-  folderName: string,
-  parentFolderId: string | null = null,
-): Promise<string | null> => {
+export const createFolder = async (folderName: string, parentFolderId: string | null = null): Promise<string | null> => {
   return addDocToCol('folders', { name: folderName, parentId: parentFolderId })
 }
 
@@ -56,10 +47,7 @@ export const getFolders = async (): Promise<DocumentData[]> => {
 }
 
 // 创建Note
-export const createNote = async (
-  folderId: string,
-  note: DocumentData,
-): Promise<string | null> => {
+export const createNote = async (folderId: string, note: DocumentData): Promise<string | null> => {
   note.folderId = folderId
   return addDocToCol('notes', note)
 }
@@ -99,9 +87,7 @@ export type OrgMemberType = {
 }
 
 // 添加成员到组织
-export const addMemberToOrg = async (
-  doc: OrgMemberType,
-): Promise<string | null> => {
+export const addMemberToOrg = async (doc: OrgMemberType): Promise<string | null> => {
   return addDocToCol(COL_ORGMEMBERS, doc)
 }
 

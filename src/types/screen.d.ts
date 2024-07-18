@@ -1,11 +1,8 @@
-import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import type { RouteProp, ParamListBase } from '@react-navigation/native'
 import { FC } from 'react'
 
-export type ScreenComponentType<
-  ParamList extends ParamListBase,
-  RouteName extends keyof ParamList,
-> = FC<{
+export type ScreenComponentType<ParamList extends ParamListBase, RouteName extends keyof ParamList> = FC<{
   navigation: StackNavigationProp<ParamList, RouteName>
   route: RouteProp<ParamList, RouteName>
 }>
@@ -19,52 +16,34 @@ export enum ScrennTypeEnum {
   My = 'My',
 }
 
-export enum RootScreenTypes {
+export enum RootScreenTypesEnum {
   HomeTabs = ScrennTypeEnum.HomeTabs,
   NodeDetail = ScrennTypeEnum.NodeDetail,
   Login = ScrennTypeEnum.Login,
 }
 
-export enum BottomTabScreenTypes {
+export enum BottomTabScreenTypesEnum {
   Moment = ScrennTypeEnum.Moment,
   Tag = ScrennTypeEnum.Tag,
   My = ScrennTypeEnum.My,
 }
 
 // 合并枚举类型
-export type ScreenTypes = ScrennTypeEnum
+// export type ScreenTypes = ScrennTypeEnum
+type ScreenTypes = keyof typeof ScrennTypeEnum
+type RootScreenTypes = keyof typeof RootScreenTypesEnum
+type BottomTabScreenTypes = keyof typeof BottomTabScreenTypesEnum
 
-export type RootStackParamList = Record<
-  RootScreenTypes,
-  { item: unknown } | undefined
->
-export type BottomTabParamList = Record<
-  BottomTabScreenTypes,
-  { item: unknown } | undefined
->
+export type RootStackParamList = Record<RootScreenTypes, { item: unknown } | undefined>
+export type BottomTabParamList = Record<BottomTabScreenTypes, { item: unknown } | undefined>
 
-// 定义 RootScreenProps 和 BottomTabScreenProps
-export type RootScreenProps<T extends RootScreenTypes> = StackScreenProps<
-  RootStackParamList,
-  T
->
-export type BottomTabScreenProps<T extends BottomTabScreenTypes> =
-  StackScreenProps<BottomTabParamList, T>
+// Common props for screen components
+type ScreenComponentProps<ParamList extends Record<string, object | undefined>, RouteName extends keyof ParamList> = {
+  navigation: StackNavigationProp<ParamList, RouteName>
+  route: RouteProp<ParamList, RouteName>
+}
 
-// 提供一个 ScreenProps 类型
-export type ScreenProps<T extends ScreenTypes> = T extends RootScreenTypes
-  ? RootScreenProps<T>
-  : T extends BottomTabScreenTypes
-    ? BottomTabScreenProps<T>
-    : never
-
-export type ScreenFC<P = {}> = FC<P & { navigation: any; route: any }>
-
-export type ScreenFCType<T extends ScreenTypes> = ScreenFC<ScreenProps<T>> &
-  (T extends BottomTabScreenTypes
-    ? ScreenComponentType<BottomTabParamList, T>
-    : ScreenComponentType<RootStackParamList, T>)
-
-// 用于 Moment 和 Login 组件的类型
-export type MomentScreenType = ScreenFCType<ScreenTypes.Moment>
-export type LoginScreenType = ScreenFCType<ScreenTypes.Login>
+// Utility type to map route names to ScreenComponentType
+export type ScreenFC<RouteName extends keyof ParamListBase> = RouteName extends keyof RootStackParamList | keyof BottomTabParamList
+  ? ScreenComponentType<ParamListBase, RouteName>
+  : never

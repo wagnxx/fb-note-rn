@@ -1,20 +1,13 @@
-import {
-  View,
-  Text,
-  StatusBar,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native'
-import React, { FC, useEffect, useState } from 'react'
+import { View, Text, StatusBar, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { EyeIcon } from 'react-native-heroicons/outline'
 import { useTheme } from 'react-native-paper'
 import { getAllPublishedNotes } from '../service/articles'
 import { transFBDate2Local } from '@/utils/utilsDate'
-import { ScreenFCType, ScrennTypeEnum } from '@/types/screen'
+import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 
-const Moment: ScreenFCType<ScrennTypeEnum.Moment> = ({ navigation, route }) => {
+const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
   const theme = useTheme()
 
   const [list, setlist] = useState([])
@@ -36,27 +29,16 @@ const Moment: ScreenFCType<ScrennTypeEnum.Moment> = ({ navigation, route }) => {
   }, [])
 
   return (
-    <View
-      style={[
-        { backgroundColor: theme.colors.background },
-        tw`flex-1 justify-center`,
-      ]}
-    >
+    <View style={[{ backgroundColor: theme.colors.background }, tw`flex-1 justify-center`]}>
       <StatusBar hidden={true} />
 
       {loading ? (
         <ActivityIndicator size="large" color={theme.colors.outline} />
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 12 }}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 12 }}>
           {list?.length > 0 ? (
             list.map((item, index) => (
-              <View
-                style={tw`flex-row items-center justify-between mt-2`}
-                key={index}
-              >
+              <View style={tw`flex-row items-center justify-between mt-2`} key={index}>
                 {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
                 <View>
                   <Text
@@ -69,13 +51,9 @@ const Moment: ScreenFCType<ScrennTypeEnum.Moment> = ({ navigation, route }) => {
                   >
                     {item.title}
                   </Text>
-                  <Text style={[{ color: theme.colors.secondary }]}>
-                    {transFBDate2Local(item.createTime)}
-                  </Text>
+                  <Text style={[{ color: theme.colors.secondary }]}>{transFBDate2Local(item.createTime)}</Text>
                 </View>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('DetailScreen')}
-                >
+                <TouchableOpacity onPress={() => navigation.navigate('DetailScreen')}>
                   <EyeIcon size={30} color={theme.colors.secondary} />
                 </TouchableOpacity>
               </View>
