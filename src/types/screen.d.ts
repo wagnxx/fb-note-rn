@@ -37,8 +37,12 @@ type ScreenTypes = keyof typeof ScrennTypeEnum
 type RootScreenTypes = keyof typeof RootScreenTypesEnum
 type BottomTabScreenTypes = keyof typeof BottomTabScreenTypesEnum
 
-export type RootStackParamList = Record<RootScreenTypes, { item: unknown } | undefined>
-export type BottomTabParamList = Record<BottomTabScreenTypes, { item: unknown } | undefined>
+interface ScreenParamsType {
+  id: string
+}
+
+export type RootStackParamList = Record<RootScreenTypes, ScreenParamsType | undefined>
+export type BottomTabParamList = Record<BottomTabScreenTypes, { params: object } | undefined>
 
 // Common props for screen components
 type ScreenComponentProps<ParamList extends Record<string, object | undefined>, RouteName extends keyof ParamList> = {

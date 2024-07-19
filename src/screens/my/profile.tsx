@@ -34,12 +34,11 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     ]
   }, [draftList, publishedList])
 
-  useEffect(() => {
+  const init = () => {
     setLoading(true)
     getAllNotes()
       .then(data => {
         setlist(data)
-        console.log('note data', data)
       })
       .catch(err => {
         console.log('\x1b[31m%s\x1b[0m', 'get all note err:::', err)
@@ -47,6 +46,10 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       .finally(() => {
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    init()
   }, [])
 
   if (loading) {
@@ -58,7 +61,14 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       case 'first':
         return (
           <View style={tw`flex-1 p-2`}>
-            {draftList?.length > 0 ? <NoteList list={draftList} /> : <Text>Null data</Text>}
+            {draftList?.length > 0 ? (
+              <NoteList
+                list={draftList}
+                onPressItem={item => navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })}
+              />
+            ) : (
+              <Text>Null data</Text>
+            )}
           </View>
         )
       case 'second':
