@@ -13,10 +13,15 @@ const styles = StyleSheet.create({
   },
 })
 
-const ListItem = ({ iconStyle, icon, label, onItemPress }) => {
+const ProfileListItem = ({ iconStyle, icon, label, onItemPress }) => {
   const theme = useTheme()
   return (
-    <View style={[tw`flex-row justify-between pr-3 pl-3 pb-2 pt-2`, { borderColor: theme.colors.primaryContainer, borderWidth: 1 }]}>
+    <View
+      style={[
+        tw`flex-row justify-between pr-3 pl-3 pb-2 pt-2`,
+        { borderColor: theme.colors.primaryContainer, borderWidth: 1 },
+      ]}
+    >
       <View style={tw`flex-row gap-2`}>
         <Image style={[iconStyle]} source={icon} />
         <Text style={{ color: theme.colors.onBackground }}>{label}</Text>
@@ -28,4 +33,4 @@ const ListItem = ({ iconStyle, icon, label, onItemPress }) => {
   )
 }
 
-export default ListItem
+export default ProfileListItem

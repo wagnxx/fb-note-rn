@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 import React from 'react'
-import ListItem from './list-item'
+import ProfileListItem from './profile-list-item'
 
 const styles = StyleSheet.create({
   imageIcon: {
@@ -37,6 +37,12 @@ export default function ProfileList() {
     console.log('item pressed:::', item)
   }
   return itemsList.map((item, index) => (
-    <ListItem key={index} label={item.label} icon={item.icon} iconStyle={styles.imageIcon} onItemPress={() => onItemPress(item)} />
+    <ProfileListItem
+      key={index}
+      label={item.label}
+      icon={item.icon}
+      iconStyle={styles.imageIcon}
+      onItemPress={() => onItemPress(item)}
+    />
   ))
 }
