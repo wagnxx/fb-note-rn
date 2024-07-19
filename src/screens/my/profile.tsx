@@ -1,4 +1,4 @@
-import { View, ScrollView, Dimensions, ActivityIndicator, StatusBar } from 'react-native'
+import { View, ScrollView, Dimensions, ActivityIndicator, StatusBar, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import Avatar from './components/avatar'
@@ -101,8 +101,36 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           />
         )}
       />
+
+      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote)}>
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
     </ScrollView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fab: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 30,
+    bottom: 30,
+    backgroundColor: '#03A9F4',
+    borderRadius: 30,
+    elevation: 8,
+  },
+  fabText: {
+    fontSize: 34,
+    color: 'white',
+  },
+})
 
 export default Profile

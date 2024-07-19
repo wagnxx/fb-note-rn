@@ -9,6 +9,7 @@ import { ActivityIndicator, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { ScrennTypeEnum } from '@/types/screen'
 import Profile from '@/screens/my/profile'
+import CreateNote from '@/screens/note/create'
 
 const Stack = createStackNavigator()
 
@@ -33,11 +34,15 @@ export default function AuthNavigator() {
     >
       {user ? (
         <>
+          {/* 首页带有 bottom tabs screen */}
           <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
+          {/* 普通 Stack.Screen 需要登录 */}
           <Stack.Screen name={ScrennTypeEnum.NodeDetail} component={NodeDetail} />
           <Stack.Screen name={ScrennTypeEnum.Profile} component={Profile} />
+          <Stack.Screen name={ScrennTypeEnum.CreateNote} component={CreateNote} />
         </>
       ) : (
+        // 不需要登录的 游客可访问页面
         <Stack.Screen name="Login" component={LoginScreen} />
       )}
     </Stack.Navigator>
