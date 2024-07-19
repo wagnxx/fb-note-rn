@@ -46,11 +46,11 @@ export const addDocToCol = async (colName: string, docData: DocumentData): Promi
 }
 
 // 获取指定文档的数据
-export const getDocData = async (colName: string, docId: string): Promise<DocumentData | null> => {
+export const getDocData = async <T>(colName: string, docId: string): Promise<(DocumentData & T) | null> => {
   try {
     const docSnap: DocumentSnapshot = await getDoc(doc(db, colName, docId))
     if (docSnap.exists) {
-      return docSnap.data() || null
+      return (docSnap.data() as DocumentData & T) || null
     } else {
       LogError('Document not found')
       return null

@@ -41,7 +41,7 @@ export const getAllNotes: () => Promise<DocumentData & Partial<Note>[]> = () => 
   )
 }
 
-export const getNote = (id: string) => getDocData(COL_ARTICLES, id)
+export const getNote = (id: string) => getDocData<Note>(COL_ARTICLES, id)
 
 export const getAllPublishedNotes = () => {
   return getFieldValues(

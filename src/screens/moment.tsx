@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { EyeIcon } from 'react-native-heroicons/outline'
 import { useTheme } from 'react-native-paper'
-import { getAllPublishedNotes } from '../service/articles'
+import { Note, getAllPublishedNotes } from '../service/articles'
 import { transFBDate2Local } from '@/utils/utilsDate'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
+import { Timestamp } from '@react-native-firebase/firestore'
 
 const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
   const theme = useTheme()
 
-  const [list, setlist] = useState([])
+  const [list, setlist] = useState<Partial<Note>[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -50,9 +51,11 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
                   >
                     {item.title}
                   </Text>
-                  <Text style={[{ color: theme.colors.secondary }]}>{transFBDate2Local(item.createTime)}</Text>
+                  <Text style={[{ color: theme.colors.secondary }]}>
+                    {transFBDate2Local(item?.createTime as Timestamp)}
+                  </Text>
                 </View>
-                <TouchableOpacity onPress={() => navigation.navigate('DetailScreen')}>
+                <TouchableOpacity onPress={() => navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })}>
                   <EyeIcon size={30} color={theme.colors.secondary} />
                 </TouchableOpacity>
               </View>
