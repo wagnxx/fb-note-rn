@@ -1,10 +1,10 @@
-import { addDocToCol, deleteDocsByIds, getDocData, getFieldValues } from '@/firebase/db'
+import { DocumentData, addDocToCol, deleteDocsByIds, getDocData, getFieldValues } from '@/firebase/db'
 import { auth } from '@/firebase/auth'
 import { FieldValue, orderBy, serverTimestamp, where } from '@react-native-firebase/firestore'
 
 const COL_ARTICLES = 'articles'
 
-export type InputDocType = {
+export type Note = {
   title: string
   content: string
   tags?: string[]
@@ -13,7 +13,7 @@ export type InputDocType = {
   createId?: string
 }
 
-export const createNote = (doc: InputDocType) => {
+export const createNote = (doc: Note) => {
   doc.createTime = serverTimestamp()
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
@@ -22,19 +22,20 @@ export const createNote = (doc: InputDocType) => {
   return Promise.reject('logout')
 }
 
-export const getAllNotes = () => {
+export const getAllNotes: () => Promise<DocumentData & Partial<Note>[]> = () => {
   if (!auth?.currentUser?.uid) {
     return Promise.reject('logout')
   }
-  return getFieldValues(
+  return getFieldValues<Partial<Note>>(
     COL_ARTICLES,
     ['title', 'id', 'createTime', 'published'],
     [
       where('createId', '==', auth.currentUser.uid),
       // where('published', 'in', [status === true ? true ? status === false ? false : ...[true , false] ]),
       // where('tags', 'not-in', ['']),
-      where('content', '>', ''),
+      // where('content', '>', ''),
       where('title', '>', ''),
+      orderBy('title', 'desc'),
       orderBy('createTime', 'desc'),
     ],
   )

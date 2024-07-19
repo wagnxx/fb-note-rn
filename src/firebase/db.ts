@@ -34,10 +34,7 @@ const LogError = console.error.bind(console)
 const LogInfo = console.log.bind(console)
 
 // 添加文档到指定集合
-export const addDocToCol = async (
-  colName: string,
-  docData: DocumentData,
-): Promise<string | null> => {
+export const addDocToCol = async (colName: string, docData: DocumentData): Promise<string | null> => {
   try {
     const docRef = await addDoc(collection(db, colName), docData)
     LogInfo('Document added with ID:', docRef.id)
@@ -49,10 +46,7 @@ export const addDocToCol = async (
 }
 
 // 获取指定文档的数据
-export const getDocData = async (
-  colName: string,
-  docId: string,
-): Promise<DocumentData | null> => {
+export const getDocData = async (colName: string, docId: string): Promise<DocumentData | null> => {
   try {
     const docSnap: DocumentSnapshot = await getDoc(doc(db, colName, docId))
     if (docSnap.exists) {
@@ -68,11 +62,7 @@ export const getDocData = async (
 }
 
 // 更新指定文档的数据
-export const updateDocData = async (
-  colName: string,
-  docId: string,
-  newData: Partial<DocumentData>,
-): Promise<void> => {
+export const updateDocData = async (colName: string, docId: string, newData: Partial<DocumentData>): Promise<void> => {
   try {
     await updateDoc(doc(db, colName, docId), newData)
     LogInfo('Document updated successfully')
@@ -82,10 +72,7 @@ export const updateDocData = async (
 }
 
 // 删除指定文档
-export const deleteDocById = async (
-  colName: string,
-  docId: string,
-): Promise<boolean> => {
+export const deleteDocById = async (colName: string, docId: string): Promise<boolean> => {
   try {
     await deleteDoc(doc(db, colName, docId))
     LogInfo('Document deleted successfully')
@@ -96,10 +83,7 @@ export const deleteDocById = async (
   return false
 }
 
-export const deleteDocsByIds = async (
-  colName: string,
-  docIds: string[],
-): Promise<boolean> => {
+export const deleteDocsByIds = async (colName: string, docIds: string[]): Promise<boolean> => {
   const batch = writeBatch(db)
 
   docIds.forEach(id => {
@@ -124,10 +108,7 @@ export const getDocsByCondition = async (
   condition: { field: string; operator: WhereFilterOp; value: any },
 ): Promise<DocumentData[]> => {
   try {
-    const q = query(
-      collection(db, colName),
-      where(condition.field, condition.operator, condition.value),
-    )
+    const q = query(collection(db, colName), where(condition.field, condition.operator, condition.value))
     const querySnapshot = await getDocs(q)
     const docsData: DocumentData[] = []
     querySnapshot.forEach(doc => {
@@ -141,11 +122,11 @@ export const getDocsByCondition = async (
 }
 
 // 获取指定字段的值
-export const getFieldValues = async (
+export const getFieldValues = async <T>(
   collectionName: string,
-  fieldNames: string[],
+  fieldNames: (keyof T | 'id')[],
   conditions: (QueryConstraint | QueryFieldFilterConstraint)[] = [],
-): Promise<DocumentData[]> => {
+): Promise<(DocumentData & T)[]> => {
   try {
     // 构建查询
     const q = query(collection(db, collectionName), ...conditions)
@@ -154,15 +135,16 @@ export const getFieldValues = async (
     const querySnapshot = await getDocs(q)
 
     // 提取字段值
-    const fieldValues: DocumentData[] = []
+    const fieldValues: (DocumentData & T)[] = []
 
     querySnapshot.forEach(doc => {
-      const fieldValue: DocumentData = {}
+      const fieldValue = {} as DocumentData & T
       fieldNames.forEach(fieldName => {
         if (fieldName === 'id') {
           fieldValue[fieldName] = doc.id
         } else {
-          fieldValue[fieldName] = doc.data()[fieldName]
+          // fieldValue[fieldName] = doc.data()[fieldName]
+          ;(fieldValue as DocumentData & { [K in keyof T]: T[K] })[fieldName] = doc.data()[fieldName as string]
         }
       })
       fieldValues.push(fieldValue)
