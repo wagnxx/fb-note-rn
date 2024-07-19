@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, Image, Dimensions, ScrollView } from 'react-native'
+import { View, Text, SafeAreaView, Image, Dimensions, ScrollView, TouchableHighlight } from 'react-native'
 import React, { useContext } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { AuthContext } from '@/context/auth-provider'
@@ -9,7 +9,7 @@ import ProfileList from './components/profile-list'
 const { width, height } = Dimensions.get('window')
 const uri =
   'https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8zMF9hX3N0dWRpb19zaG90X29mX2NhdF93YXZpbmdfaW1hZ2VzZnVsbF9ib2R5X182YzRmM2YyOC0wMGJjLTQzNTYtYjM3ZC05NDM0NTgwY2FmNDcucG5n.png'
-const Ny: ScreenFC<ScrennTypeEnum.My> = ({}) => {
+const Ny: ScreenFC<ScrennTypeEnum.My> = ({ navigation }) => {
   const { user } = useContext(AuthContext)
   return (
     <ScrollView>
@@ -34,9 +34,12 @@ const Ny: ScreenFC<ScrennTypeEnum.My> = ({}) => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         />
-        <View style={{ width: 80, height: 80, borderRadius: 50, overflow: 'hidden' }}>
+        <TouchableHighlight
+          style={{ width: 80, height: 80, borderRadius: 50, overflow: 'hidden' }}
+          onPress={() => navigation.navigate(ScrennTypeEnum.Profile)}
+        >
           <Image source={{ uri: user?.photoURL || uri }} style={{ width: 80, height: 80 }} />
-        </View>
+        </TouchableHighlight>
         <Text>{user?.displayName || user?.email}</Text>
         <Text>{user?.uid}</Text>
       </SafeAreaView>

@@ -11,6 +11,8 @@ export enum ScrennTypeEnum {
   HomeTabs = 'HomeTabs',
   NodeDetail = 'NodeDetail',
   Login = 'Login',
+  Profile = 'Profile',
+  // bottome
   Moment = 'Moment',
   Tag = 'Tag',
   My = 'My',
@@ -20,6 +22,7 @@ export enum RootScreenTypesEnum {
   HomeTabs = ScrennTypeEnum.HomeTabs,
   NodeDetail = ScrennTypeEnum.NodeDetail,
   Login = ScrennTypeEnum.Login,
+  Profile = ScrennTypeEnum.Profile,
 }
 
 export enum BottomTabScreenTypesEnum {
@@ -43,7 +46,14 @@ type ScreenComponentProps<ParamList extends Record<string, object | undefined>, 
   route: RouteProp<ParamList, RouteName>
 }
 
+type ScreenProps<RouteName extends keyof RootStackParamList | keyof BottomTabParamList> = ScreenComponentProps<
+  ParamListBase,
+  RouteName
+>
+
 // Utility type to map route names to ScreenComponentType
-export type ScreenFC<RouteName extends keyof ParamListBase> = RouteName extends keyof RootStackParamList | keyof BottomTabParamList
+export type ScreenFC<RouteName extends keyof ParamListBase> = RouteName extends
+  | keyof RootStackParamList
+  | keyof BottomTabParamList
   ? ScreenComponentType<ParamListBase, RouteName>
   : never

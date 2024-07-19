@@ -8,14 +8,9 @@ import { AuthContext } from '@/context/auth-provider'
 import { ActivityIndicator, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { ScrennTypeEnum } from '@/types/screen'
+import Profile from '@/screens/my/profile'
 
 const Stack = createStackNavigator()
-
-
-
-
-
-
 
 export default function AuthNavigator() {
   const theme = useTheme()
@@ -39,7 +34,8 @@ export default function AuthNavigator() {
       {user ? (
         <>
           <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
-          <Stack.Screen name="NodeDetail" component={NodeDetail} />
+          <Stack.Screen name={ScrennTypeEnum.NodeDetail} component={NodeDetail} />
+          <Stack.Screen name={ScrennTypeEnum.Profile} component={Profile} />
         </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />
