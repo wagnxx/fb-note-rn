@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {
   ArrowLeftIcon,
   ArrowUturnLeftIcon,
@@ -15,19 +15,31 @@ import tw from 'twrnc'
 const iconSize = 18
 
 const CreateNote = () => {
-  const richText = useRef(null)
+  const headingRichText = useRef<RichEditor>(null)
+  const contentRichText = useRef<RichEditor>(null)
   const theme = useTheme()
 
   const [isFocus, setIsFocus] = useState(false)
 
   const save = () => {
-    richText?.current?.getContentHtml().then(html => {
+    contentRichText?.current?.getContentHtml().then(html => {
       console.log('save value is:::', html)
     })
   }
 
+  const contentTextUndo = () => contentRichText?.current?.sendAction(actions.undo, 'result')
+  const contentTextRedo = () => contentRichText?.current?.sendAction(actions.redo, 'result')
+  // editor.sendAction(action, 'result');
+  const handleKeyPress = ({ key }: { keyCode: number; key: string }) => {
+    if (key === 'Enter') {
+      contentRichText?.current?.focusContentEditor()
+      headingRichText?.current?.sendAction(actions.undo, 'result')
+      return false
+    }
+  }
+
   return (
-    <SafeAreaView style={[tw`flex-1`, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[tw`flex-1 p-1`, { backgroundColor: theme.colors.background }]}>
       <View style={[tw`justify-between items-center flex-row p-2`, { backgroundColor: theme.colors.surface }]}>
         <View style={tw`flex-row gap-2`}>
           <TouchableOpacity>
@@ -40,8 +52,12 @@ const CreateNote = () => {
 
         {isFocus && (
           <View style={tw`flex-row gap-2`}>
-            <ArrowUturnLeftIcon size={iconSize} color={theme.colors.onSurface} />
-            <ArrowUturnRightIcon size={iconSize} color={theme.colors.onSurface} />
+            <TouchableOpacity onPress={contentTextUndo}>
+              <ArrowUturnLeftIcon size={iconSize} color={theme.colors.onSurface} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={contentTextRedo}>
+              <ArrowUturnRightIcon size={iconSize} color={theme.colors.onSurface} />
+            </TouchableOpacity>
           </View>
         )}
 
@@ -56,29 +72,48 @@ const CreateNote = () => {
           )}
         </View>
       </View>
+      <View style={[tw`flex-row gap-1`, { paddingBottom: 4 }]}>
+        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>07/11/2023, 19:23</Text>
+        <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
+        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>9</Text>
+        <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
+        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>daily</Text>
+      </View>
       <ScrollView style={[tw`flex-1 border-red-700`, { borderWidth: 1 }]}>
         <RichEditor
-          ref={richText}
+          ref={headingRichText}
+          style={styles.headingEditor}
+          placeholder="Heading"
+          initialContentHTML=""
+          editorStyle={{ contentCSSText: 'font-size: 25px;' }} // 设置字体大小为20px
+          onKeyDown={handleKeyPress}
+        />
+
+        <RichEditor
+          ref={contentRichText}
           style={styles.editor}
           placeholder="Start writing here..."
-          initialContentHTML="<h1>Hello World</h1><p>This is a <b>bold</b> paragraph.</p>"
+          initialContentHTML=""
           editorStyle={{ contentCSSText: 'font-size: 20px;' }} // 设置字体大小为20px
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
         />
       </ScrollView>
       <RichToolbar
-        editor={richText}
+        editor={contentRichText}
         actions={[
           actions.insertImage,
           actions.setBold,
           actions.setItalic,
           actions.insertBulletsList,
-          actions.insertOrderedList,
-          actions.insertLink,
-          actions.setStrikethrough,
-          actions.setUnderline,
-          actions.setParagraph,
+          // actions.insertOrderedList,
+          // actions.insertLink,
+          // actions.setStrikethrough,
+          // actions.setUnderline,
+          // actions.setParagraph,
+          actions.undo,
+          actions.redo,
+          'customAction',
         ]}
         style={[styles.toolbar, { backgroundColor: theme.colors.surface }]}
       />
@@ -94,13 +129,24 @@ const styles = StyleSheet.create({
   // scroll: {
   //   flex: 1,
   // },
-  editor: {
-    flex: 1,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+  headingEditor: {
+    // flex: 1,
+    minHeight: 60,
+    maxHeight: 80,
+    padding: 0,
+    // borderWidth: 1,
+    borderColor: 'transparent',
+    // borderRadius: 5,
     // minHeight: 300,
+  },
+  editor: {
+    // flex: 1,
+    paddingTop: 0,
+    paddingBottom: 30,
+    borderWidth: 0,
+    borderColor: 'transparent',
+    // borderRadius: 5,
+    minHeight: 300,
   },
   toolbar: {
     // backgroundColor: '#eee',
