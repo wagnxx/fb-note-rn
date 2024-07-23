@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {
   ArrowLeftIcon,
   ArrowUturnLeftIcon,
@@ -12,23 +12,54 @@ import { useTheme } from 'react-native-paper'
 import { RichEditor, actions } from 'react-native-pell-rich-editor'
 import tw from 'twrnc'
 import ToolBar from './components/tool-bar'
+import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
+import { createNote } from '@/service/articles'
 
 const iconSize = 18
 
-console.log('Object.keys(actions):::::', Object.values(actions))
 const colorGray50 = 'rgb(249 250 251)'
 
-const CreateNote = () => {
+const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
   const headingRichText = useRef<RichEditor>(null)
   const contentRichText = useRef<RichEditor>(null)
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
   const theme = useTheme()
 
   const [isFocus, setIsFocus] = useState(false)
+  const [isFirstLoadWithoutInteraction, setIsFirstLoadWithoutInteraction] = useState(true)
+
+  const handleEditorChange = (text, type) => {
+    if (type === 'title') {
+      setTitle(text)
+    }
+    if (type === 'content') {
+      setContent(text)
+    }
+    if (isFirstLoadWithoutInteraction) {
+      setIsFirstLoadWithoutInteraction(false)
+    }
+  }
 
   const save = () => {
-    contentRichText?.current?.getContentHtml().then(html => {
-      console.log('save value is:::', html)
-    })
+    console.log('title,content', title, content)
+    if (!title || !content) return
+    createNote({ title, content })
+      .then(res => {
+        if (res) {
+          // success
+          Alert.alert('warning', 'create note success.')
+          navigation.navigate(ScrennTypeEnum.Profile)
+          setContent('')
+          setTitle('')
+        } else {
+          // faild
+          Alert.alert('warn', 'create note failed')
+        }
+      })
+      .catch(err => {
+        console.log('create note error:::', err)
+      })
   }
 
   const contentTextUndo = () => contentRichText?.current?.sendAction(actions.undo, 'result')
@@ -42,16 +73,22 @@ const CreateNote = () => {
     }
   }
 
+  const goBack = () => {
+    navigation.goBack()
+  }
+
   return (
     <SafeAreaView style={[tw`flex-1 p-1 bg-gray-50`]}>
       <View style={[tw`justify-between items-center flex-row p-2`]}>
         <View style={tw`flex-row gap-2`}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={goBack}>
             <ArrowLeftIcon size={iconSize} color={theme.colors.onSurface} />
           </TouchableOpacity>
-          <TouchableOpacity>
-            <XMarkIcon size={iconSize} color={theme.colors.onSurface} />
-          </TouchableOpacity>
+          {isFirstLoadWithoutInteraction && (
+            <TouchableOpacity onPress={goBack}>
+              <XMarkIcon size={iconSize} color={theme.colors.onSurface} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {isFocus && (
@@ -83,7 +120,7 @@ const CreateNote = () => {
         <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
         <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>daily</Text>
       </View>
-      <ScrollView style={[tw`flex-1 `]}>
+      <ScrollView style={[tw`flex-1  `]}>
         <RichEditor
           ref={headingRichText}
           style={styles.headingEditor}
@@ -91,6 +128,7 @@ const CreateNote = () => {
           initialContentHTML=""
           editorStyle={{ contentCSSText: 'font-size: 25px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
           onKeyDown={handleKeyPress}
+          onChange={text => handleEditorChange(text, 'title')}
         />
 
         <RichEditor
@@ -101,6 +139,7 @@ const CreateNote = () => {
           editorStyle={{ contentCSSText: 'font-size: 20px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
+          onChange={text => handleEditorChange(text, 'content')}
         />
       </ScrollView>
       <ToolBar editor={contentRichText} />

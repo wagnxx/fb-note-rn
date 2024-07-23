@@ -1,14 +1,12 @@
 import { SafeAreaView, View } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { RefObject, useEffect, useMemo, useState } from 'react'
 import { Text, useTheme } from 'react-native-paper'
 import { RichEditor, actions } from 'react-native-pell-rich-editor'
 import ToolActions from './tool-actions'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { CheckCircleIcon } from 'react-native-heroicons/outline'
 type ToolBarProps = {
-  editor: {
-    current: RichEditor
-  }
+  editor: RefObject<RichEditor>
 }
 export default function ToolBar({ editor }: ToolBarProps) {
   const theme = useTheme()
@@ -23,8 +21,8 @@ export default function ToolBar({ editor }: ToolBarProps) {
   }, [selectedItems])
 
   useEffect(() => {
-    editor?.current.registerToolbar(items => {
-      console.log(items)
+    editor?.current?.registerToolbar(items => {
+      // console.log(items)
       setSelectedItems(items)
     })
   }, [editor])
