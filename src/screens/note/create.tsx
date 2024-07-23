@@ -9,10 +9,14 @@ import {
   XMarkIcon,
 } from 'react-native-heroicons/outline'
 import { useTheme } from 'react-native-paper'
-import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'
+import { RichEditor, actions } from 'react-native-pell-rich-editor'
 import tw from 'twrnc'
+import ToolBar from './components/tool-bar'
 
 const iconSize = 18
+
+console.log('Object.keys(actions):::::', Object.values(actions))
+const colorGray50 = 'rgb(249 250 251)'
 
 const CreateNote = () => {
   const headingRichText = useRef<RichEditor>(null)
@@ -39,8 +43,8 @@ const CreateNote = () => {
   }
 
   return (
-    <SafeAreaView style={[tw`flex-1 p-1`, { backgroundColor: theme.colors.background }]}>
-      <View style={[tw`justify-between items-center flex-row p-2`, { backgroundColor: theme.colors.surface }]}>
+    <SafeAreaView style={[tw`flex-1 p-1 bg-gray-50`]}>
+      <View style={[tw`justify-between items-center flex-row p-2`]}>
         <View style={tw`flex-row gap-2`}>
           <TouchableOpacity>
             <ArrowLeftIcon size={iconSize} color={theme.colors.onSurface} />
@@ -72,20 +76,20 @@ const CreateNote = () => {
           )}
         </View>
       </View>
-      <View style={[tw`flex-row gap-1`, { paddingBottom: 4 }]}>
+      <View style={[tw`flex-row gap-1 border-b-gray-200`, { paddingBottom: 4, borderBottomWidth: 1 }]}>
         <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>07/11/2023, 19:23</Text>
         <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
         <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>9</Text>
         <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
         <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>daily</Text>
       </View>
-      <ScrollView style={[tw`flex-1 border-red-700`, { borderWidth: 1 }]}>
+      <ScrollView style={[tw`flex-1 `]}>
         <RichEditor
           ref={headingRichText}
           style={styles.headingEditor}
           placeholder="Heading"
           initialContentHTML=""
-          editorStyle={{ contentCSSText: 'font-size: 25px;' }} // 设置字体大小为20px
+          editorStyle={{ contentCSSText: 'font-size: 25px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
           onKeyDown={handleKeyPress}
         />
 
@@ -94,29 +98,12 @@ const CreateNote = () => {
           style={styles.editor}
           placeholder="Start writing here..."
           initialContentHTML=""
-          editorStyle={{ contentCSSText: 'font-size: 20px;' }} // 设置字体大小为20px
+          editorStyle={{ contentCSSText: 'font-size: 20px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
         />
       </ScrollView>
-      <RichToolbar
-        editor={contentRichText}
-        actions={[
-          actions.insertImage,
-          actions.setBold,
-          actions.setItalic,
-          actions.insertBulletsList,
-          // actions.insertOrderedList,
-          // actions.insertLink,
-          // actions.setStrikethrough,
-          // actions.setUnderline,
-          // actions.setParagraph,
-          actions.undo,
-          actions.redo,
-          'customAction',
-        ]}
-        style={[styles.toolbar, { backgroundColor: theme.colors.surface }]}
-      />
+      <ToolBar editor={contentRichText} />
     </SafeAreaView>
   )
 }
