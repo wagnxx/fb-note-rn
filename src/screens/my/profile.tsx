@@ -1,7 +1,6 @@
 import { View, ScrollView, Dimensions, ActivityIndicator, StatusBar, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
-import Avatar from './components/avatar'
 import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
 import { Note, getAllNotes } from '@/service/articles'
@@ -85,7 +84,10 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={[{ backgroundColor: theme.colors.background, flex: 1 }]}>
       <StatusBar hidden />
-      <Avatar />
+      {/* <Avatar /> */}
+      <View style={tw` flex-row px-2 py-2`}>
+        <Text style={tw`font-bold`}>Default Folder</Text>
+      </View>
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}

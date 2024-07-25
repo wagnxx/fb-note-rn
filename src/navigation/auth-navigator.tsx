@@ -27,7 +27,7 @@ export default function AuthNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName="CreateNote"
+      initialRouteName="HomeTabs"
       screenOptions={{
         headerShown: false,
       }}
