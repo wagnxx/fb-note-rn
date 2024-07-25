@@ -9,7 +9,7 @@
     "start": "react-native start",
     "start:debug": "react-native start --experimental-debugger",
     "test": "jest",
-     "prepare": "husky install"
+    "prepare": "husky install"
   },
   "lint-staged": {
     "*.js": "eslint --fix",
@@ -21,6 +21,7 @@
     "@react-native-firebase/auth": "^20.2.0",
     "@react-native-firebase/firestore": "^20.2.0",
     "@react-navigation/bottom-tabs": "^6.6.0",
+    "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.4.0",
     "react": "18.2.0",

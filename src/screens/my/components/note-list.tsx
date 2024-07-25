@@ -16,7 +16,13 @@ const voidFunc = (item: Partial<Note>) => {}
 const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
   const theme = useTheme()
   return list.map((item, index) => (
-    <View style={tw`flex-row items-center justify-between mt-2 border-b border-slate-200 pb-2`} key={index}>
+    <View
+      style={[
+        tw`flex-row items-center justify-between mt-2 border-b border-slate-200 bg-gray-50  py-3 px-2`,
+        { borderRadius: 18 },
+      ]}
+      key={index}
+    >
       {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
 
       <TouchableOpacity onPress={() => onPressItem(item)}>
@@ -31,7 +37,9 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
           >
             {item.title}
           </Text>
-          <Text style={[{ color: theme.colors.secondary }]}>{transFBDate2Local(item.createTime as Timestamp)}</Text>
+          <Text style={[{ color: theme.colors.secondary }, theme.fonts.labelSmall]}>
+            {transFBDate2Local(item.createTime as Timestamp)}
+          </Text>
         </View>
         {/* <EyeIcon size={30} color={theme.colors.secondary} /> */}
       </TouchableOpacity>
