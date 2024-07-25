@@ -29,16 +29,19 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
   }, [])
 
   return (
-    <View style={[{ backgroundColor: theme.colors.background }, tw`flex-1 justify-center`]}>
+    <View style={[{ backgroundColor: theme.colors.background }, tw`flex-1 justify-center bg-gray-50`]}>
       <StatusBar hidden={true} />
 
       {loading ? (
         <ActivityIndicator size="large" color={theme.colors.outline} />
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 12 }}>
+          <View style={tw`justify-center flex-row px-2`}>
+            <Text style={[theme.fonts.titleMedium]}>All published notes</Text>
+          </View>
           {list?.length > 0 ? (
             list.map((item, index) => (
-              <View style={tw`flex-row items-center justify-between mt-2`} key={index}>
+              <View style={tw`flex-row items-center justify-between mt-2 px-2 bg-white`} key={index}>
                 {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
                 <View>
                   <Text
