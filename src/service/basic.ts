@@ -1,4 +1,6 @@
+import { auth } from '@/firebase/auth'
 import { addDocToCol, getDocsByCondition, getFieldValues, DocumentData } from '@/firebase/db'
+import { where } from '@react-native-firebase/firestore'
 
 /**
  * 
@@ -30,20 +32,38 @@ getPublishedNotes 用于获取所有已发布的文章。
 
 const COL_ORGANIZATIONS = 'organizations'
 const COL_ORGMEMBERS = 'orgMembers'
+const COL_FOLDERSS = 'folders'
 
 export type Tag = {
   name: string
   id: string
 }
-
+export type Folder = {
+  id: string
+  name: string
+  container?: string
+  textColor?: string
+  createId?: string
+}
 // 创建文件夹
-export const createFolder = async (folderName: string, parentFolderId: string | null = null): Promise<string | null> => {
-  return addDocToCol('folders', { name: folderName, parentId: parentFolderId })
+export const createFolder = async (doc: Partial<Folder>): Promise<string | null> => {
+  if (auth?.currentUser?.uid) {
+    doc.createId = auth.currentUser.uid
+    return addDocToCol(COL_FOLDERSS, doc)
+  }
+  return Promise.reject('logout')
 }
 
 // 获取文件夹列表
-export const getFolders = async (): Promise<DocumentData[]> => {
-  return getFieldValues('folders', ['name', 'parentId'])
+export const getFolders = async (): Promise<(DocumentData | Folder)[]> => {
+  if (auth?.currentUser?.uid) {
+    return getFieldValues(
+      'folders',
+      ['name', 'id', 'container', 'textColor'],
+      [where('createId', '==', auth.currentUser.uid)],
+    )
+  }
+  return Promise.reject('logout')
 }
 
 // 创建Note

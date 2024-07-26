@@ -18,7 +18,7 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
   return list.map((item, index) => (
     <View
       style={[
-        tw`flex-row items-center justify-between mt-2 border-b border-slate-200 bg-gray-50  py-3 px-2`,
+        tw`flex-row items-center justify-between mt-2 border-b border-slate-200 bg-white  py-3 px-2`,
         { borderRadius: 18 },
       ]}
       key={index}

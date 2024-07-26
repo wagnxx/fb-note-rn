@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
-import { Drawer, Text, TouchableRipple, useTheme } from 'react-native-paper'
+import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
 import { Note, getAllNotes } from '@/service/articles'
 import NoteList from './components/note-list'
@@ -23,6 +23,7 @@ import {
   EllipsisVerticalIcon,
   MagnifyingGlassIcon,
 } from 'react-native-heroicons/outline'
+import FolderManage from './components/folder-manage'
 
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
@@ -114,7 +115,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         {/* <Avatar /> */}
         <Pressable onPress={() => setDrawerOpen(!drawerOpen)}>
           <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-            <Text style={[tw`font-bold`, { fontSize: 30 }]}>Default Folder</Text>
+            <Text style={[tw`font-bold`, { fontSize: 30 }]}>ALL FOLDERS</Text>
             {!drawerOpen ? (
               <ChevronDownIcon size={20} color={theme.colors.onBackground} />
             ) : (
@@ -145,32 +146,13 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       </TouchableOpacity>
 
       {drawerOpen && (
-        <Drawer.Section
-          title="Folders Manage"
-          style={[styles.fixedFooter, { backgroundColor: theme.colors.surface }, tw`flex-row`]}
-        >
-          <TouchableRipple onPress={() => navigation.navigate('Home')}>
-            <View style={styles.drawerItem}>
-              <Text style={{ color: theme.colors.text }}>Home</Text>
-            </View>
-          </TouchableRipple>
-          <TouchableRipple onPress={() => navigation.navigate('Settings')}>
-            <View style={styles.drawerItem}>
-              <Text style={{ color: theme.colors.text }}>Settings</Text>
-            </View>
-          </TouchableRipple>
-        </Drawer.Section>
+        <FolderManage style={[styles.fixedFooter, tw`flex-row bg-white`]} closeDrawer={() => setDrawerOpen(false)} />
       )}
     </>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   fab: {
     position: 'absolute',
     width: 60,
@@ -182,20 +164,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#03A9F4',
     borderRadius: 30,
     elevation: 8,
-    zIndex: 3,
+    zIndex: 0,
   },
   fabText: {
     fontSize: 34,
     color: 'white',
   },
-  drawerItem: {
-    padding: 16,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   fixedFooter: {
     position: 'absolute',
     bottom: 0,
@@ -203,10 +178,11 @@ const styles = StyleSheet.create({
     right: 0,
     // height: 60,x
     minHeight: 200,
-    // backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    width: 600,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     // justifyContent: 'center',
     // alignItems: 'center',
-    zIndex: 3,
+    zIndex: 9,
   },
 })
 
