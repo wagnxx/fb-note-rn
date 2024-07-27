@@ -1,6 +1,5 @@
 import {
   View,
-  ScrollView,
   Dimensions,
   ActivityIndicator,
   StatusBar,
@@ -8,6 +7,7 @@ import {
   StyleSheet,
   Pressable,
   SafeAreaView,
+  ScrollView,
 } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
@@ -18,15 +18,21 @@ import NoteList from './components/note-list'
 const { width, height } = Dimensions.get('window')
 import tw from 'twrnc'
 import {
+  ArrowRightStartOnRectangleIcon,
+  ArrowUpIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   EllipsisVerticalIcon,
+  EyeSlashIcon,
   MagnifyingGlassIcon,
+  TrashIcon,
+  XMarkIcon,
 } from 'react-native-heroicons/outline'
 import FolderManage from './components/folder-manage'
 import { Folder } from '@/service/basic'
 import { getCurrentFolderFromStorage, ICurrentFolder, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
 import { extractTextFromHTML } from '@/utils/utilsString'
+import { useIsFocused } from '@react-navigation/native'
 
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
@@ -35,6 +41,17 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const [currentFolder, setCurrentFolder] = useState<ICurrentFolder>(null)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const isFocused = useIsFocused()
+
+  const [isShowBottomAction, setIsShowBottomAction] = useState(false)
+  // const [bottomActionDisabled, setBottomActionDisabled] = useState(true)
+  const [checkedIds, setCheckedIds] = useState<string[]>([])
+
+  const bottomActionDisabled = useMemo(() => !checkedIds.length, [checkedIds])
+
+  const onNoteCheckBoxChange = (ids: string[]) => {
+    setCheckedIds(ids)
+  }
 
   const draftList = useMemo(() => {
     return list.filter(item => !item?.published)
@@ -56,6 +73,25 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     ]
   }, [draftList, publishedList])
 
+  const bottomActionItemStyle = useMemo(() => {
+    const color = bottomActionDisabled ? theme.colors.onSurfaceDisabled : theme.colors.onSurface
+    return {
+      color,
+      iconProps: {
+        size: 20,
+        color,
+      },
+      textProps: {
+        style: [
+          theme.fonts.labelSmall,
+          {
+            color,
+          },
+        ],
+      },
+    }
+  }, [bottomActionDisabled, theme])
+
   const onCheckFolderItem = (folder: Folder) => {
     const current = {
       id: folder.id,
@@ -69,6 +105,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   }
 
   const init = useCallback(() => {
+    if (!currentFolder) return
     setLoading(true)
     getAllNotes(currentFolder?.id)
       .then(data => {
@@ -89,16 +126,17 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
   useEffect(() => {
     init()
-  }, [currentFolder, init])
+  }, [currentFolder, init, isFocused])
 
   useEffect(() => {
     // saveCurrentFolderToStorage
-    getCurrentFolderFromStorage().then(data => {
+    getCurrentFolderFromStorage({ id: '', name: 'ALL Folders' }).then(data => {
       if (data) {
         setCurrentFolder(data)
       }
     })
   }, [])
+  const [isChecked, setIsChecked] = useState(false)
 
   if (loading) {
     return (
@@ -113,20 +151,28 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       case 'first':
         return (
           <View style={tw`flex-1 p-2`}>
-            {draftList?.length > 0 ? (
-              <NoteList
-                list={draftList}
-                onPressItem={item => navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })}
-              />
-            ) : (
-              <Text>Null data</Text>
-            )}
+            <ScrollView contentContainerStyle={[{}, tw`bg-gray-100`]} showsVerticalScrollIndicator={true}>
+              {draftList?.length > 0 ? (
+                <NoteList
+                  list={draftList}
+                  showCheckBox={isShowBottomAction}
+                  onCheckBoxChange={onNoteCheckBoxChange}
+                  onPressItem={item => navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })}
+                />
+              ) : (
+                <Text>Null data</Text>
+              )}
+            </ScrollView>
           </View>
         )
       case 'second':
         return (
           <View style={tw`flex-1 p-2`}>
-            {publishedList?.length > 0 ? <NoteList list={publishedList} /> : <Text>Null data</Text>}
+            {publishedList?.length > 0 ? (
+              <NoteList list={publishedList} showCheckBox={isShowBottomAction} onCheckBoxChange={() => {}} />
+            ) : (
+              <Text>Null data</Text>
+            )}
           </View>
         )
       default:
@@ -136,40 +182,48 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={[{ flex: 1 }, tw`bg-gray-100`]}>
-        <StatusBar hidden />
-        <SafeAreaView style={[tw`flex-row justify-end items-center gap-3 py-2 px-2`]}>
+      <StatusBar hidden />
+      <SafeAreaView style={tw`flex-row justify-between justify-end items-center pl-2`}>
+        {isShowBottomAction && (
+          <TouchableOpacity onPress={() => setIsShowBottomAction(false)}>
+            <XMarkIcon size={20} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+        )}
+
+        <View style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}>
           <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
-          <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
-        </SafeAreaView>
-        {/* <Avatar /> */}
-        <Pressable onPress={() => setDrawerOpen(!drawerOpen)}>
-          <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-            <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder.name}</Text>
-            {!drawerOpen ? (
-              <ChevronDownIcon size={20} color={theme.colors.onBackground} />
-            ) : (
-              <ChevronUpIcon size={20} color={theme.colors.onBackground} />
-            )}
-          </View>
-        </Pressable>
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width }}
-          tabBarPosition="bottom"
-          renderTabBar={props => (
-            <TabBar
-              {...props}
-              style={[{ height: 38 }, tw`bg-gray-50`]} // 自定义样式
-              activeColor={theme.colors.primary}
-              inactiveColor={theme.colors.onPrimaryContainer}
-              indicatorStyle={{ backgroundColor: theme.colors.primary }}
-            />
+          <TouchableOpacity onPress={() => setIsShowBottomAction(!isShowBottomAction)}>
+            <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+      {/* <Avatar /> */}
+      <Pressable onPress={() => setDrawerOpen(!drawerOpen)}>
+        <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
+          <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder.name}</Text>
+          {!drawerOpen ? (
+            <ChevronDownIcon size={20} color={theme.colors.onBackground} />
+          ) : (
+            <ChevronUpIcon size={20} color={theme.colors.onBackground} />
           )}
-        />
-      </ScrollView>
+        </View>
+      </Pressable>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width }}
+        tabBarPosition="bottom"
+        renderTabBar={props => (
+          <TabBar
+            {...props}
+            style={[{ height: 38 }, tw`bg-gray-50`]} // 自定义样式
+            activeColor={theme.colors.primary}
+            inactiveColor={theme.colors.onPrimaryContainer}
+            indicatorStyle={{ backgroundColor: theme.colors.primary }}
+          />
+        )}
+      />
 
       <TouchableOpacity
         style={styles.fab}
@@ -177,6 +231,31 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+
+      {isShowBottomAction && (
+        <View style={[styles.fixedBottomsTabs]}>
+          <View
+            style={[{ backgroundColor: 'rgba(255,255,255, 0.7)' }, tw`flex-row justify-between items-center px-3 py-1`]}
+          >
+            <View style={tw` items-center `}>
+              <ArrowRightStartOnRectangleIcon {...bottomActionItemStyle.iconProps} />
+              <Text {...bottomActionItemStyle.textProps}>Move</Text>
+            </View>
+            <View style={tw` items-center`}>
+              <EyeSlashIcon {...bottomActionItemStyle.iconProps} />
+              <Text {...bottomActionItemStyle.textProps}>Hide</Text>
+            </View>
+            <View style={tw` items-center`}>
+              <ArrowUpIcon {...bottomActionItemStyle.iconProps} />
+              <Text {...bottomActionItemStyle.textProps}>Pin</Text>
+            </View>
+            <View style={tw` items-center`}>
+              <TrashIcon {...bottomActionItemStyle.iconProps} />
+              <Text {...bottomActionItemStyle.textProps}>Delete</Text>
+            </View>
+          </View>
+        </View>
+      )}
 
       {drawerOpen && (
         <FolderManage
@@ -221,6 +300,23 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
     zIndex: 9,
+  },
+  fixedBottomsTabs: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // height: 60,x
+    height: 50,
+    // width: 600,
+    // flexDirection: 'row',
+    backgroundColor: '#fff',
+    // gap: 20,
+    // paddingLeft: 12,
+    // paddingRight: 12,
+    // justifyContent: 'space-between',
+    // alignItems: 'center',
+    zIndex: 90,
   },
 })
 

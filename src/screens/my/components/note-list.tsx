@@ -1,20 +1,41 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { transFBDate2Local } from '@/utils/utilsDate'
 import { useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { Note } from '@/service/articles'
 import { Timestamp } from '@react-native-firebase/firestore'
+import { CheckCircleIcon } from 'react-native-heroicons/outline'
+import { CheckBox } from 'react-native-elements'
 type NoteListProps = {
   list: Partial<Note>[]
+  showCheckBox: boolean
+  onCheckBoxChange: (selectedIds: string[]) => void
   onPressItem?: (item: Partial<Note>) => void
 }
 
 // eslint-disable-next-line unused-imports/no-unused-vars-ts
 const voidFunc = (item: Partial<Note>) => {}
 
-const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
+const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBox, onCheckBoxChange }) => {
   const theme = useTheme()
+  const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>({})
+
+  const checkItemHandle = item => {
+    setCheckedMap(prevMap => {
+      const newValue = {
+        ...prevMap,
+        [item.id]: !prevMap[item.id],
+      }
+      const entries = Object.entries(newValue).filter(([k, v]) => v)
+      const ids = entries.map(([k]) => k)
+      onCheckBoxChange(ids)
+      return newValue
+    })
+
+    // console.log('checkedMap', ids)
+  }
+
   return list.map((item, index) => (
     <View
       style={[
@@ -41,8 +62,16 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
             {transFBDate2Local(item.createTime as Timestamp)}
           </Text>
         </View>
-        {/* <EyeIcon size={30} color={theme.colors.secondary} /> */}
       </TouchableOpacity>
+
+      {showCheckBox && (
+        <CheckBox
+          checked={!!checkedMap[item.id]}
+          checkedIcon={<CheckCircleIcon size={22} color={theme.colors.onBackground} />}
+          uncheckedIcon={<CheckCircleIcon size={22} color={theme.colors.outline} />}
+          onPress={() => checkItemHandle(item)}
+        />
+      )}
     </View>
   ))
 }

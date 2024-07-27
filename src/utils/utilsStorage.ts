@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const getItem = async (key: string) => {
+export const getItem = async (key: string, defaultValue) => {
   try {
     const jsonValue = await AsyncStorage.getItem(key)
-    return jsonValue != null ? JSON.parse(jsonValue) : null
+    return jsonValue != null ? JSON.parse(jsonValue) : defaultValue ? defaultValue : null
   } catch (error) {
     console.error('Error reading data:', error)
   }
@@ -23,4 +23,5 @@ export interface ICurrentFolder {
 }
 const CURRENT_FOLDER_KEY = 'current_folder_key'
 export const saveCurrentFolderToStorage = (value: ICurrentFolder) => setItem(CURRENT_FOLDER_KEY, value)
-export const getCurrentFolderFromStorage = () => getItem(CURRENT_FOLDER_KEY) as Promise<ICurrentFolder>
+export const getCurrentFolderFromStorage = defaultValue =>
+  getItem(CURRENT_FOLDER_KEY, defaultValue) as Promise<ICurrentFolder>
