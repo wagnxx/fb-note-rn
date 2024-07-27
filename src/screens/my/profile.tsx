@@ -9,7 +9,7 @@ import {
   Pressable,
   SafeAreaView,
 } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
@@ -24,11 +24,15 @@ import {
   MagnifyingGlassIcon,
 } from 'react-native-heroicons/outline'
 import FolderManage from './components/folder-manage'
+import { Folder } from '@/service/basic'
+import { getCurrentFolderFromStorage, ICurrentFolder, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
+import { extractTextFromHTML } from '@/utils/utilsString'
 
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
   const [list, setlist] = useState<Partial<Note>[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentFolder, setCurrentFolder] = useState<ICurrentFolder>(null)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -52,10 +56,27 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     ]
   }, [draftList, publishedList])
 
-  const init = () => {
+  const onCheckFolderItem = (folder: Folder) => {
+    const current = {
+      id: folder.id,
+      name: folder.name,
+    }
+
+    saveCurrentFolderToStorage(current)
+    setCurrentFolder(current)
+
+    setDrawerOpen(false)
+  }
+
+  const init = useCallback(() => {
     setLoading(true)
-    getAllNotes()
+    getAllNotes(currentFolder?.id)
       .then(data => {
+        const _data = data?.map(item => {
+          item.titleText = extractTextFromHTML(item.title)
+          return item
+        })
+        console.log('get current folder notes::', data)
         setlist(data)
       })
       .catch(err => {
@@ -64,10 +85,19 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       .finally(() => {
         setLoading(false)
       })
-  }
+  }, [currentFolder])
 
   useEffect(() => {
     init()
+  }, [currentFolder, init])
+
+  useEffect(() => {
+    // saveCurrentFolderToStorage
+    getCurrentFolderFromStorage().then(data => {
+      if (data) {
+        setCurrentFolder(data)
+      }
+    })
   }, [])
 
   if (loading) {
@@ -115,7 +145,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         {/* <Avatar /> */}
         <Pressable onPress={() => setDrawerOpen(!drawerOpen)}>
           <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-            <Text style={[tw`font-bold`, { fontSize: 30 }]}>ALL FOLDERS</Text>
+            <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder.name}</Text>
             {!drawerOpen ? (
               <ChevronDownIcon size={20} color={theme.colors.onBackground} />
             ) : (
@@ -141,12 +171,20 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         />
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote)}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote, { id: currentFolder.id })}
+      >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
       {drawerOpen && (
-        <FolderManage style={[styles.fixedFooter, tw`flex-row bg-white`]} closeDrawer={() => setDrawerOpen(false)} />
+        <FolderManage
+          currentFolder={currentFolder}
+          style={[styles.fixedFooter, tw`flex-row bg-white`]}
+          closeDrawer={() => setDrawerOpen(false)}
+          onCheckFolderItem={onCheckFolderItem}
+        />
       )}
     </>
   )

@@ -1,5 +1,12 @@
 import { auth } from '@/firebase/auth'
-import { addDocToCol, getDocsByCondition, getFieldValues, DocumentData } from '@/firebase/db'
+import {
+  addDocToCol,
+  getDocsByCondition,
+  getFieldValues,
+  DocumentData,
+  deleteDocById,
+  updateDocData,
+} from '@/firebase/db'
 import { where } from '@react-native-firebase/firestore'
 
 /**
@@ -54,6 +61,14 @@ export const createFolder = async (doc: Partial<Folder>): Promise<string | null>
   return Promise.reject('logout')
 }
 
+export const updateFolder = async (doc: Partial<Folder>): Promise<boolean | null> => {
+  if (auth?.currentUser?.uid) {
+    doc.createId = auth.currentUser.uid
+    return updateDocData(COL_FOLDERSS, doc.id!, doc)
+  }
+  return Promise.reject('logout')
+}
+
 // 获取文件夹列表
 export const getFolders = async (): Promise<(DocumentData | Folder)[]> => {
   if (auth?.currentUser?.uid) {
@@ -64,6 +79,10 @@ export const getFolders = async (): Promise<(DocumentData | Folder)[]> => {
     )
   }
   return Promise.reject('logout')
+}
+
+export const delFolder = async (id: string) => {
+  return deleteDocById(COL_FOLDERSS, id)
 }
 
 // 创建Note

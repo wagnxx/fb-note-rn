@@ -62,12 +62,18 @@ export const getDocData = async <T>(colName: string, docId: string): Promise<(Do
 }
 
 // 更新指定文档的数据
-export const updateDocData = async (colName: string, docId: string, newData: Partial<DocumentData>): Promise<void> => {
+export const updateDocData = async (
+  colName: string,
+  docId: string,
+  newData: Partial<DocumentData>,
+): Promise<boolean> => {
   try {
     await updateDoc(doc(db, colName, docId), newData)
     LogInfo('Document updated successfully')
+    return true
   } catch (error: unknown) {
     dealError(error)
+    return false
   }
 }
 

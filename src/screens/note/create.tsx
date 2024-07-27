@@ -12,8 +12,9 @@ import { useTheme } from 'react-native-paper'
 import { RichEditor, actions } from 'react-native-pell-rich-editor'
 import tw from 'twrnc'
 import ToolBar from './components/tool-bar'
-import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
+import { RootStackParamList, ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { createNote } from '@/service/articles'
+import { RouteProp, useRoute } from '@react-navigation/native'
 
 const iconSize = 18
 
@@ -28,6 +29,10 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
 
   const [isFocus, setIsFocus] = useState(false)
   const [isFirstLoadWithoutInteraction, setIsFirstLoadWithoutInteraction] = useState(true)
+
+  const {
+    params: { id: folderId },
+  } = useRoute<RouteProp<RootStackParamList>>()
 
   const handleEditorChange = (text, type) => {
     if (type === 'title') {
@@ -44,7 +49,7 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
   const save = () => {
     console.log('title,content', title, content)
     if (!title || !content) return
-    createNote({ title, content })
+    createNote({ title, content, folderId })
       .then(res => {
         if (res) {
           // success

@@ -35,7 +35,7 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc }) => {
               theme.fonts.titleMedium,
             ]}
           >
-            {item.title}
+            {item.titleText}
           </Text>
           <Text style={[{ color: theme.colors.secondary }, theme.fonts.labelSmall]}>
             {transFBDate2Local(item.createTime as Timestamp)}
