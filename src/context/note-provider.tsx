@@ -3,7 +3,7 @@ import { Folder, getFolders } from '@/service/basic'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { COL_ARTICLES, getAllNotes, Note } from '@/service/articles'
 import { extractTextFromHTML } from '@/utils/utilsString'
-import { ICurrentFolder } from '@/utils/utilsStorage'
+import { getCurrentFolderFromStorage, ICurrentFolder } from '@/utils/utilsStorage'
 import { db } from '@/firebase/firebase'
 import { useAuth } from './auth-provider'
 
@@ -111,6 +111,14 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshFolders()
     refreshNote()
   }, [refreshFolders, refreshNote])
+
+  useEffect(() => {
+    getCurrentFolderFromStorage({ id: '', name: 'ALL Folders' }).then(data => {
+      if (data) {
+        setCurrentFolder(data)
+      }
+    })
+  }, [setCurrentFolder])
 
   useEffect(() => {
     // const unsubscribe = () => {}

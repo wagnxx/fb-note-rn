@@ -9,5 +9,5 @@ module.exports = {
   spaceBeforeFunctionParen: true,
   tabWidth: 2,
   useTabs: false,
-  printWidth: 120
+  printWidth: 80
 }

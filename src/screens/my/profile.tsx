@@ -8,7 +8,7 @@ import {
   Pressable,
   SafeAreaView,
 } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
@@ -28,7 +28,7 @@ import {
 } from 'react-native-heroicons/outline'
 import FolderManage from './components/folder-manage'
 import { Folder } from '@/service/basic'
-import { getCurrentFolderFromStorage, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
+import { saveCurrentFolderToStorage } from '@/utils/utilsStorage'
 import FolderMovedTo from './components/folder-moved-to'
 import { NoteProvider, useNote } from '@/context/note-provider'
 import NodeListScreen from './components/node-list-screen'
@@ -46,7 +46,13 @@ type TabRoute = {
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
 
-  const { noteList: list, noteLoading: loading, currentFolder, setCurrentFolder, refreshNote } = useNote()
+  const {
+    noteList: list,
+    noteLoading: loading,
+    currentFolder,
+    setCurrentFolder,
+    refreshNote,
+  } = useNote()
 
   const [showFolderManageDrawer, setShowFolderManageDrawer] = useState(false)
   const [showMovedDrawer, setShowMovedDrawer] = useState(false)
@@ -66,12 +72,17 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const routes = useMemo<TabRoute[]>(() => {
     return [
       { key: TabScreenTypes.draft, title: 'Draft(' + draftList.length + ')' },
-      { key: TabScreenTypes.published, title: 'Published(' + publishedList.length + ')' },
+      {
+        key: TabScreenTypes.published,
+        title: 'Published(' + publishedList.length + ')',
+      },
     ]
   }, [draftList, publishedList])
 
   const bottomActionItemStyle = useMemo(() => {
-    const color = bottomActionDisabled ? theme.colors.onSurfaceDisabled : theme.colors.onSurface
+    const color = bottomActionDisabled
+      ? theme.colors.onSurfaceDisabled
+      : theme.colors.onSurface
     return {
       color,
       iconProps: {
@@ -121,17 +132,8 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
     saveCurrentFolderToStorage(current)
     setCurrentFolder(current)
-
     setShowFolderManageDrawer(false)
   }
-
-  useEffect(() => {
-    getCurrentFolderFromStorage({ id: '', name: 'ALL Folders' }).then(data => {
-      if (data) {
-        setCurrentFolder(data)
-      }
-    })
-  }, [setCurrentFolder])
 
   const renderScene = useCallback(
     ({ route }: { route: TabRoute }) => {
@@ -180,17 +182,25 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        <View style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}>
+        <View
+          style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}
+        >
           <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
-          <TouchableOpacity onPress={() => setShowBottomActionBar(!showBottomActionBar)}>
+          <TouchableOpacity
+            onPress={() => setShowBottomActionBar(!showBottomActionBar)}
+          >
             <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
       {/* <Avatar /> */}
-      <Pressable onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}>
+      <Pressable
+        onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}
+      >
         <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-          <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder?.name}</Text>
+          <Text style={[tw`font-bold`, { fontSize: 24 }]}>
+            {currentFolder?.name}
+          </Text>
           {!showFolderManageDrawer ? (
             <ChevronDownIcon size={20} color={theme.colors.onBackground} />
           ) : (
@@ -217,7 +227,11 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote, { id: currentFolder?.id })}
+        onPress={() =>
+          navigation.navigate(ScrennTypeEnum.CreateNote, {
+            id: currentFolder?.id,
+          })
+        }
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
@@ -226,11 +240,16 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       {showBottomActionBar && (
         <View style={[styles.fixedBottomsTabs]}>
           <View
-            style={[{ backgroundColor: 'rgba(255,255,255, 0.7)' }, tw`flex-row justify-between items-center px-3 py-1`]}
+            style={[
+              { backgroundColor: 'rgba(255,255,255, 0.7)' },
+              tw`flex-row justify-between items-center px-3 py-1`,
+            ]}
           >
             <TouchableOpacity onPress={() => setShowMovedDrawer(true)}>
               <View style={tw` items-center `}>
-                <ArrowRightStartOnRectangleIcon {...bottomActionItemStyle.iconProps} />
+                <ArrowRightStartOnRectangleIcon
+                  {...bottomActionItemStyle.iconProps}
+                />
                 <Text {...bottomActionItemStyle.textProps}>Move</Text>
               </View>
             </TouchableOpacity>
