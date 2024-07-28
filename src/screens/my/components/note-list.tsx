@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { transFBDate2Local } from '@/utils/utilsDate'
 import { useTheme } from 'react-native-paper'
 import tw from 'twrnc'
@@ -27,14 +27,24 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBo
         ...prevMap,
         [item.id]: !prevMap[item.id],
       }
-      const entries = Object.entries(newValue).filter(([k, v]) => v)
-      const ids = entries.map(([k]) => k)
-      onCheckBoxChange(ids)
+
       return newValue
     })
 
     // console.log('checkedMap', ids)
   }
+
+  useEffect(() => {
+    const entries = Object.entries(checkedMap).filter(([k, v]) => v)
+    const ids = entries.map(([k]) => k)
+    onCheckBoxChange(ids)
+  }, [checkedMap, onCheckBoxChange])
+
+  useEffect(() => {
+    if (!showCheckBox) {
+      setCheckedMap({})
+    }
+  }, [showCheckBox])
 
   return list.map((item, index) => (
     <View
@@ -46,7 +56,7 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBo
     >
       {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
 
-      <TouchableOpacity onPress={() => onPressItem(item)}>
+      <TouchableOpacity onPress={() => !showCheckBox && onPressItem(item)}>
         <View>
           <Text
             style={[

@@ -1,5 +1,5 @@
 import firebase from '@react-native-firebase/app'
-import { getFirestore } from '@react-native-firebase/firestore'
+import { getFirestore, onSnapshot } from '@react-native-firebase/firestore'
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -31,4 +31,4 @@ if (!firebase.apps.length) {
 console.log('Initialize Firebase succesfully ,firebase app length:::::::::::', firebase.apps.length)
 
 const db = getFirestore()
-export { firebase, app, db }
+export { firebase, app, db, onSnapshot }

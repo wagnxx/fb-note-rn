@@ -17,9 +17,7 @@ export const AuthContext = createContext<AuthContextType>({
 })
 
 // Create the AuthProvider component
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(null)
   const [loadingUser, setLoadingUser] = useState(true)
 
@@ -32,11 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return unsubscribe // Clean up subscription on unmount
   }, [])
 
-  return (
-    <AuthContext.Provider value={{ user, loadingUser }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user, loadingUser }}>{children}</AuthContext.Provider>
 }
 
 // Custom hook to use the AuthContext

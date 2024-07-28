@@ -1,4 +1,12 @@
-import { DocumentData, addDocToCol, deleteDocsByIds, getDocData, getFieldValues } from '@/firebase/db'
+import {
+  DocumentData,
+  addDocToCol,
+  batchUpdateDocData,
+  deleteDocsByIds,
+  getDocData,
+  getFieldValues,
+  updateDocData,
+} from '@/firebase/db'
 import { auth } from '@/firebase/auth'
 import {
   FieldValue,
@@ -8,9 +16,10 @@ import {
   where,
 } from '@react-native-firebase/firestore'
 
-const COL_ARTICLES = 'articles'
+export const COL_ARTICLES = 'articles'
 
 export type Note = {
+  id: string
   title: string
   content: string
   tags?: string[]
@@ -18,6 +27,7 @@ export type Note = {
   published?: boolean // if draft ? false : true
   createTime?: FieldValue
   createId?: string
+  titleText?: string
 }
 
 export const createNote = (doc: Note) => {
@@ -25,6 +35,22 @@ export const createNote = (doc: Note) => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
     return addDocToCol(COL_ARTICLES, doc)
+  }
+  return Promise.reject('logout')
+}
+
+export const updateNote = async (doc: Partial<Note>): Promise<boolean | null> => {
+  if (auth?.currentUser?.uid) {
+    doc.createId = auth.currentUser.uid
+    return updateDocData(COL_ARTICLES, doc.id!, doc)
+  }
+  return Promise.reject('logout')
+}
+
+export const batchUpdateNote = async (noteIds: string[], docs: Partial<Note>[]): Promise<boolean | null> => {
+  if (auth?.currentUser?.uid) {
+    docs?.forEach(item => (item.createId = auth.currentUser?.uid))
+    return batchUpdateDocData(COL_ARTICLES, noteIds, docs)
   }
   return Promise.reject('logout')
 }

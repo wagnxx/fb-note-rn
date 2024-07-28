@@ -17,10 +17,11 @@ export const setItem = async (key: string, value) => {
   }
 }
 
-export interface ICurrentFolder {
+export type ICurrentFolder = {
   id: string
   name: string
-}
+} | null
+
 const CURRENT_FOLDER_KEY = 'current_folder_key'
 export const saveCurrentFolderToStorage = (value: ICurrentFolder) => setItem(CURRENT_FOLDER_KEY, value)
 export const getCurrentFolderFromStorage = defaultValue =>

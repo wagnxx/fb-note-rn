@@ -37,9 +37,9 @@ getPublishedNotes 用于获取所有已发布的文章。
  * 
  */
 
-const COL_ORGANIZATIONS = 'organizations'
-const COL_ORGMEMBERS = 'orgMembers'
-const COL_FOLDERSS = 'folders'
+export const COL_ORGANIZATIONS = 'organizations'
+export const COL_ORGMEMBERS = 'orgMembers'
+export const COL_FOLDERS = 'folders'
 
 export type Tag = {
   name: string
@@ -51,12 +51,13 @@ export type Folder = {
   container?: string
   textColor?: string
   createId?: string
+  noteCount?: number
 }
 // 创建文件夹
 export const createFolder = async (doc: Partial<Folder>): Promise<string | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
-    return addDocToCol(COL_FOLDERSS, doc)
+    return addDocToCol(COL_FOLDERS, doc)
   }
   return Promise.reject('logout')
 }
@@ -64,7 +65,7 @@ export const createFolder = async (doc: Partial<Folder>): Promise<string | null>
 export const updateFolder = async (doc: Partial<Folder>): Promise<boolean | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
-    return updateDocData(COL_FOLDERSS, doc.id!, doc)
+    return updateDocData(COL_FOLDERS, doc.id!, doc)
   }
   return Promise.reject('logout')
 }
@@ -82,7 +83,7 @@ export const getFolders = async (): Promise<(DocumentData | Folder)[]> => {
 }
 
 export const delFolder = async (id: string) => {
-  return deleteDocById(COL_FOLDERSS, id)
+  return deleteDocById(COL_FOLDERS, id)
 }
 
 // 创建Note

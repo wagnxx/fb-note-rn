@@ -1,16 +1,16 @@
 import { View, Text, Dimensions, TouchableOpacity, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
+import React, { useState } from 'react'
 import { Drawer, TouchableRipple, useTheme } from 'react-native-paper'
 import { XMarkIcon } from 'react-native-heroicons/outline'
 
 import tw from 'twrnc'
-import { Folder, getFolders } from '@/service/basic'
+import { Folder } from '@/service/basic'
 import FolderList, { itemStyle, itemTextStyle } from './folder-list'
 import FolderOtherNav from './folder-other-nav'
 import useToggle from '@/hooks/useToggle'
 import FolderEdit from './folder-edit'
 import { ICurrentFolder } from '@/utils/utilsStorage'
+import { useNote } from '@/context/note-provider'
 
 type FolderManageProps = {
   currentFolder: ICurrentFolder
@@ -22,13 +22,13 @@ type FolderManageProps = {
 const { width, height } = Dimensions.get('window')
 
 export default function FolderManage({ style, closeDrawer, onCheckFolderItem, currentFolder }: FolderManageProps) {
-  const navigation = useNavigation()
   const theme = useTheme()
 
   const [showNewDrawer, toggleshowNewDrawer] = useToggle(false)
   const [outClicked, setOutClicked] = useState(0)
-  const [folders, setFolders] = useState<Folder[]>([])
   const [targetEditFolder, setTargetEditFolder] = useState<Folder>()
+
+  const { folders, refreshFolders: refreshPage, noteLength } = useNote()
 
   const onFolderEditClose = (needRefresh?: boolean) => {
     toggleshowNewDrawer(false)
@@ -46,26 +46,10 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
     onCheckFolderItem(folder)
   }
 
-  const refreshPage = () => {
-    getFolders().then(res => {
-      if (res) {
-        setFolders(res)
-        return
-      }
-      setFolders([])
-    })
-  }
-
   const onDismissKeyboard = () => {
     Keyboard.dismiss()
     setOutClicked(preCount => ++preCount)
-    console.log('outside click')
-    // closeDrawer()
   }
-
-  useEffect(() => {
-    refreshPage()
-  }, [])
 
   return (
     <>
@@ -77,11 +61,13 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
           <View
             style={[{ minHeight: 200, maxHeight: 450, width }, tw`bg-gray-100  pb-8 absolute bottom-0 rounded-t-xl`]}
           >
-            <View style={tw`flex-row gap-8 px-4 py-3`}>
-              <TouchableOpacity onPress={closeDrawer}>
+            <View style={tw`flex-row justify-center px-4 py-3`}>
+              <TouchableOpacity onPress={closeDrawer} style={tw`absolute top-4 left-4`}>
                 <XMarkIcon size={22} color={theme.colors.onBackground} />
               </TouchableOpacity>
               <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>Folders</Text>
+              {/* <View style={tw`justify-center items-center flex-row flex-1`}>
+              </View> */}
             </View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
               <View style={[tw`flex-row justify-start px-5 gap-6 flex-wrap py-2`, { width }]}>
@@ -91,8 +77,8 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
                   </View>
                 </TouchableRipple>
                 <TouchableRipple onPress={() => onCheckFolderItemHandle({ id: '', name: 'ALL FOLDERS' })}>
-                  <View style={[itemStyle, tw`bg-blue-700 `, currentFolder.id === '' && tw` border-yellow-500`]}>
-                    <Text style={itemTextStyle}>All NOTES</Text>
+                  <View style={[itemStyle, tw`bg-blue-700 `, currentFolder?.id === '' && tw` border-yellow-500`]}>
+                    <Text style={itemTextStyle}>All NOTES({noteLength})</Text>
                   </View>
                 </TouchableRipple>
                 {folders?.length > 0 && (
@@ -100,7 +86,7 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
                     currentFolder={currentFolder}
                     folders={folders}
                     onEditFolder={onEditFolder}
-                    onDeleteFolder={() => refreshPage}
+                    onDeleteFolder={refreshPage}
                     outClickedCount={outClicked}
                     onCheckFolderItemHandle={onCheckFolderItemHandle}
                   />

@@ -33,6 +33,28 @@ const dealError = (error: unknown) => {
 const LogError = console.error.bind(console)
 const LogInfo = console.log.bind(console)
 
+export const batchUpdateDocData = async (colName: string, docIds: string[], docDatas: DocumentData[]) => {
+  if (docIds.length !== docDatas.length) {
+    throw new Error('The number of docIds must match the number of docDatas.')
+  }
+  const batch = writeBatch(db)
+  docIds.forEach((docId, index) => {
+    // doc(db, colName, docId)
+    const docRef = doc(db, colName, docId)
+    const docData = docDatas[index]
+    batch.update(docRef, docData)
+  })
+
+  try {
+    await batch.commit()
+    console.log('Batch update successful!')
+    return true
+  } catch (error) {
+    console.error('Error performing batch update: ', error)
+    return null
+  }
+}
+
 // 添加文档到指定集合
 export const addDocToCol = async (colName: string, docData: DocumentData): Promise<string | null> => {
   try {

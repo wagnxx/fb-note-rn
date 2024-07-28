@@ -9,11 +9,11 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
-import { Note, getAllNotes } from '@/service/articles'
+import { batchUpdateNote } from '@/service/articles'
 import NoteList from './components/note-list'
 const { width, height } = Dimensions.get('window')
 import tw from 'twrnc'
@@ -30,28 +30,26 @@ import {
 } from 'react-native-heroicons/outline'
 import FolderManage from './components/folder-manage'
 import { Folder } from '@/service/basic'
-import { getCurrentFolderFromStorage, ICurrentFolder, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
-import { extractTextFromHTML } from '@/utils/utilsString'
-import { useIsFocused } from '@react-navigation/native'
+import { getCurrentFolderFromStorage, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
+import FolderMovedTo from './components/folder-moved-to'
+import { NoteProvider, useNote } from '@/context/note-provider'
+
+type TabRoute = {
+  key: string
+  title: string
+}
 
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
-  const [list, setlist] = useState<Partial<Note>[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentFolder, setCurrentFolder] = useState<ICurrentFolder>(null)
 
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const isFocused = useIsFocused()
+  const { noteList: list, noteLoading: loading, currentFolder, setCurrentFolder, refreshNote } = useNote()
 
+  const [showFolderManageDrawer, setShowFolderManageDrawer] = useState(false)
+  const [showMovedDrawer, setShowMovedDrawer] = useState(false)
   const [isShowBottomAction, setIsShowBottomAction] = useState(false)
-  // const [bottomActionDisabled, setBottomActionDisabled] = useState(true)
   const [checkedIds, setCheckedIds] = useState<string[]>([])
 
   const bottomActionDisabled = useMemo(() => !checkedIds.length, [checkedIds])
-
-  const onNoteCheckBoxChange = (ids: string[]) => {
-    setCheckedIds(ids)
-  }
 
   const draftList = useMemo(() => {
     return list.filter(item => !item?.published)
@@ -59,11 +57,6 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const publishedList = useMemo(() => {
     return list.filter(item => item?.published)
   }, [list])
-
-  type TabRoute = {
-    key: string
-    title: string
-  }
 
   const [index, setIndex] = useState(0)
   const routes = useMemo<TabRoute[]>(() => {
@@ -92,6 +85,30 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     }
   }, [bottomActionDisabled, theme])
 
+  const onNoteCheckBoxChange = (ids: string[]) => {
+    setCheckedIds(ids)
+  }
+
+  const moveNoteToFolderHandle = (folderId: string) => {
+    if (!checkedIds?.length) return
+
+    const docs = checkedIds.map(item => ({ folderId }))
+
+    batchUpdateNote(checkedIds, docs)
+      .then(res => {
+        if (res) {
+          console.log('update success!')
+          setShowMovedDrawer(false)
+          refreshNote()
+        } else {
+          console.log('update failed.')
+        }
+      })
+      .catch(err => {
+        console.log('update notes err:', err)
+      })
+  }
+
   const onCheckFolderItem = (folder: Folder) => {
     const current = {
       id: folder.id,
@@ -101,42 +118,16 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     saveCurrentFolderToStorage(current)
     setCurrentFolder(current)
 
-    setDrawerOpen(false)
+    setShowFolderManageDrawer(false)
   }
 
-  const init = useCallback(() => {
-    if (!currentFolder) return
-    setLoading(true)
-    getAllNotes(currentFolder?.id)
-      .then(data => {
-        const _data = data?.map(item => {
-          item.titleText = extractTextFromHTML(item.title)
-          return item
-        })
-        console.log('get current folder notes::', data)
-        setlist(data)
-      })
-      .catch(err => {
-        console.log('\x1b[31m%s\x1b[0m', 'get all note err:::', err)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [currentFolder])
-
   useEffect(() => {
-    init()
-  }, [currentFolder, init, isFocused])
-
-  useEffect(() => {
-    // saveCurrentFolderToStorage
     getCurrentFolderFromStorage({ id: '', name: 'ALL Folders' }).then(data => {
       if (data) {
         setCurrentFolder(data)
       }
     })
-  }, [])
-  const [isChecked, setIsChecked] = useState(false)
+  }, [setCurrentFolder])
 
   if (loading) {
     return (
@@ -183,7 +174,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   return (
     <>
       <StatusBar hidden />
-      <SafeAreaView style={tw`flex-row justify-between justify-end items-center pl-2`}>
+      <SafeAreaView style={tw`flex-row  justify-end items-center pl-2`}>
         {isShowBottomAction && (
           <TouchableOpacity onPress={() => setIsShowBottomAction(false)}>
             <XMarkIcon size={20} color={theme.colors.onBackground} />
@@ -198,10 +189,10 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         </View>
       </SafeAreaView>
       {/* <Avatar /> */}
-      <Pressable onPress={() => setDrawerOpen(!drawerOpen)}>
+      <Pressable onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}>
         <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-          <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder.name}</Text>
-          {!drawerOpen ? (
+          <Text style={[tw`font-bold`, { fontSize: 24 }]}>{currentFolder?.name}</Text>
+          {!showFolderManageDrawer ? (
             <ChevronDownIcon size={20} color={theme.colors.onBackground} />
           ) : (
             <ChevronUpIcon size={20} color={theme.colors.onBackground} />
@@ -227,7 +218,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote, { id: currentFolder.id })}
+        onPress={() => navigation.navigate(ScrennTypeEnum.CreateNote, { id: currentFolder?.id })}
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
@@ -237,10 +228,12 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           <View
             style={[{ backgroundColor: 'rgba(255,255,255, 0.7)' }, tw`flex-row justify-between items-center px-3 py-1`]}
           >
-            <View style={tw` items-center `}>
-              <ArrowRightStartOnRectangleIcon {...bottomActionItemStyle.iconProps} />
-              <Text {...bottomActionItemStyle.textProps}>Move</Text>
-            </View>
+            <TouchableOpacity onPress={() => setShowMovedDrawer(true)}>
+              <View style={tw` items-center `}>
+                <ArrowRightStartOnRectangleIcon {...bottomActionItemStyle.iconProps} />
+                <Text {...bottomActionItemStyle.textProps}>Move</Text>
+              </View>
+            </TouchableOpacity>
             <View style={tw` items-center`}>
               <EyeSlashIcon {...bottomActionItemStyle.iconProps} />
               <Text {...bottomActionItemStyle.textProps}>Hide</Text>
@@ -257,12 +250,20 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         </View>
       )}
 
-      {drawerOpen && (
+      {showFolderManageDrawer && (
         <FolderManage
           currentFolder={currentFolder}
           style={[styles.fixedFooter, tw`flex-row bg-white`]}
-          closeDrawer={() => setDrawerOpen(false)}
+          closeDrawer={() => setShowFolderManageDrawer(false)}
           onCheckFolderItem={onCheckFolderItem}
+        />
+      )}
+
+      {showMovedDrawer && (
+        <FolderMovedTo
+          style={[styles.fixedFooter, tw`flex-row bg-white`]}
+          closeDrawer={() => setShowMovedDrawer(false)}
+          onMoveNoteToFolder={moveNoteToFolderHandle}
         />
       )}
     </>
@@ -293,12 +294,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    // height: 60,x
     minHeight: 200,
     width: 600,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    // justifyContent: 'center',
-    // alignItems: 'center',
     zIndex: 9,
   },
   fixedBottomsTabs: {
@@ -306,18 +304,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    // height: 60,x
     height: 50,
-    // width: 600,
-    // flexDirection: 'row',
     backgroundColor: '#fff',
-    // gap: 20,
-    // paddingLeft: 12,
-    // paddingRight: 12,
-    // justifyContent: 'space-between',
-    // alignItems: 'center',
     zIndex: 90,
   },
 })
 
-export default Profile
+const RenderComp = props => (
+  <NoteProvider>
+    <Profile {...props} />
+  </NoteProvider>
+)
+
+export default RenderComp

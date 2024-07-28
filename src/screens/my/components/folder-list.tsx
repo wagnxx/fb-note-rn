@@ -22,31 +22,33 @@ export const itemStyle = [
 ]
 export const itemTextStyle = [tw`text-gray-400`]
 
-type FolderList = {
+type FolderListProps = {
   folders: Folder[]
   currentFolder: ICurrentFolder
-  onEditFolder: (folder: Folder) => void
-  onDeleteFolder: (folder: Folder) => void
+  onEditFolder?: (folder: Folder) => void
+  onDeleteFolder?: (folder: Folder) => void
   onCheckFolderItemHandle: (folder: Folder) => void
-  outClickedCount: number
-  // onFolderItemTooltipsVisibility: (show: boolean) => void
+  outClickedCount?: number
+  forCheck?: boolean
 }
+
+const voidFunc = (folder: Folder) => {}
 
 export default function FolderList({
   folders,
   currentFolder,
-  onEditFolder,
-  onDeleteFolder,
-  outClickedCount,
+  outClickedCount = 0,
+  forCheck = false,
+  onEditFolder = voidFunc,
+  onDeleteFolder = voidFunc,
   onCheckFolderItemHandle,
-  // onFolderItemTooltipsVisibility,
-}: FolderList) {
+}: FolderListProps) {
   const theme = useTheme()
   const [visiblePopoverId, setVisiblePopoverId] = useState<string | null>(null)
   const itemRefs = useRef<{ [key: string]: any }>({})
 
   // const editFolder = folder => {}
-  const deleteItem = folder => {
+  const deleteItem = (folder: Folder) => {
     if (!folder) return
 
     delFolder(folder.id)
@@ -68,17 +70,17 @@ export default function FolderList({
   }
 
   const showItemTooltips = (id: string) => {
+    if (forCheck) {
+      // only for check item
+      return
+    }
     setVisiblePopoverId(id)
-    // onFolderItemTooltipsVisibility(true)
   }
   const closeItemTooltips = useCallback(() => {
     setVisiblePopoverId(null)
-    // onFolderItemTooltipsVisibility(true)
   }, [])
 
   useEffect(() => {
-    // if (visiblePopoverId) {
-    // }
     closeItemTooltips()
   }, [outClickedCount, closeItemTooltips])
 
@@ -93,10 +95,12 @@ export default function FolderList({
         style={[
           itemStyle,
           { backgroundColor: folder?.container || '', position: 'relative' },
-          folder.id === currentFolder.id ? tw` border-yellow-500` : null,
+          folder.id === currentFolder?.id ? tw` border-yellow-500` : null,
         ]}
       >
-        <Text style={[itemTextStyle, { color: folder?.textColor || '' }]}>{folder.name}</Text>
+        <Text style={[itemTextStyle, { color: folder?.textColor || '' }]}>
+          {folder.name} ({folder?.noteCount})
+        </Text>
         {visiblePopoverId === folder.id && (
           <View
             style={[
