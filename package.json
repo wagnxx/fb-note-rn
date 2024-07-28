@@ -9,7 +9,8 @@
     "start": "react-native start",
     "start:debug": "react-native start --experimental-debugger",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "lint-staged": {
     "*.js": "eslint --fix",
