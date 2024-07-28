@@ -7,14 +7,12 @@ import {
   StyleSheet,
   Pressable,
   SafeAreaView,
-  ScrollView,
 } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
 import { TabBar, TabView } from 'react-native-tab-view'
 import { batchUpdateNote } from '@/service/articles'
-import NoteList from './components/note-list'
 const { width, height } = Dimensions.get('window')
 import tw from 'twrnc'
 import {
@@ -33,6 +31,12 @@ import { Folder } from '@/service/basic'
 import { getCurrentFolderFromStorage, saveCurrentFolderToStorage } from '@/utils/utilsStorage'
 import FolderMovedTo from './components/folder-moved-to'
 import { NoteProvider, useNote } from '@/context/note-provider'
+import NodeListScreen from './components/node-list-screen'
+
+const TabScreenTypes = {
+  draft: 'draft',
+  published: 'published',
+}
 
 type TabRoute = {
   key: string
@@ -46,7 +50,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
   const [showFolderManageDrawer, setShowFolderManageDrawer] = useState(false)
   const [showMovedDrawer, setShowMovedDrawer] = useState(false)
-  const [isShowBottomAction, setIsShowBottomAction] = useState(false)
+  const [showBottomActionBar, setShowBottomActionBar] = useState(false)
   const [checkedIds, setCheckedIds] = useState<string[]>([])
 
   const bottomActionDisabled = useMemo(() => !checkedIds.length, [checkedIds])
@@ -61,8 +65,8 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const [index, setIndex] = useState(0)
   const routes = useMemo<TabRoute[]>(() => {
     return [
-      { key: 'first', title: 'Draft(' + draftList.length + ')' },
-      { key: 'second', title: 'Published(' + publishedList.length + ')' },
+      { key: TabScreenTypes.draft, title: 'Draft(' + draftList.length + ')' },
+      { key: TabScreenTypes.published, title: 'Published(' + publishedList.length + ')' },
     ]
   }, [draftList, publishedList])
 
@@ -129,6 +133,35 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     })
   }, [setCurrentFolder])
 
+  const renderScene = useCallback(
+    ({ route }: { route: TabRoute }) => {
+      switch (route.key) {
+        case TabScreenTypes.draft:
+          return (
+            <NodeListScreen
+              list={draftList}
+              isShowBottomAction={showBottomActionBar}
+              onNoteCheckBoxChange={onNoteCheckBoxChange}
+              navigation={navigation}
+            />
+          )
+
+        case TabScreenTypes.published:
+          return (
+            <NodeListScreen
+              list={publishedList}
+              isShowBottomAction={showBottomActionBar}
+              onNoteCheckBoxChange={onNoteCheckBoxChange}
+              navigation={navigation}
+            />
+          )
+        default:
+          return null
+      }
+    },
+    [draftList, showBottomActionBar, navigation, publishedList],
+  )
+
   if (loading) {
     return (
       <View style={tw`flex-1 justify-center items-center`}>
@@ -137,53 +170,19 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     )
   }
 
-  const renderScene = ({ route }: { route: TabRoute }) => {
-    switch (route.key) {
-      case 'first':
-        return (
-          <View style={tw`flex-1 p-2`}>
-            <ScrollView contentContainerStyle={[{}, tw`bg-gray-100`]} showsVerticalScrollIndicator={true}>
-              {draftList?.length > 0 ? (
-                <NoteList
-                  list={draftList}
-                  showCheckBox={isShowBottomAction}
-                  onCheckBoxChange={onNoteCheckBoxChange}
-                  onPressItem={item => navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })}
-                />
-              ) : (
-                <Text>Null data</Text>
-              )}
-            </ScrollView>
-          </View>
-        )
-      case 'second':
-        return (
-          <View style={tw`flex-1 p-2`}>
-            {publishedList?.length > 0 ? (
-              <NoteList list={publishedList} showCheckBox={isShowBottomAction} onCheckBoxChange={() => {}} />
-            ) : (
-              <Text>Null data</Text>
-            )}
-          </View>
-        )
-      default:
-        return null
-    }
-  }
-
   return (
     <>
       <StatusBar hidden />
       <SafeAreaView style={tw`flex-row  justify-end items-center pl-2`}>
-        {isShowBottomAction && (
-          <TouchableOpacity onPress={() => setIsShowBottomAction(false)}>
+        {showBottomActionBar && (
+          <TouchableOpacity onPress={() => setShowBottomActionBar(false)}>
             <XMarkIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         )}
 
         <View style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}>
           <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
-          <TouchableOpacity onPress={() => setIsShowBottomAction(!isShowBottomAction)}>
+          <TouchableOpacity onPress={() => setShowBottomActionBar(!showBottomActionBar)}>
             <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         </View>
@@ -223,7 +222,8 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
-      {isShowBottomAction && (
+      {/* bottom action to edit note */}
+      {showBottomActionBar && (
         <View style={[styles.fixedBottomsTabs]}>
           <View
             style={[{ backgroundColor: 'rgba(255,255,255, 0.7)' }, tw`flex-row justify-between items-center px-3 py-1`]}
@@ -250,6 +250,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         </View>
       )}
 
+      {/* Drawer */}
       {showFolderManageDrawer && (
         <FolderManage
           currentFolder={currentFolder}
