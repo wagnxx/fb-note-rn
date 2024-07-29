@@ -69,18 +69,32 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Define a method to load properties from a file
+def loadPropertiesFromFile(String fileName) {
+    def properties = new Properties()
+    def propertiesFile = file(fileName)
+    if (propertiesFile.exists()) {
+        propertiesFile.withInputStream { stream ->
+            properties.load(stream)
+        }
+    }
+    return properties
+}
+// Load properties from env.properties
+def envProperties = loadPropertiesFromFile("${rootDir}/env.properties")
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.fbnote"
+    namespace "com.note"
     defaultConfig {
-        applicationId "com.fbnote"
+        applicationId "com.note"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.2"
     }
     signingConfigs {
         debug {
@@ -89,15 +103,27 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (envProperties.containsKey('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(envProperties['MYAPP_RELEASE_STORE_FILE'])
+                storePassword envProperties['MYAPP_RELEASE_STORE_PASSWORD']
+                keyAlias envProperties['MYAPP_RELEASE_KEY_ALIAS']
+                keyPassword envProperties['MYAPP_RELEASE_KEY_PASSWORD']
+            }
+    }
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"  // 为 debug 版本添加后缀，使其包名不同
+            versionNameSuffix "-debug"    // 可选：为 debug 版本添加版本名称后缀
             signingConfig signingConfigs.debug
+              // signingConfig signingConfigs.release
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FNote</string>
+    <string name="app_name_debug">FNote debug</string>
 </resources>
