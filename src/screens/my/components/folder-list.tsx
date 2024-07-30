@@ -4,6 +4,7 @@ import { TouchableRipple, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { delFolder, Folder } from '@/service/basic'
 import { ICurrentFolder } from '@/utils/utilsStorage'
+import { messageConfirm } from '@/utils/utilsAlert'
 const { width, height } = Dimensions.get('window')
 const itemWidth = (width - 24 * 2 - 20 * 2) / 3
 
@@ -51,17 +52,21 @@ export default function FolderList({
   const deleteItem = (folder: Folder) => {
     if (!folder) return
 
-    delFolder(folder.id)
-      .then(res => {
-        if (res) {
-          onDeleteFolder(folder)
-          return
-        }
-        console.log('del folder failed')
-      })
-      .catch(err => {
-        console.log('del folder err::::', err)
-      })
+    messageConfirm({
+      message: `Are you sure to delete follder ${folder.name} ?`,
+    }).then(() => {
+      delFolder(folder.id)
+        .then(res => {
+          if (res) {
+            onDeleteFolder(folder)
+            return
+          }
+          console.log('del folder failed')
+        })
+        .catch(err => {
+          console.log('del folder err::::', err)
+        })
+    })
   }
 
   const editItem = (folder: Folder) => {
@@ -88,7 +93,9 @@ export default function FolderList({
     <TouchableRipple
       key={index}
       onPress={() => onCheckFolderItemHandle(folder)}
-      onLongPress={() => showItemTooltips(folder.id)}
+      onLongPress={() =>
+        folder.id !== currentFolder?.id && showItemTooltips(folder.id)
+      }
       ref={ref => (itemRefs.current[folder.id] = ref)}
     >
       <View
@@ -119,7 +126,9 @@ export default function FolderList({
             </View>
             <View style={[tw`py-1`]}>
               <TouchableOpacity onPress={() => deleteItem(folder)}>
-                <Text style={[{ color: theme.colors.onBackground }]}>Delete</Text>
+                <Text style={[{ color: theme.colors.onBackground }]}>
+                  Delete
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

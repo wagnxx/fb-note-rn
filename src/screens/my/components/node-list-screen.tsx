@@ -12,23 +12,21 @@ export default function NodeListScreen({
   // const navigation = useNavigation<NavigationProp<RootStackParamList>>()
 
   if (!list?.length) {
-    return <Text>Null data</Text>
+    return (
+      <View
+        style={{
+          height,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#000', fontSize: 33 }}>Null data</Text>
+      </View>
+    )
   }
-  // return (
-  //   <View style={tw`flex-1 p-2`}>
-  //     <NoteList
-  //       list={list}
-  //       showCheckBox={isShowBottomAction}
-  //       onCheckBoxChange={onNoteCheckBoxChange}
-  //       onPressItem={item =>
-  //         navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })
-  //       }
-  //     />
-  //   </View>
-  // )
 
   return (
-    // <View style={{ backgroundColor: 'red', height: 4444 }} />
     <View style={{ minHeight: height }}>
       <NoteList
         list={list}

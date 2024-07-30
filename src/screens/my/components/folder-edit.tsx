@@ -1,10 +1,23 @@
-import { View, Text, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Dimensions,
+} from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { CheckIcon, XMarkIcon } from 'react-native-heroicons/outline'
-import { MD3Theme, TextInput, TouchableRipple, useTheme } from 'react-native-paper'
+import {
+  MD3Theme,
+  TextInput,
+  TouchableRipple,
+  useTheme,
+} from 'react-native-paper'
 import tw from 'twrnc'
 import { createFolder, Folder, updateFolder } from '@/service/basic'
 import { itemStyle, itemTextStyle } from './folder-list'
+import Toast from 'react-native-toast-message'
 
 type FolderEditTProps = {
   onClose: (refresh?: boolean) => void
@@ -48,7 +61,10 @@ const initSelections: (theme: MD3Theme) => SelectinType[] = theme => {
 
 const { width, height } = Dimensions.get('window')
 
-export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTProps) {
+export default function FolderEdit({
+  onClose,
+  targetEditFolder,
+}: FolderEditTProps) {
   const theme = useTheme()
 
   const [newFolderValue, setNewFolderValue] = useState<string>('')
@@ -85,14 +101,31 @@ export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTPro
     fn({ name: newFolderValue, ...selectedBgItem, ...options })
       .then(res => {
         if (res) {
-          Alert.alert('warning', 'create success.')
+          Toast.show({
+            type: 'info',
+            position: 'top',
+            text1: 'Operation successful',
+            visibilityTime: 3000, // 显示时间
+          })
           onClose(true)
         } else {
-          Alert.alert('warning', 'create failed.')
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Operation failed',
+            visibilityTime: 3000, // 显示时间
+          })
         }
       })
-      .then(err => {
+      .catch(err => {
         console.log('create err:::', err)
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Operation  error',
+          text2: err,
+          visibilityTime: 3000, // 显示时间
+        })
       })
   }
 
@@ -103,7 +136,9 @@ export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTPro
       setNewFolderId(folder.id)
       setNewFolderValue(folder.name)
 
-      let selectedBgIndex = selections.findIndex(item => item.container === folder.container)
+      let selectedBgIndex = selections.findIndex(
+        item => item.container === folder.container,
+      )
       selectedBgIndex = selectedBgIndex == -1 ? 0 : selectedBgIndex
       setselectedBgItem(selections[selectedBgIndex])
     },
@@ -117,13 +152,25 @@ export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTPro
   }, [targetEditFolder, initEditParams])
 
   return (
-    <View style={[{ height: 500, width }, tw`bg-gray-100 px-2 pb-8 absolute bottom-0 rounded-t-xl`]}>
+    <View
+      style={[
+        { height: 500, width },
+        tw`bg-gray-100 px-2 pb-8 absolute bottom-0 rounded-t-xl`,
+      ]}
+    >
       <View style={[tw`p-2`]}>
         <View style={tw`flex-row justify-between items-center gap-8  py-3`}>
           <TouchableOpacity onPress={closeNewFolderDrawer}>
             <XMarkIcon size={22} color={theme.colors.onBackground} />
           </TouchableOpacity>
-          <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>Create New Note</Text>
+          <Text
+            style={[
+              theme.fonts.titleMedium,
+              { color: theme.colors.onBackground },
+            ]}
+          >
+            Create New Note
+          </Text>
           <TouchableOpacity onPress={createNewFolder}>
             <CheckIcon size={22} color={theme.colors.onBackground} />
           </TouchableOpacity>
@@ -138,14 +185,30 @@ export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTPro
         <View style={tw`bg-white mt-4 p-3 rounded-lg`}>
           <View style={tw`justify-center items-center`}>
             <TouchableRipple onPress={() => {}}>
-              <View style={[itemStyle, { backgroundColor: selectedBgItem.container }]}>
-                <Text style={[itemTextStyle, { color: selectedBgItem.textColor }]}>NOTES</Text>
+              <View
+                style={[
+                  itemStyle,
+                  { backgroundColor: selectedBgItem.container },
+                ]}
+              >
+                <Text
+                  style={[itemTextStyle, { color: selectedBgItem.textColor }]}
+                >
+                  NOTES
+                </Text>
               </View>
             </TouchableRipple>
           </View>
 
           <View style={tw`mt-4`}>
-            <Text style={[theme.fonts.labelMedium, { color: theme.colors.onBackground }]}>Pure Colors</Text>
+            <Text
+              style={[
+                theme.fonts.labelMedium,
+                { color: theme.colors.onBackground },
+              ]}
+            >
+              Pure Colors
+            </Text>
             <ScrollView horizontal>
               <View style={tw`flex-row gap-4`}>
                 {selections.map((item, index) => (
@@ -159,10 +222,16 @@ export default function FolderEdit({ onClose, targetEditFolder }: FolderEditTPro
                       style={[
                         itemStyle,
                         tw`${selectedBgItem === item ? 'border-yellow-500' : ''} `,
-                        { backgroundColor: item.container, width: width * 0.22, height: width * 0.3 },
+                        {
+                          backgroundColor: item.container,
+                          width: width * 0.22,
+                          height: width * 0.3,
+                        },
                       ]}
                     >
-                      <Text style={[itemTextStyle, { color: item.textColor }]}>NOTES</Text>
+                      <Text style={[itemTextStyle, { color: item.textColor }]}>
+                        NOTES
+                      </Text>
                     </View>
                   </TouchableRipple>
                 ))}

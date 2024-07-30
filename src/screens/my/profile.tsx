@@ -11,7 +11,7 @@ import {
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
-import { batchUpdateNote } from '@/service/articles'
+import { batchUpdateNote, deleteNotes } from '@/service/articles'
 const { width, height } = Dimensions.get('window')
 import tw from 'twrnc'
 import {
@@ -19,9 +19,9 @@ import {
   ArrowUpIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  EllipsisVerticalIcon,
   EyeSlashIcon,
   MagnifyingGlassIcon,
+  PencilSquareIcon,
   TrashIcon,
   XMarkIcon,
 } from 'react-native-heroicons/outline'
@@ -32,6 +32,9 @@ import FolderMovedTo from './components/folder-moved-to'
 import { NoteProvider, useNote } from '@/context/note-provider'
 import { TabBar, TabView } from 'react-native-tab-view'
 import NodeListScreen from './components/node-list-screen'
+import { messageConfirm } from '@/utils/utilsAlert'
+import Toast from 'react-native-toast-message'
+import NoteSearch from './components/note-search'
 
 const TabScreenTypes = {
   draft: 'draft',
@@ -81,6 +84,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const [showFolderManageDrawer, setShowFolderManageDrawer] = useState(false)
   const [showMovedDrawer, setShowMovedDrawer] = useState(false)
   const [showBottomActionBar, setShowBottomActionBar] = useState(false)
+  const [showSearchNoteDrawer, setShowSearchNoteDrawer] = useState(false)
   const [checkedIds, setCheckedIds] = useState<string[]>([])
 
   const bottomActionDisabled = useMemo(() => !checkedIds.length, [checkedIds])
@@ -148,6 +152,34 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       })
   }
 
+  const removeNotes = () => {
+    if (!checkedIds?.length) return
+
+    messageConfirm({
+      message: `Are you sure to delete  these notes : [${[...checkedIds]}] ?`,
+    }).then(() => {
+      deleteNotes(checkedIds).then(res => {
+        if (res) {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            text1: 'Operation successfuly',
+            visibilityTime: 3000,
+          })
+        } else {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Operation failed',
+            visibilityTime: 3000,
+          })
+        }
+      })
+    })
+
+    // deleteNotes(checkedIds)
+  }
+
   const onCheckFolderItem = (folder: Folder) => {
     const current = {
       id: folder.id,
@@ -184,12 +216,22 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
         case TabScreenTypes.published:
           return (
-            <NodeListScreen
-              list={publishedList}
-              isShowBottomAction={showBottomActionBar}
-              onNoteCheckBoxChange={onNoteCheckBoxChange}
-              navigation={navigation}
-            />
+            <Animated.ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={[{ paddingTop: HEADER_MAX_HEIGHT }]}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: false },
+              )}
+              scrollEventThrottle={16}
+            >
+              <NodeListScreen
+                list={publishedList}
+                isShowBottomAction={showBottomActionBar}
+                onNoteCheckBoxChange={onNoteCheckBoxChange}
+                navigation={navigation}
+              />
+            </Animated.ScrollView>
           )
         default:
           return null
@@ -252,11 +294,13 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
         <View
           style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}
         >
-          <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
+          <TouchableOpacity onPress={() => setShowSearchNoteDrawer(true)}>
+            <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setShowBottomActionBar(!showBottomActionBar)}
           >
-            <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
+            <PencilSquareIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -314,10 +358,10 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
               <ArrowUpIcon {...bottomActionItemStyle.iconProps} />
               <Text {...bottomActionItemStyle.textProps}>Pin</Text>
             </View>
-            <View style={tw` items-center`}>
+            <TouchableOpacity style={tw` items-center`} onPress={removeNotes}>
               <TrashIcon {...bottomActionItemStyle.iconProps} />
               <Text {...bottomActionItemStyle.textProps}>Delete</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -329,6 +373,14 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           style={[styles.fixedFooter, tw`flex-row bg-white`]}
           closeDrawer={() => setShowFolderManageDrawer(false)}
           onCheckFolderItem={onCheckFolderItem}
+        />
+      )}
+      {/* Drawer */}
+      {showSearchNoteDrawer && (
+        <NoteSearch
+          style={[styles.fixedFooter, tw`flex-row bg-white`]}
+          closeDrawer={() => setShowSearchNoteDrawer(false)}
+          // onCheckFolderItem={onCheckFolderItem}
         />
       )}
 

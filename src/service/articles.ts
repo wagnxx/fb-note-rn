@@ -28,6 +28,7 @@ export type Note = {
   createTime?: FieldValue
   createId?: string
   titleText?: string
+  contentText?: string
 }
 
 export const createNote = (doc: Note) => {
@@ -39,7 +40,9 @@ export const createNote = (doc: Note) => {
   return Promise.reject('logout')
 }
 
-export const updateNote = async (doc: Partial<Note>): Promise<boolean | null> => {
+export const updateNote = async (
+  doc: Partial<Note>,
+): Promise<boolean | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
     return updateDocData(COL_ARTICLES, doc.id!, doc)
@@ -47,7 +50,10 @@ export const updateNote = async (doc: Partial<Note>): Promise<boolean | null> =>
   return Promise.reject('logout')
 }
 
-export const batchUpdateNote = async (noteIds: string[], docs: Partial<Note>[]): Promise<boolean | null> => {
+export const batchUpdateNote = async (
+  noteIds: string[],
+  docs: Partial<Note>[],
+): Promise<boolean | null> => {
   if (auth?.currentUser?.uid) {
     docs?.forEach(item => (item.createId = auth.currentUser?.uid))
     return batchUpdateDocData(COL_ARTICLES, noteIds, docs)
@@ -55,7 +61,9 @@ export const batchUpdateNote = async (noteIds: string[], docs: Partial<Note>[]):
   return Promise.reject('logout')
 }
 
-export const getAllNotes: (folderId?: string) => Promise<DocumentData & Partial<Note>[]> = (folderId?: string) => {
+export const getAllNotes: (
+  folderId?: string,
+) => Promise<DocumentData & Partial<Note>[]> = (folderId?: string) => {
   if (!auth?.currentUser?.uid) {
     return Promise.reject('logout')
   }
@@ -68,9 +76,15 @@ export const getAllNotes: (folderId?: string) => Promise<DocumentData & Partial<
     where('title', '>', ''),
     orderBy('title', 'desc'),
     orderBy('createTime', 'desc'),
-  ].filter((condition): condition is QueryFieldFilterConstraint => condition !== null) // 过滤掉 null 或 undefined
+  ].filter(
+    (condition): condition is QueryFieldFilterConstraint => condition !== null,
+  ) // 过滤掉 null 或 undefined
 
-  return getFieldValues<Partial<Note>>(COL_ARTICLES, ['title', 'id', 'createTime', 'published'], conditions)
+  return getFieldValues<Partial<Note>>(
+    COL_ARTICLES,
+    ['title', 'id', 'createTime', 'published'],
+    conditions,
+  )
 }
 
 export const getNote = (id: string) => getDocData<Note>(COL_ARTICLES, id)

@@ -33,7 +33,11 @@ const dealError = (error: unknown) => {
 const LogError = console.error.bind(console)
 const LogInfo = console.log.bind(console)
 
-export const batchUpdateDocData = async (colName: string, docIds: string[], docDatas: DocumentData[]) => {
+export const batchUpdateDocData = async (
+  colName: string,
+  docIds: string[],
+  docDatas: DocumentData[],
+) => {
   if (docIds.length !== docDatas.length) {
     throw new Error('The number of docIds must match the number of docDatas.')
   }
@@ -56,7 +60,10 @@ export const batchUpdateDocData = async (colName: string, docIds: string[], docD
 }
 
 // 添加文档到指定集合
-export const addDocToCol = async (colName: string, docData: DocumentData): Promise<string | null> => {
+export const addDocToCol = async (
+  colName: string,
+  docData: DocumentData,
+): Promise<string | null> => {
   try {
     const docRef = await addDoc(collection(db, colName), docData)
     LogInfo('Document added with ID:', docRef.id)
@@ -68,7 +75,10 @@ export const addDocToCol = async (colName: string, docData: DocumentData): Promi
 }
 
 // 获取指定文档的数据
-export const getDocData = async <T>(colName: string, docId: string): Promise<(DocumentData & T) | null> => {
+export const getDocData = async <T>(
+  colName: string,
+  docId: string,
+): Promise<(DocumentData & T) | null> => {
   try {
     const docSnap: DocumentSnapshot = await getDoc(doc(db, colName, docId))
     if (docSnap.exists) {
@@ -100,7 +110,10 @@ export const updateDocData = async (
 }
 
 // 删除指定文档
-export const deleteDocById = async (colName: string, docId: string): Promise<boolean> => {
+export const deleteDocById = async (
+  colName: string,
+  docId: string,
+): Promise<boolean> => {
   try {
     await deleteDoc(doc(db, colName, docId))
     LogInfo('Document deleted successfully')
@@ -111,7 +124,10 @@ export const deleteDocById = async (colName: string, docId: string): Promise<boo
   return false
 }
 
-export const deleteDocsByIds = async (colName: string, docIds: string[]): Promise<boolean> => {
+export const deleteDocsByIds = async (
+  colName: string,
+  docIds: string[],
+): Promise<boolean> => {
   const batch = writeBatch(db)
 
   docIds.forEach(id => {
@@ -136,7 +152,10 @@ export const getDocsByCondition = async (
   condition: { field: string; operator: WhereFilterOp; value: any },
 ): Promise<DocumentData[]> => {
   try {
-    const q = query(collection(db, colName), where(condition.field, condition.operator, condition.value))
+    const q = query(
+      collection(db, colName),
+      where(condition.field, condition.operator, condition.value),
+    )
     const querySnapshot = await getDocs(q)
     const docsData: DocumentData[] = []
     querySnapshot.forEach(doc => {
@@ -172,7 +191,8 @@ export const getFieldValues = async <T>(
           fieldValue[fieldName] = doc.id
         } else {
           // fieldValue[fieldName] = doc.data()[fieldName]
-          ;(fieldValue as DocumentData & { [K in keyof T]: T[K] })[fieldName] = doc.data()[fieldName as string]
+          ;(fieldValue as DocumentData & { [K in keyof T]: T[K] })[fieldName] =
+            doc.data()[fieldName as string]
         }
       })
       fieldValues.push(fieldValue)
