@@ -6,12 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
-  SafeAreaView,
+  Animated,
 } from 'react-native'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { Text, useTheme } from 'react-native-paper'
-import { TabBar, TabView } from 'react-native-tab-view'
 import { batchUpdateNote } from '@/service/articles'
 const { width, height } = Dimensions.get('window')
 import tw from 'twrnc'
@@ -31,6 +30,7 @@ import { Folder } from '@/service/basic'
 import { saveCurrentFolderToStorage } from '@/utils/utilsStorage'
 import FolderMovedTo from './components/folder-moved-to'
 import { NoteProvider, useNote } from '@/context/note-provider'
+import { TabBar, TabView } from 'react-native-tab-view'
 import NodeListScreen from './components/node-list-screen'
 
 const TabScreenTypes = {
@@ -43,8 +43,32 @@ type TabRoute = {
   title: string
 }
 
+const HEADER_MAX_HEIGHT = 100
+const HEADER_MIN_HEIGHT = 60
+const TITLE_MAX_MARGIN = 35 // Adjust this value based on your layout
+
 const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   const theme = useTheme()
+
+  // const scrollY = new Animated.Value(0)
+  const scrollY = useRef(new Animated.Value(0)).current
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    extrapolate: 'clamp',
+  })
+  const headerTextSize = scrollY.interpolate({
+    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+    outputRange: [34, 20],
+    extrapolate: 'clamp',
+  })
+
+  const titleTranslateY = scrollY.interpolate({
+    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+    outputRange: [TITLE_MAX_MARGIN, -10],
+    extrapolate: 'clamp',
+  })
 
   const {
     noteList: list,
@@ -140,12 +164,22 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       switch (route.key) {
         case TabScreenTypes.draft:
           return (
-            <NodeListScreen
-              list={draftList}
-              isShowBottomAction={showBottomActionBar}
-              onNoteCheckBoxChange={onNoteCheckBoxChange}
-              navigation={navigation}
-            />
+            <Animated.ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={[{ paddingTop: HEADER_MAX_HEIGHT }]}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: false },
+              )}
+              scrollEventThrottle={16}
+            >
+              <NodeListScreen
+                list={draftList}
+                isShowBottomAction={showBottomActionBar}
+                onNoteCheckBoxChange={onNoteCheckBoxChange}
+                navigation={navigation}
+              />
+            </Animated.ScrollView>
           )
 
         case TabScreenTypes.published:
@@ -161,7 +195,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           return null
       }
     },
-    [draftList, showBottomActionBar, navigation, publishedList],
+    [scrollY, draftList, showBottomActionBar, navigation, publishedList],
   )
 
   if (loading) {
@@ -173,14 +207,47 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   }
 
   return (
-    <>
+    <View style={[tw`bg-gray-50`, { height }]}>
       <StatusBar hidden />
-      <SafeAreaView style={tw`flex-row  justify-end items-center pl-2`}>
+      <Animated.View
+        style={[
+          styles.header,
+          tw`flex-row  justify-start items-start pl-2 pt-3 bg-gray-50`,
+          { height: headerHeight },
+        ]}
+      >
         {showBottomActionBar && (
           <TouchableOpacity onPress={() => setShowBottomActionBar(false)}>
             <XMarkIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         )}
+
+        <Animated.View
+          style={[{ transform: [{ translateY: titleTranslateY }] }]}
+        >
+          <Pressable
+            onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}
+          >
+            <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
+              <Animated.Text
+                style={[
+                  tw`font-bold`,
+                  {
+                    fontSize: headerTextSize,
+                    color: theme.colors.onBackground,
+                  },
+                ]}
+              >
+                {currentFolder?.name}
+              </Animated.Text>
+              {!showFolderManageDrawer ? (
+                <ChevronDownIcon size={20} color={theme.colors.onBackground} />
+              ) : (
+                <ChevronUpIcon size={20} color={theme.colors.onBackground} />
+              )}
+            </View>
+          </Pressable>
+        </Animated.View>
 
         <View
           style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}
@@ -192,22 +259,8 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
             <EllipsisVerticalIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-      {/* <Avatar /> */}
-      <Pressable
-        onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}
-      >
-        <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
-          <Text style={[tw`font-bold`, { fontSize: 24 }]}>
-            {currentFolder?.name}
-          </Text>
-          {!showFolderManageDrawer ? (
-            <ChevronDownIcon size={20} color={theme.colors.onBackground} />
-          ) : (
-            <ChevronUpIcon size={20} color={theme.colors.onBackground} />
-          )}
-        </View>
-      </Pressable>
+      </Animated.View>
+
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -286,19 +339,29 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           onMoveNoteToFolder={moveNoteToFolderHandle}
         />
       )}
-    </>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+
   fab: {
     position: 'absolute',
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     right: 30,
-    bottom: 40,
+    bottom: 50,
     backgroundColor: '#03A9F4',
     borderRadius: 30,
     elevation: 8,

@@ -1,4 +1,12 @@
-import { View, Text, Dimensions, TouchableOpacity, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import {
+  View,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native'
 import React, { useState } from 'react'
 import { Drawer, TouchableRipple, useTheme } from 'react-native-paper'
 import { XMarkIcon } from 'react-native-heroicons/outline'
@@ -21,7 +29,12 @@ type FolderManageProps = {
 
 const { width, height } = Dimensions.get('window')
 
-export default function FolderManage({ style, closeDrawer, onCheckFolderItem, currentFolder }: FolderManageProps) {
+export default function FolderManage({
+  style,
+  closeDrawer,
+  onCheckFolderItem,
+  currentFolder,
+}: FolderManageProps) {
   const theme = useTheme()
 
   const [showNewDrawer, toggleshowNewDrawer] = useToggle(false)
@@ -54,30 +67,68 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
   return (
     <>
       <Drawer.Section
-        style={[style, tw`flex-col`, { height, backgroundColor: 'rgba(0,0,0,0.6)', width }]}
+        style={[
+          style,
+          tw`flex-col`,
+          { height, backgroundColor: 'rgba(0,0,0,0.6)', width },
+        ]}
         showDivider={false}
       >
-        <TouchableWithoutFeedback onPress={onDismissKeyboard} style={{ height }}>
+        <TouchableWithoutFeedback
+          onPress={onDismissKeyboard}
+          style={{ height }}
+        >
           <View
-            style={[{ minHeight: 200, maxHeight: 450, width }, tw`bg-gray-100  pb-8 absolute bottom-0 rounded-t-xl`]}
+            style={[
+              { minHeight: 200, maxHeight: 500, width },
+              tw`bg-gray-100  pb-8 absolute bottom-0 rounded-t-xl`,
+            ]}
           >
             <View style={tw`flex-row justify-center px-4 py-3`}>
-              <TouchableOpacity onPress={closeDrawer} style={tw`absolute top-4 left-4`}>
+              <TouchableOpacity
+                onPress={closeDrawer}
+                style={tw`absolute top-4 left-4`}
+              >
                 <XMarkIcon size={22} color={theme.colors.onBackground} />
               </TouchableOpacity>
-              <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>Folders</Text>
+              <Text
+                style={[
+                  theme.fonts.titleMedium,
+                  { color: theme.colors.onBackground },
+                ]}
+              >
+                Folders
+              </Text>
               {/* <View style={tw`justify-center items-center flex-row flex-1`}>
               </View> */}
             </View>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
-              <View style={[tw`flex-row justify-start px-5 gap-6 flex-wrap py-2`, { width }]}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 32 }}
+            >
+              <View
+                style={[
+                  tw`flex-row justify-start px-5 gap-6 flex-wrap py-2`,
+                  { width },
+                ]}
+              >
                 <TouchableRipple onPress={() => toggleshowNewDrawer(true)}>
                   <View style={[itemStyle, tw`justify-center `, {}]}>
                     <Text style={itemTextStyle}>+</Text>
                   </View>
                 </TouchableRipple>
-                <TouchableRipple onPress={() => onCheckFolderItemHandle({ id: '', name: 'ALL FOLDERS' })}>
-                  <View style={[itemStyle, tw`bg-blue-700 `, currentFolder?.id === '' && tw` border-yellow-500`]}>
+                <TouchableRipple
+                  onPress={() =>
+                    onCheckFolderItemHandle({ id: '', name: 'ALL FOLDERS' })
+                  }
+                >
+                  <View
+                    style={[
+                      itemStyle,
+                      tw`bg-blue-700 `,
+                      currentFolder?.id === '' && tw` border-yellow-500`,
+                    ]}
+                  >
                     <Text style={itemTextStyle}>All NOTES({noteLength})</Text>
                   </View>
                 </TouchableRipple>
@@ -100,7 +151,12 @@ export default function FolderManage({ style, closeDrawer, onCheckFolderItem, cu
         </TouchableWithoutFeedback>
 
         {/* new folder input drawer */}
-        {showNewDrawer && <FolderEdit onClose={onFolderEditClose} targetEditFolder={targetEditFolder} />}
+        {showNewDrawer && (
+          <FolderEdit
+            onClose={onFolderEditClose}
+            targetEditFolder={targetEditFolder}
+          />
+        )}
       </Drawer.Section>
     </>
   )

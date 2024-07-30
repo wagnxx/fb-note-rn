@@ -3,7 +3,10 @@ import { Folder, getFolders } from '@/service/basic'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { COL_ARTICLES, getAllNotes, Note } from '@/service/articles'
 import { extractTextFromHTML } from '@/utils/utilsString'
-import { getCurrentFolderFromStorage, ICurrentFolder } from '@/utils/utilsStorage'
+import {
+  getCurrentFolderFromStorage,
+  ICurrentFolder,
+} from '@/utils/utilsStorage'
 import { db } from '@/firebase/firebase'
 import { useAuth } from './auth-provider'
 
@@ -30,7 +33,9 @@ export const NoteContext = createContext<NoteContextType>({
 })
 
 // Create the NoteProvider component
-export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [folders, setFolders] = useState<Folder[]>([])
   const [noteList, setNoteList] = useState<Partial<Note>[]>([])
   const [noteLoading, setNoteLoading] = useState(false)
@@ -56,7 +61,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
             folderId: doc.data().folderId || '',
             // ...doc.data(),
           }))
-          console.log('notesList:::', notesList)
+          // console.log('notesList:::', notesList)
           setAllNotesList(notesList)
         },
         error => {
