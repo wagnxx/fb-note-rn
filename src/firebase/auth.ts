@@ -51,7 +51,8 @@ const registerUser = async (email: string, password: string) => {
 // 用户注销
 const logoutUser = async () => {
   try {
-    await signOut()
+    // await signOut()
+    await auth.signOut()
     console.log('User logged out successfully.')
     return true
   } catch (error) {
