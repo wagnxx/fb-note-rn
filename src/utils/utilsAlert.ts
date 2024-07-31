@@ -1,4 +1,5 @@
 import { Alert } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 type MessageConfirmProp = {
   title?: string
@@ -29,5 +30,16 @@ export const messageConfirm = ({
       ],
       { cancelable: false },
     )
+  })
+}
+
+export const developWarn = () => {
+  const text = 'This feature is under development.'
+
+  Toast.show({
+    type: 'info',
+    position: 'top',
+    text1: text,
+    visibilityTime: 3000, // 显示时间
   })
 }

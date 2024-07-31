@@ -6,6 +6,7 @@ import ProfileList, { Actions } from './components/profile-list'
 import Avatar from './components/avatar'
 import tw from 'twrnc'
 import Settings from './components/settings'
+import { developWarn } from '@/utils/utilsAlert'
 
 const Ny: ScreenFC<ScrennTypeEnum.My> = ({ navigation }) => {
   const { user } = useContext(AuthContext)
@@ -16,6 +17,8 @@ const Ny: ScreenFC<ScrennTypeEnum.My> = ({ navigation }) => {
       case Actions.settings:
         setShowSettings(true)
         break
+      default:
+        developWarn()
     }
   }
 
