@@ -1,28 +1,33 @@
-import { StyleSheet } from 'react-native'
+import { ImageRequireSource, StyleSheet, View } from 'react-native'
 import React from 'react'
 import ProfileListItem from './profile-list-item'
-
-const styles = StyleSheet.create({
-  imageIcon: {
-    width: 23.5,
-    height: 23.5,
-  },
-  arrayIcon: {
-    width: 10,
-    height: 18,
-  },
-})
-
-const voidFunc = name => {}
+import tw from 'twrnc'
+import { developWarn } from '@/utils/utilsAlert'
+import { FilmIcon, MusicalNoteIcon } from 'react-native-heroicons/outline'
 
 export enum Actions {
   apply,
   record,
   help,
   settings,
+  video,
+  music,
 }
 
-const itemsList = [
+export type SvgProps = {
+  color?: string
+  size?: number
+}
+
+export type ItemType = {
+  label: string
+  icon?: ImageRequireSource
+  IconElement?: React.FC<SvgProps>
+  name: Actions
+}
+const ICON_SIZE = 23.5
+
+const itemsList: ItemType[] = [
   {
     label: '我的申请',
     icon: require('../../../assets/images/wd-sq.png'),
@@ -43,23 +48,52 @@ const itemsList = [
     icon: require('../../../assets/images/wd-sz.png'),
     name: Actions.settings,
   },
+  {
+    label: '视频',
+    IconElement: prop => <FilmIcon size={ICON_SIZE} {...prop} />,
+    name: Actions.video,
+  },
+  {
+    label: '音乐',
+    IconElement: prop => <MusicalNoteIcon size={ICON_SIZE} {...prop} />,
+    name: Actions.music,
+  },
 ]
 
 type ProfileListProps = {
-  doAction: (name: Actions) => void
+  onSettingsDrawerOpen: () => void
 }
 
-export default function ProfileList({ doAction = voidFunc }: ProfileListProps) {
-  const onItemPress = item => {
-    doAction(item.name)
+export default function ProfileList({
+  onSettingsDrawerOpen,
+}: ProfileListProps) {
+  const onItemPress = (item: ItemType) => {
+    switch (item.name) {
+      case Actions.settings:
+        onSettingsDrawerOpen()
+        break
+      default:
+        developWarn()
+    }
   }
-  return itemsList.map((item, index) => (
-    <ProfileListItem
-      key={index}
-      label={item.label}
-      icon={item.icon}
-      iconStyle={styles.imageIcon}
-      onItemPress={() => onItemPress(item)}
-    />
-  ))
+
+  return (
+    <View style={[{}, tw`flex-row bg-gray-50 `]}>
+      {itemsList.map((item, index) => (
+        <ProfileListItem
+          key={index}
+          item={item}
+          iconStyle={styles.imageIcon}
+          onItemPress={() => onItemPress(item)}
+        />
+      ))}
+    </View>
+  )
 }
+
+const styles = StyleSheet.create({
+  imageIcon: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+  },
+})

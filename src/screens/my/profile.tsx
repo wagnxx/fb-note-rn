@@ -179,6 +179,37 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
 
     // deleteNotes(checkedIds)
   }
+  const publishNote = async () => {
+    if (!checkedIds?.length) return
+
+    try {
+      await messageConfirm({
+        message: `Are you sure to publish  these notes : [${[...checkedIds]}] ?`,
+      })
+      const docs = checkedIds.map(item => ({ published: true }))
+
+      batchUpdateNote(checkedIds, docs)
+        .then(res => {
+          if (res) {
+            console.log('update success!')
+            setShowMovedDrawer(false)
+            refreshNote()
+          } else {
+            console.log('update failed.')
+          }
+        })
+        .catch(err => {
+          console.log('update notes err:', err)
+        })
+    } catch (error) {
+      console.log('error cancel?', error)
+    }
+
+    console.log('other statement')
+    // messageConfirm({
+    //   message: `Are you sure to delete  these notes : [${[...checkedIds]}] ?`,
+    // }).then(() => {
+  }
 
   const onCheckFolderItem = (folder: Folder) => {
     const current = {
@@ -354,10 +385,10 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
               <EyeSlashIcon {...bottomActionItemStyle.iconProps} />
               <Text {...bottomActionItemStyle.textProps}>Hide</Text>
             </View>
-            <View style={tw` items-center`}>
+            <TouchableOpacity style={tw` items-center`} onPress={publishNote}>
               <ArrowUpIcon {...bottomActionItemStyle.iconProps} />
-              <Text {...bottomActionItemStyle.textProps}>Pin</Text>
-            </View>
+              <Text {...bottomActionItemStyle.textProps}>Publish</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={tw` items-center`} onPress={removeNotes}>
               <TrashIcon {...bottomActionItemStyle.iconProps} />
               <Text {...bottomActionItemStyle.textProps}>Delete</Text>

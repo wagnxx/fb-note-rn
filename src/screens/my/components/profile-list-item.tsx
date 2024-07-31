@@ -1,30 +1,41 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import tw from 'twrnc'
 import { useTheme } from 'react-native-paper'
-const styles = StyleSheet.create({
-  imageIcon: {
-    width: 23.5,
-    height: 23.5,
-  },
-  arrayIcon: {
-    width: 10,
-    height: 18,
-  },
-})
+import { ItemType } from './profile-list'
+import { SvgProps } from 'react-native-svg'
 
-const ProfileListItem = ({ iconStyle, icon, label, onItemPress }) => {
+type ProfileListItemProps = {
+  item: ItemType
+  iconStyle: object
+  onItemPress: () => void
+}
+const ProfileListItem = ({
+  item,
+  iconStyle,
+  onItemPress,
+}: ProfileListItemProps) => {
   const theme = useTheme()
+
+  const IconElement = item.IconElement as React.FC<SvgProps>
+
   return (
-    <View style={[tw`flex-row justify-between px-3 pb-2 pt-2 mt-2 border-b-gray-100`, { borderBottomWidth: 1 }]}>
-      <View style={tw`flex-row gap-2`}>
-        <Image style={[iconStyle]} source={icon} />
-        <Text style={{ color: theme.colors.onBackground }}>{label}</Text>
-      </View>
-      <TouchableOpacity onPress={onItemPress}>
-        <Image style={[styles.arrayIcon]} source={require('../../../assets/images/go-sq.png')} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      onPress={onItemPress}
+      style={[
+        tw`justify-between items-center gap-2 px-3 pb-2 pt-2 mt-2 border-b-gray-100`,
+        { borderBottomWidth: 1 },
+      ]}
+    >
+      {item.icon && <Image style={[iconStyle]} source={item.icon} />}
+
+      {!item.icon && <IconElement color={theme.colors.onBackground} />}
+      <Text
+        style={[{ color: theme.colors.onBackground }, theme.fonts.labelSmall]}
+      >
+        {item.label}
+      </Text>
+    </TouchableOpacity>
   )
 }
 
