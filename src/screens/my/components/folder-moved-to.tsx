@@ -1,4 +1,10 @@
-import { View, Text, Dimensions, TouchableOpacity, ScrollView } from 'react-native'
+import {
+  View,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native'
 import React, { useState } from 'react'
 import { Drawer, TouchableRipple, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
@@ -13,10 +19,14 @@ const { width, height } = Dimensions.get('window')
 type FolderMovedToType = {
   style?: object
   closeDrawer?: () => void
-  onMoveNoteToFolder?: (id: string) => void
+  onMoveNoteToFolder?: (folder: Folder) => void
 }
 
-export default function FolderMovedTo({ style, closeDrawer, onMoveNoteToFolder = () => {} }: FolderMovedToType) {
+export default function FolderMovedTo({
+  style,
+  closeDrawer,
+  onMoveNoteToFolder = () => {},
+}: FolderMovedToType) {
   const theme = useTheme()
   const { folders } = useNote()
   const [currentFolder, setCurrentFolder] = useState<ICurrentFolder>(null)
@@ -27,29 +37,70 @@ export default function FolderMovedTo({ style, closeDrawer, onMoveNoteToFolder =
 
   const moveNoteToFolder = () => {
     if (currentFolder?.id) {
-      onMoveNoteToFolder(currentFolder.id)
+      onMoveNoteToFolder(currentFolder)
     }
   }
 
   return (
     <Drawer.Section
-      style={[style, tw`flex-col`, { height, backgroundColor: 'rgba(0,0,0,0.6)', width }]}
+      style={[
+        style,
+        tw`flex-col`,
+        { height, backgroundColor: 'rgba(0,0,0,0.6)', width },
+      ]}
       showDivider={false}
     >
-      <View style={[{ minHeight: 200, maxHeight: 450, width }, tw`bg-gray-100  pb-8 absolute bottom-10 rounded-t-xl`]}>
+      <View
+        style={[
+          { minHeight: 200, maxHeight: 450, width },
+          tw`bg-gray-100  pb-8 absolute bottom-10 rounded-t-xl`,
+        ]}
+      >
         <View style={tw`flex-row justify-between items-center px-4 py-3`}>
           <TouchableOpacity onPress={closeDrawer} style={tw``}>
             <XMarkIcon size={22} color={theme.colors.onBackground} />
           </TouchableOpacity>
-          <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>Folders</Text>
+          <Text
+            style={[
+              theme.fonts.titleMedium,
+              { color: theme.colors.onBackground },
+            ]}
+          >
+            Folders
+          </Text>
           <TouchableOpacity onPress={moveNoteToFolder} style={tw``}>
-            <CheckIcon size={22} color={currentFolder ? theme.colors.onBackground : theme.colors.surfaceDisabled} />
+            <CheckIcon
+              size={22}
+              color={
+                currentFolder
+                  ? theme.colors.onBackground
+                  : theme.colors.surfaceDisabled
+              }
+            />
           </TouchableOpacity>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
-          <View style={[tw`flex-row justify-start px-5 gap-6 flex-wrap py-2`, { width }]}>
-            <TouchableRipple onPress={() => onCheckFolderItemHandle({ id: '', name: 'ALL FOLDERS' })}>
-              <View style={[itemStyle, tw`bg-blue-700 `, currentFolder?.id === '' && tw` border-yellow-500`]}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{}}
+        >
+          <View
+            style={[
+              tw`flex-row justify-start px-5 gap-6 flex-wrap py-2`,
+              { width },
+            ]}
+          >
+            <TouchableRipple
+              onPress={() =>
+                onCheckFolderItemHandle({ id: '', name: 'ALL FOLDERS' })
+              }
+            >
+              <View
+                style={[
+                  itemStyle,
+                  tw`bg-blue-700 `,
+                  currentFolder?.id === '' && tw` border-yellow-500`,
+                ]}
+              >
                 <Text style={itemTextStyle}>All NOTES</Text>
               </View>
             </TouchableRipple>

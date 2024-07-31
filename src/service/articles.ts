@@ -19,7 +19,7 @@ import {
 export const COL_ARTICLES = 'articles'
 
 export type Note = {
-  id: string
+  id?: string // id 是自动给生成
   title: string
   content: string
   tags?: string[]

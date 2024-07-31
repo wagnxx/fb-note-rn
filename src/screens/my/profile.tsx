@@ -132,24 +132,30 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     setCheckedIds(ids)
   }
 
-  const moveNoteToFolderHandle = (folderId: string) => {
+  const moveNoteToFolderHandle = async (folder: Folder) => {
     if (!checkedIds?.length) return
 
-    const docs = checkedIds.map(item => ({ folderId }))
+    const docs = checkedIds.map(() => ({ folderId: folder.id }))
 
-    batchUpdateNote(checkedIds, docs)
-      .then(res => {
-        if (res) {
-          console.log('update success!')
-          setShowMovedDrawer(false)
-          refreshNote()
-        } else {
-          console.log('update failed.')
-        }
+    try {
+      await messageConfirm({
+        message: `Are you sure you want to move these notes : [${[...checkedIds]}]  to Folder ${folder.name}?`,
       })
-      .catch(err => {
-        console.log('update notes err:', err)
-      })
+
+      batchUpdateNote(checkedIds, docs)
+        .then(res => {
+          if (res) {
+            console.log('update success!')
+            setShowMovedDrawer(false)
+            refreshNote()
+          } else {
+            console.log('update failed.')
+          }
+        })
+        .catch(err => {
+          console.log('update notes err:', err)
+        })
+    } catch (error) {}
   }
 
   const removeNotes = () => {
@@ -204,11 +210,6 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
     } catch (error) {
       console.log('error cancel?', error)
     }
-
-    console.log('other statement')
-    // messageConfirm({
-    //   message: `Are you sure to delete  these notes : [${[...checkedIds]}] ?`,
-    // }).then(() => {
   }
 
   const onCheckFolderItem = (folder: Folder) => {

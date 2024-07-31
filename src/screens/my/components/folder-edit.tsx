@@ -18,6 +18,7 @@ import tw from 'twrnc'
 import { createFolder, Folder, updateFolder } from '@/service/basic'
 import { itemStyle, itemTextStyle } from './folder-list'
 import Toast from 'react-native-toast-message'
+import { messageConfirm } from '@/utils/utilsAlert'
 
 type FolderEditTProps = {
   onClose: (refresh?: boolean) => void
@@ -79,7 +80,7 @@ export default function FolderEdit({
     onClose()
   }
 
-  const createNewFolder = () => {
+  const createNewFolder = async () => {
     if (newFolderValue.length < 3) {
       Alert.alert('warning', 'new folder name should grade than 3 charts')
       return
@@ -87,46 +88,54 @@ export default function FolderEdit({
 
     let fn
     let options = {}
+    let actionName = 'Create'
 
     if (!newFolderId) {
       fn = createFolder
     } else {
       fn = updateFolder
+      actionName = 'Update'
       options = {
         ...options,
         id: newFolderId,
       }
     }
 
-    fn({ name: newFolderValue, ...selectedBgItem, ...options })
-      .then(res => {
-        if (res) {
-          Toast.show({
-            type: 'info',
-            position: 'top',
-            text1: 'Operation successful',
-            visibilityTime: 3000, // 显示时间
-          })
-          onClose(true)
-        } else {
+    try {
+      await messageConfirm({
+        message: `Are you sure you want to ${actionName}  ${newFolderValue} Folder ?`,
+      })
+
+      fn({ name: newFolderValue, ...selectedBgItem, ...options })
+        .then(res => {
+          if (res) {
+            Toast.show({
+              type: 'info',
+              position: 'top',
+              text1: 'Operation successful',
+              visibilityTime: 3000, // 显示时间
+            })
+            onClose(true)
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Operation failed',
+              visibilityTime: 3000, // 显示时间
+            })
+          }
+        })
+        .catch(err => {
+          console.log('create err:::', err)
           Toast.show({
             type: 'error',
             position: 'top',
-            text1: 'Operation failed',
+            text1: 'Operation  error',
+            text2: err,
             visibilityTime: 3000, // 显示时间
           })
-        }
-      })
-      .catch(err => {
-        console.log('create err:::', err)
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          text1: 'Operation  error',
-          text2: err,
-          visibilityTime: 3000, // 显示时间
         })
-      })
+    } catch (error) {}
   }
 
   const initEditParams = useCallback(

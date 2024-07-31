@@ -1,5 +1,13 @@
-import React, { useRef, useState } from 'react'
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  InteractionManager,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import {
   ArrowLeftIcon,
   ArrowUturnLeftIcon,
@@ -15,6 +23,10 @@ import ToolBar from './components/tool-bar'
 import { RootStackParamList, ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { createNote } from '@/service/articles'
 import { RouteProp, useRoute } from '@react-navigation/native'
+import { messageConfirm } from '@/utils/utilsAlert'
+import { extractTextFromHTML } from '@/utils/utilsString'
+import Toast from 'react-native-toast-message'
+import { formatDate } from '@/utils/utilsDate'
 
 const iconSize = 18
 
@@ -25,14 +37,18 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
   const contentRichText = useRef<RichEditor>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [lastupdte, setLastupdte] = useState('')
   const theme = useTheme()
 
   const [isFocus, setIsFocus] = useState(false)
-  const [isFirstLoadWithoutInteraction, setIsFirstLoadWithoutInteraction] = useState(true)
+  const [isFirstLoadWithoutInteraction, setIsFirstLoadWithoutInteraction] =
+    useState(true)
 
   const {
     params: { id: folderId },
   } = useRoute<RouteProp<RootStackParamList>>()
+
+  const contentLen = useMemo(() => content.length, [content])
 
   const handleEditorChange = (text, type) => {
     if (type === 'title') {
@@ -46,29 +62,45 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
     }
   }
 
-  const save = () => {
-    console.log('title,content', title, content)
+  const save = async () => {
     if (!title || !content) return
-    createNote({ title, content, folderId })
-      .then(res => {
-        if (res) {
-          // success
-          Alert.alert('warning', 'create note success.')
-          navigation.navigate(ScrennTypeEnum.Profile)
-          setContent('')
-          setTitle('')
-        } else {
-          // faild
-          Alert.alert('warn', 'create note failed')
-        }
+
+    try {
+      const titleText = extractTextFromHTML(title)
+      await messageConfirm({
+        message: `Are you sure you want to create Note ${titleText} ?`,
       })
-      .catch(err => {
-        console.log('create note error:::', err)
-      })
+      createNote({ title, content, folderId })
+        .then(res => {
+          if (res) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'create note success.',
+              visibilityTime: 3000,
+            })
+            navigation.navigate(ScrennTypeEnum.Profile)
+            setContent('')
+            setTitle('')
+          } else {
+            Toast.show({
+              type: 'info',
+              position: 'top',
+              text1: 'create note failed',
+              visibilityTime: 3000,
+            })
+          }
+        })
+        .catch(err => {
+          console.log('create note error:::', err)
+        })
+    } catch (error) {}
   }
 
-  const contentTextUndo = () => contentRichText?.current?.sendAction(actions.undo, 'result')
-  const contentTextRedo = () => contentRichText?.current?.sendAction(actions.redo, 'result')
+  const contentTextUndo = () =>
+    contentRichText?.current?.sendAction(actions.undo, 'result')
+  const contentTextRedo = () =>
+    contentRichText?.current?.sendAction(actions.redo, 'result')
   // editor.sendAction(action, 'result');
   const handleKeyPress = ({ key }: { keyCode: number; key: string }) => {
     if (key === 'Enter') {
@@ -81,6 +113,22 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
   const goBack = () => {
     navigation.goBack()
   }
+
+  useEffect(() => {
+    const date = formatDate(new Date(), {
+      customFormat: 'DD/MM/YYYY,HH:mm',
+    })
+    console.log('date:', date)
+    setLastupdte(date)
+  }, [])
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      headingRichText.current?.focusContentEditor()
+    })
+
+    return () => task.cancel()
+  }, [])
 
   return (
     <SafeAreaView style={[tw`flex-1 p-1 bg-gray-50`]}>
@@ -99,17 +147,26 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
         {isFocus && (
           <View style={tw`flex-row gap-2`}>
             <TouchableOpacity onPress={contentTextUndo}>
-              <ArrowUturnLeftIcon size={iconSize} color={theme.colors.onSurface} />
+              <ArrowUturnLeftIcon
+                size={iconSize}
+                color={theme.colors.onSurface}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={contentTextRedo}>
-              <ArrowUturnRightIcon size={iconSize} color={theme.colors.onSurface} />
+              <ArrowUturnRightIcon
+                size={iconSize}
+                color={theme.colors.onSurface}
+              />
             </TouchableOpacity>
           </View>
         )}
 
         <View style={tw`flex-row gap-2`}>
           <TouchableOpacity>
-            <EllipsisVerticalIcon size={iconSize} color={theme.colors.onSurface} />
+            <EllipsisVerticalIcon
+              size={iconSize}
+              color={theme.colors.onSurface}
+            />
           </TouchableOpacity>
           {isFocus && (
             <TouchableOpacity onPress={save}>
@@ -118,12 +175,37 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
           )}
         </View>
       </View>
-      <View style={[tw`flex-row gap-1 border-b-gray-200`, { paddingBottom: 4, borderBottomWidth: 1 }]}>
-        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>07/11/2023, 19:23</Text>
-        <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
-        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>9</Text>
-        <Text style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}>|</Text>
-        <Text style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}>daily</Text>
+      <View
+        style={[
+          tw`flex-row gap-1 border-b-gray-200`,
+          { paddingBottom: 4, borderBottomWidth: 1 },
+        ]}
+      >
+        <Text
+          style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}
+        >
+          {lastupdte}
+        </Text>
+        <Text
+          style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}
+        >
+          |
+        </Text>
+        <Text
+          style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}
+        >
+          {contentLen}
+        </Text>
+        <Text
+          style={[{ fontSize: 10, color: theme.colors.secondaryContainer }]}
+        >
+          |
+        </Text>
+        <Text
+          style={[{ fontSize: 10, color: theme.colors.onSecondaryContainer }]}
+        >
+          daily
+        </Text>
       </View>
       <ScrollView style={[tw`flex-1  `]}>
         <RichEditor
@@ -131,7 +213,10 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
           style={styles.headingEditor}
           placeholder="Heading"
           initialContentHTML=""
-          editorStyle={{ contentCSSText: 'font-size: 25px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
+          editorStyle={{
+            contentCSSText: 'font-size: 25px;',
+            backgroundColor: colorGray50,
+          }} // 设置字体大小为20px
           onKeyDown={handleKeyPress}
           onChange={text => handleEditorChange(text, 'title')}
         />
@@ -141,7 +226,10 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
           style={styles.editor}
           placeholder="Start writing here..."
           initialContentHTML=""
-          editorStyle={{ contentCSSText: 'font-size: 20px;', backgroundColor: colorGray50 }} // 设置字体大小为20px
+          editorStyle={{
+            contentCSSText: 'font-size: 20px;',
+            backgroundColor: colorGray50,
+          }} // 设置字体大小为20px
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={text => handleEditorChange(text, 'content')}
