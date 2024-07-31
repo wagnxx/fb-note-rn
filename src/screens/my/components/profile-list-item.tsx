@@ -23,7 +23,7 @@ const ProfileListItem = ({
     <TouchableOpacity
       onPress={onItemPress}
       style={[
-        tw`justify-between items-center gap-2 px-3 pb-2 pt-2 mt-2 border-b-gray-100`,
+        tw`justify-between items-center gap-2 px-2 my-2 border-b-gray-100`,
         { borderBottomWidth: 1 },
       ]}
     >

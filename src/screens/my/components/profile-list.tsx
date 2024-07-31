@@ -78,7 +78,7 @@ export default function ProfileList({
   }
 
   return (
-    <View style={[{}, tw`flex-row bg-gray-50 `]}>
+    <View style={[tw`flex-row gap-3 flex-wrap bg-gray-50 `]}>
       {itemsList.map((item, index) => (
         <ProfileListItem
           key={index}
