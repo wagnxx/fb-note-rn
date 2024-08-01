@@ -11,6 +11,7 @@ import { ScrennTypeEnum } from '@/types/screen'
 import Profile from '@/screens/my/profile'
 import CreateNote from '@/screens/note/create'
 import Photo from '@/screens/my/photo'
+import Music from '@/screens/my/music'
 
 const Stack = createStackNavigator()
 
@@ -48,6 +49,7 @@ export default function AuthNavigator() {
             component={CreateNote}
           />
           <Stack.Screen name={ScrennTypeEnum.Photo} component={Photo} />
+          <Stack.Screen name={ScrennTypeEnum.Music} component={Music} />
         </>
       ) : (
         // 不需要登录的 游客可访问页面

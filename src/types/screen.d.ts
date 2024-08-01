@@ -16,6 +16,7 @@ export enum ScrennTypeEnum {
   Login = 'Login',
   Profile = 'Profile',
   Photo = 'Photo',
+  Music = 'Music',
   CreateNote = 'CreateNote',
   // bottome
   Moment = 'Moment',

@@ -89,6 +89,9 @@ export default function ProfileList({
       case Actions.photo:
         navigation.navigate(ScrennTypeEnum.Photo)
         break
+      case Actions.music:
+        navigation.navigate(ScrennTypeEnum.Music)
+        break
       default:
         developWarn()
     }
