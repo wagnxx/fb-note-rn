@@ -1,4 +1,6 @@
+import HeaderScrollView from '@/components/header-scroll-view'
 import { COL_PHOTO, getPhotos, uploadImageToFirebase } from '@/service/basic'
+import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import {
   View,
@@ -7,22 +9,43 @@ import {
   Dimensions,
   Button,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native'
+import { ArrowLeftIcon, XMarkIcon } from 'react-native-heroicons/outline'
 import { launchImageLibrary } from 'react-native-image-picker'
-import { ProgressBar } from 'react-native-paper'
+import { ProgressBar, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 
 const numColumns = 3
-const screenWidth = Dimensions.get('window').width
-const itemSize = screenWidth / numColumns // 每个项的宽度
+const { width, height } = Dimensions.get('window')
+const itemSize = width / numColumns // 每个项的宽度
 
 interface ImageItem {
   id: string
   uri: string
 }
 let id = 10000
+
+const HeaderComponent = () => {
+  const theme = useTheme()
+  const navigation = useNavigation()
+  const goBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+    }
+  }
+  return (
+    <View style={tw`flex-row justify-start items-center flex-1  px-2`}>
+      <TouchableOpacity onPress={goBack}>
+        <ArrowLeftIcon color={theme.colors.onBackground} />
+      </TouchableOpacity>
+    </View>
+  )
+}
+
 const PhotoScreen: React.FC = () => {
   const [images, setImages] = useState<ImageItem[]>([])
+  const [previewImage, setpreviewImage] = useState<ImageItem | null>(null)
   const [progress, setProgress] = useState(0)
 
   const fetchRemotePhotos = () => {
@@ -77,31 +100,73 @@ const PhotoScreen: React.FC = () => {
   }, [])
 
   const renderItem = ({ item }: { item: ImageItem }) => (
-    <View style={[tw`flex-1`, { height: screenWidth / numColumns, margin: 1 }]}>
-      <Image
-        source={{ uri: item.uri }}
-        style={[
-          // tw`size-full`,
-          styles.image,
-          { resizeMode: 'cover' },
-        ]}
-      />
+    <View
+      style={[tw`flex-1`, { height: width / numColumns, margin: 1 }]}
+      key={item.id}
+    >
+      <TouchableOpacity onPress={() => setpreviewImage(item)}>
+        <Image
+          source={{ uri: item.uri }}
+          style={[
+            // tw`size-full`,
+            styles.image,
+            { resizeMode: 'cover' },
+          ]}
+        />
+      </TouchableOpacity>
     </View>
   )
 
   return (
-    <View style={[tw`flex-1 p-1 bg-slate-50`]}>
-      {progress > 0 && (
-        <ProgressBar style={{ height: 20, marginTop: 0 }} progress={progress} />
+    <>
+      <HeaderScrollView
+        HeaderComponent={HeaderComponent}
+        headerContainerStyle={{
+          flexDirection: 'row',
+          // justifyContent: 'flex-start',
+          // backgroundColor: 'red',
+          alignItems: 'stretch',
+        }}
+      >
+        <View style={[tw`flex-1 p-1 bg-slate-50`, { height }]}>
+          {progress > 0 && (
+            <ProgressBar
+              style={{ height: 20, marginTop: 0 }}
+              progress={progress}
+            />
+          )}
+          <FlatList
+            data={images}
+            horizontal
+            renderItem={renderItem}
+            keyExtractor={item => item.id || item.uri}
+            // numColumns={numColumns}
+          />
+          <View style={[tw`absolute bottom-0 left-0 right-0 px-2 py-2`]}>
+            <Button title="Select Image" onPress={selectImage} />
+          </View>
+        </View>
+      </HeaderScrollView>
+      {previewImage?.uri && (
+        <View
+          style={tw`absolute inset-x-0 inset-y-0 bg-black z-10 flex-1 justify-end items-center gap-2`}
+        >
+          <View style={tw`self-start`}>
+            <TouchableOpacity onPress={() => setpreviewImage(null)}>
+              <XMarkIcon color={'#fff'} />
+            </TouchableOpacity>
+          </View>
+          <Image
+            source={{ uri: previewImage?.uri }}
+            style={[
+              // tw`size-full`,
+              // styles.image,
+              { height: height * 0.9, width: width * 0.9 },
+            ]}
+          />
+        </View>
       )}
-      <FlatList
-        data={images}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        numColumns={numColumns}
-      />
-      <Button title="Select Image" onPress={selectImage} />
-    </View>
+    </>
   )
 }
 const styles = StyleSheet.create({

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    // backgroundColor: '#f8f8f8',
+    backgroundColor: '#f8f8f8',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingTop: HEADER_MAX_HEIGHT,
     borderColor: '#ff0',
-    padding: 20,
+    // padding: 20,
   },
   content: {
     paddingHorizontal: 16,
