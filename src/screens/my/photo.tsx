@@ -7,11 +7,14 @@ import {
   FlatList,
   Image,
   Dimensions,
-  Button,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native'
-import { ArrowLeftIcon, XMarkIcon } from 'react-native-heroicons/outline'
+import {
+  ArrowLeftIcon,
+  PlusIcon,
+  XMarkIcon,
+} from 'react-native-heroicons/outline'
 import { launchImageLibrary } from 'react-native-image-picker'
 import { ProgressBar, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
@@ -26,7 +29,7 @@ interface ImageItem {
 }
 let id = 10000
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ selectImage }) => {
   const theme = useTheme()
   const navigation = useNavigation()
   const goBack = () => {
@@ -35,10 +38,19 @@ const HeaderComponent = () => {
     }
   }
   return (
-    <View style={tw`flex-row justify-start items-center flex-1  px-2`}>
+    <View
+      style={[
+        tw`flex-row justify-between items-center flex-1  px-2`,
+        { backgroundColor: theme.colors.background },
+      ]}
+    >
       <TouchableOpacity onPress={goBack}>
         <ArrowLeftIcon color={theme.colors.onBackground} />
       </TouchableOpacity>
+      <TouchableOpacity onPress={selectImage}>
+        <PlusIcon size={36} color={theme.colors.onBackground} />
+      </TouchableOpacity>
+      {/* <Button title="Select Image" onPress={selectImage} /> */}
     </View>
   )
 }
@@ -120,11 +132,9 @@ const PhotoScreen: React.FC = () => {
   return (
     <>
       <HeaderScrollView
-        HeaderComponent={HeaderComponent}
+        headerElement={<HeaderComponent selectImage={selectImage} />}
         headerContainerStyle={{
           flexDirection: 'row',
-          // justifyContent: 'flex-start',
-          // backgroundColor: 'red',
           alignItems: 'stretch',
         }}
       >
@@ -142,9 +152,9 @@ const PhotoScreen: React.FC = () => {
             keyExtractor={item => item.id || item.uri}
             // numColumns={numColumns}
           />
-          <View style={[tw`absolute bottom-0 left-0 right-0 px-2 py-2`]}>
+          {/* <View style={[tw`absolute bottom-0 left-0 right-0 px-2 py-2`]}>
             <Button title="Select Image" onPress={selectImage} />
-          </View>
+          </View> */}
         </View>
       </HeaderScrollView>
       {previewImage?.uri && (

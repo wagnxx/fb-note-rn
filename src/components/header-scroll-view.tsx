@@ -10,7 +10,7 @@ type HeaderScrollViewProps = {
   titleStyle?: object
   containerStyle?: object
   headerContainerStyle?: object
-  HeaderComponent?: React.Fc
+  headerElement?: React.ReactElement
   scrollContainerStyle?: object
   scrollViewProps?: object
 }
@@ -21,7 +21,7 @@ const HeaderScrollView = ({
   titleStyle = {},
   containerStyle = {},
   headerContainerStyle = {},
-  HeaderComponent = () => <Text>Header</Text>,
+  headerElement = <Text>Header</Text>,
   scrollContainerStyle = {},
   scrollViewProps = {},
 }: HeaderScrollViewProps) => {
@@ -47,7 +47,7 @@ const HeaderScrollView = ({
         style={[styles.header, { height: headerHeight }, headerContainerStyle]}
       >
         {title && <Text style={[styles.headerText, titleStyle]}>{title} </Text>}
-        {!title && <HeaderComponent />}
+        {headerElement && headerElement}
       </Animated.View>
       <Animated.ScrollView
         contentContainerStyle={[styles.scrollViewContent, scrollContainerStyle]}
