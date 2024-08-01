@@ -8,6 +8,9 @@ import {
   updateDocData,
 } from '@/firebase/db'
 import { where } from '@react-native-firebase/firestore'
+import storage from '@react-native-firebase/storage'
+// import firestore from '@react-native-firebase/firestore'
+import { serverTimestamp } from '@react-native-firebase/firestore'
 
 /**
  * 
@@ -40,6 +43,7 @@ getPublishedNotes 用于获取所有已发布的文章。
 export const COL_ORGANIZATIONS = 'organizations'
 export const COL_ORGMEMBERS = 'orgMembers'
 export const COL_FOLDERS = 'folders'
+export const COL_PHOTO = 'photo'
 
 export type Tag = {
   name: string
@@ -53,8 +57,17 @@ export type Folder = {
   createId?: string
   noteCount?: number
 }
+export type Photo = {
+  id?: string
+  createId?: string
+  createdAt?: string
+  name?: string
+  url?: string
+}
 // 创建文件夹
-export const createFolder = async (doc: Partial<Folder>): Promise<string | null> => {
+export const createFolder = async (
+  doc: Partial<Folder>,
+): Promise<string | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
     return addDocToCol(COL_FOLDERS, doc)
@@ -62,7 +75,9 @@ export const createFolder = async (doc: Partial<Folder>): Promise<string | null>
   return Promise.reject('logout')
 }
 
-export const updateFolder = async (doc: Partial<Folder>): Promise<boolean | null> => {
+export const updateFolder = async (
+  doc: Partial<Folder>,
+): Promise<boolean | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
     return updateDocData(COL_FOLDERS, doc.id!, doc)
@@ -87,7 +102,10 @@ export const delFolder = async (id: string) => {
 }
 
 // 创建Note
-export const createNote = async (folderId: string, note: DocumentData): Promise<string | null> => {
+export const createNote = async (
+  folderId: string,
+  note: DocumentData,
+): Promise<string | null> => {
   note.folderId = folderId
   return addDocToCol('notes', note)
 }
@@ -127,7 +145,9 @@ export type OrgMemberType = {
 }
 
 // 添加成员到组织
-export const addMemberToOrg = async (doc: OrgMemberType): Promise<string | null> => {
+export const addMemberToOrg = async (
+  doc: OrgMemberType,
+): Promise<string | null> => {
   return addDocToCol(COL_ORGMEMBERS, doc)
 }
 
@@ -153,5 +173,80 @@ export const getPublishedNotes = async (): Promise<DocumentData[]> => {
     field: 'published',
     operator: '==',
     value: true,
+  })
+}
+
+interface UploadImageOptions {
+  uri: string
+  fileName?: string
+  photosCollection: string
+  onProgress?: (progress: number) => void // 用于实时观察进度
+}
+
+export const uploadImageToFirebase = ({
+  uri,
+  fileName,
+  photosCollection,
+  onProgress,
+}: UploadImageOptions): Promise<void> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const filename: string =
+        fileName || uri.substring(uri.lastIndexOf('/') + 1)
+      const reference = storage().ref(`profile_photos/${fileName}`)
+      const task = reference.putFile(uri)
+
+      // 监听上传进度
+      task.on(
+        'state_changed',
+        snapshot => {
+          const progress = snapshot.bytesTransferred / snapshot.totalBytes
+          if (onProgress) {
+            onProgress(progress)
+          }
+        },
+        error => {
+          console.log('task sate chnged error:', error)
+          reject(error)
+        },
+        async () => {
+          try {
+            const url = await reference.getDownloadURL()
+            console.log('Image URL:', url)
+
+            const userId = auth.currentUser?.uid || 'unknown-user'
+
+            // await db.collection(photosCollection).add({})
+            await addDocToCol(photosCollection, {
+              createId: userId,
+              uri: url,
+              name: filename,
+              createdAt: serverTimestamp(),
+            })
+
+            resolve()
+          } catch (error) {
+            console.log('add doc to photos col error:', error)
+            reject(error)
+          }
+        },
+      )
+    } catch (error) {
+      console.log('uploadImageToFirebase block error:', error)
+      reject(error)
+    }
+  })
+}
+
+// 获取已发布的文章列表
+export const getPhotos = async (): Promise<(DocumentData | Photo)[]> => {
+  if (!auth?.currentUser?.uid) {
+    return Promise.reject('logout')
+  }
+
+  return getDocsByCondition(COL_PHOTO, {
+    field: 'createId',
+    operator: '==',
+    value: auth.currentUser.uid,
   })
 }

@@ -3,7 +3,13 @@ import React from 'react'
 import ProfileListItem from './profile-list-item'
 import tw from 'twrnc'
 import { developWarn } from '@/utils/utilsAlert'
-import { FilmIcon, MusicalNoteIcon } from 'react-native-heroicons/outline'
+import {
+  FilmIcon,
+  MusicalNoteIcon,
+  PhotoIcon,
+} from 'react-native-heroicons/outline'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { RootStackParamList, ScrennTypeEnum } from '@/types/screen'
 
 export enum Actions {
   apply,
@@ -12,6 +18,7 @@ export enum Actions {
   settings,
   video,
   music,
+  photo,
 }
 
 export type SvgProps = {
@@ -49,6 +56,11 @@ const itemsList: ItemType[] = [
     name: Actions.settings,
   },
   {
+    label: '相册',
+    IconElement: prop => <PhotoIcon size={ICON_SIZE} {...prop} />,
+    name: Actions.photo,
+  },
+  {
     label: '视频',
     IconElement: prop => <FilmIcon size={ICON_SIZE} {...prop} />,
     name: Actions.video,
@@ -67,10 +79,15 @@ type ProfileListProps = {
 export default function ProfileList({
   onSettingsDrawerOpen,
 }: ProfileListProps) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+
   const onItemPress = (item: ItemType) => {
     switch (item.name) {
       case Actions.settings:
         onSettingsDrawerOpen()
+        break
+      case Actions.photo:
+        navigation.navigate(ScrennTypeEnum.Photo)
         break
       default:
         developWarn()
