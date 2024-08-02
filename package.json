@@ -35,6 +35,7 @@
     "react-native-gesture-handler": "^2.17.1",
     "react-native-header-scroll-view": "^2.0.0",
     "react-native-heroicons": "^4.0.0",
+    "react-native-hyperlink": "^0.0.22",
     "react-native-image-picker": "^7.1.2",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-pager-view": "^6.3.3",
