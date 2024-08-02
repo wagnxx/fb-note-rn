@@ -9,17 +9,24 @@ import Slider from '@react-native-community/slider'
 import { Button, useTheme } from 'react-native-paper'
 import { XMarkIcon } from 'react-native-heroicons/outline'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useThemePaper } from '@/context/theme-provider'
 
 type MusicPlayerProps = {
   url: string
   onClose: () => void
+  onEnd?: () => void
 }
 
-const MusicPlayer = ({ url, onClose = () => {} }: MusicPlayerProps) => {
+const MusicPlayer = ({
+  url,
+  onClose = () => {},
+  onEnd = () => {},
+}: MusicPlayerProps) => {
   const theme = useTheme()
+  const { isDarkMode } = useThemePaper()
 
   const { position, duration } = useProgress()
-  const [volume, setVolume] = useState(1)
+  const [volume, setVolume] = useState(0.4)
   const playbackState = usePlaybackState()
   const togglePlayback = async () => {
     const isReady =
@@ -27,7 +34,7 @@ const MusicPlayer = ({ url, onClose = () => {} }: MusicPlayerProps) => {
       playbackState?.state === State.Ready ||
       playbackState?.state === State.Stopped
 
-    const isPLaying = playbackState.state === State.Playing
+    // const isPLaying = playbackState.state === State.Playing
     if (isReady) {
       await TrackPlayer.play()
     } else {
@@ -40,6 +47,19 @@ const MusicPlayer = ({ url, onClose = () => {} }: MusicPlayerProps) => {
     setVolume(value)
     await TrackPlayer.setVolume(value)
   }
+  const onCloseHanlde = () => {
+    TrackPlayer.reset()
+    onClose()
+  }
+
+  useEffect(() => {
+    if (State.Ended === playbackState.state) {
+      console.log('playbackState:', playbackState.state)
+      onEnd()
+
+      TrackPlayer.reset()
+    }
+  }, [playbackState, onEnd])
 
   useEffect(() => {
     const AUDIO =
@@ -59,19 +79,28 @@ const MusicPlayer = ({ url, onClose = () => {} }: MusicPlayerProps) => {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <View style={{ alignSelf: 'flex-start' }}>
-        <TouchableOpacity onPress={onClose}>
-          <XMarkIcon size={33} color={theme.colors.text} />
+        <TouchableOpacity onPress={onCloseHanlde}>
+          <XMarkIcon size={33} color={theme.colors.onBackground} />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.title, { color: theme.colors.text }]}>
+      <Text style={[styles.title, { color: theme.colors.onBackground }]}>
         Music Player
       </Text>
 
-      <Button background={theme.colors.text} onPress={togglePlayback}>
+      <Button
+        mode="outlined"
+        dark={isDarkMode}
+        background={{
+          // color: theme.colors.onBackground,
+          borderless: true,
+          foreground: false,
+        }}
+        onPress={togglePlayback}
+      >
         {playbackState.state === State.Playing ? 'Pause' : 'Play'}
       </Button>
 
-      <Text style={[{ color: theme.colors.text }]}>
+      <Text style={[{ color: theme.colors.onBackground }]}>
         Progress: {Math.floor(position)} / {Math.floor(duration)}
       </Text>
 
@@ -105,6 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    gap: 8,
   },
   title: {
     fontSize: 24,
@@ -113,7 +143,7 @@ const styles = StyleSheet.create({
   slider: {
     width: '80%',
     height: 40,
-    marginVertical: 10,
+    // marginVertical: 10,
   },
 })
 
