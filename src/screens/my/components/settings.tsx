@@ -1,11 +1,13 @@
-import { Dimensions, TouchableWithoutFeedback, View } from 'react-native'
+import { Dimensions, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React from 'react'
-import { Drawer } from 'react-native-paper'
+import { Drawer, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { messageConfirm } from '@/utils/utilsAlert'
 import { logoutUser } from '@/firebase/auth'
 import Toast from 'react-native-toast-message'
 import { StyleSheet } from 'react-native'
+import { Switch } from 'react-native-elements/dist/switch/switch'
+import { useThemePaper } from '@/context/theme-provider'
 
 const { height, width } = Dimensions.get('window')
 
@@ -18,6 +20,9 @@ export default function Settings({
   onClose,
   showSettings = false,
 }: SettingsProps) {
+  const { isDarkMode, setIsDarkMode } = useThemePaper()
+  const theme = useTheme()
+
   const logout = () => {
     messageConfirm({
       message: 'Are you sure to logout?',
@@ -57,10 +62,18 @@ export default function Settings({
         style={[
           styles.drawerContainer,
           showSettings && styles.drawerOpen,
-          tw`bg-gray-100`,
+          // tw`bg-gray-100`,
+          { backgroundColor: theme.colors.background },
         ]}
       >
         <Drawer.Item label=" Logout" onPress={logout} />
+        <View style={[tw`flex-row justify-between`]}>
+          <Text style={{ color: theme.colors.onBackground }}>isDarkMode: </Text>
+          <Switch
+            value={isDarkMode}
+            onValueChange={val => setIsDarkMode(val)}
+          />
+        </View>
       </Drawer.Section>
     </>
   )

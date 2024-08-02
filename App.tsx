@@ -7,10 +7,8 @@
 
 import React, { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { Provider as PaperProvider } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-
-import theme from './theme'
+import { ThemePaperProvider } from './src/context/theme-provider'
 import { AuthProvider } from './src/context/auth-provider'
 import AuthNavigator from './src/navigation/auth-navigator'
 import TrackPlayer from 'react-native-track-player'
@@ -31,14 +29,14 @@ function App(): React.JSX.Element {
   }, [])
 
   return (
-    <PaperProvider theme={theme}>
+    <ThemePaperProvider>
       <AuthProvider>
         <NavigationContainer>
           <AuthNavigator />
           <Toast />
         </NavigationContainer>
       </AuthProvider>
-    </PaperProvider>
+    </ThemePaperProvider>
   )
 }
 

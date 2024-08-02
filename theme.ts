@@ -1,25 +1,33 @@
-// theme.js
-import { DefaultTheme } from 'react-native-paper'
+import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper'
 
-const fontSizes = {
-  small: 12,
-  medium: 16,
-  large: 24,
+const LightTheme = {
+  ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    background: '#ffffff',
+    primary: '#6200ee',
+    accent: '#03dac4',
+    surface: '#f5f5f5',
+    onBackground: '#000000',
+    onPrimary: '#ffffff',
+    onAccent: '#000000',
+    onSurface: '#000000',
+  },
 }
 
-const colors = {
-  ...DefaultTheme.colors,
-  // primary: '#6200ee',
-  // accent: '#03dac4',
-  // background: '#f6f6f6',
-  // textSecondary: '#585b58',
-  // textMain: '#929497',
+const DarkTheme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    background: '#121212',
+    primary: '#bb86fc',
+    accent: '#03dac6',
+    surface: '#121212',
+    onBackground: '#ffffff',
+    onPrimary: '#000000',
+    onAccent: '#000000',
+    onSurface: '#ffffff',
+  },
 }
 
-const theme = {
-  ...DefaultTheme,
-  colors,
-  fontSizes,
-}
-
-export default theme
+export { LightTheme, DarkTheme }
