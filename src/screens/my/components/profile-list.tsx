@@ -1,4 +1,4 @@
-import { ImageRequireSource, StyleSheet, View } from 'react-native'
+import { Dimensions, ImageRequireSource, StyleSheet, View } from 'react-native'
 import React from 'react'
 import ProfileListItem from './profile-list-item'
 import tw from 'twrnc'
@@ -10,6 +10,8 @@ import {
 } from 'react-native-heroicons/outline'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList, ScrennTypeEnum } from '@/types/screen'
+import { useTheme } from 'react-native-paper'
+const { width } = Dimensions.get('window')
 
 export enum Actions {
   apply,
@@ -32,7 +34,6 @@ export type ItemType = {
   IconElement?: React.FC<SvgProps>
   name: Actions
 }
-const ICON_SIZE = 23.5
 
 const itemsList: ItemType[] = [
   {
@@ -76,10 +77,14 @@ type ProfileListProps = {
   onSettingsDrawerOpen: () => void
 }
 
+const avalibleWidth = width - 12 * 4 - 8 * 2
+export const ITEM_WIDTH = avalibleWidth / 5
+const ICON_SIZE = 23.5
 export default function ProfileList({
   onSettingsDrawerOpen,
 }: ProfileListProps) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const theme = useTheme()
 
   const onItemPress = (item: ItemType) => {
     switch (item.name) {
@@ -98,9 +103,16 @@ export default function ProfileList({
   }
 
   return (
-    <View style={[tw`flex-row gap-3 flex-wrap bg-gray-50 `]}>
+    <View
+      style={[
+        tw`flex-row gap-3 flex-wrap  flex-1 p-2`,
+        // { backgroundColor: 'red' },
+        // { backgroundColor: theme.colors.background },
+      ]}
+    >
       {itemsList.map((item, index) => (
         <ProfileListItem
+          width={ITEM_WIDTH}
           key={index}
           item={item}
           iconStyle={styles.imageIcon}

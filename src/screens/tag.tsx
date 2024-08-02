@@ -2,12 +2,16 @@ import { View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { getTags } from '@/service/basic'
-import { List } from 'react-native-paper'
+import { List, useTheme } from 'react-native-paper'
 import { XMarkIcon } from 'react-native-heroicons/outline'
 
-const RightIcon = props => <XMarkIcon size={20} color={props.color} onPress={props.onPress} />
+const RightIcon = props => (
+  <XMarkIcon size={20} color={props.color} onPress={props.onPress} />
+)
 
 const Tag: ScreenFC<ScrennTypeEnum.Tag> = () => {
+  const theme = useTheme()
+
   const [tags, settags] = useState([])
   useEffect(() => {
     getTags()
@@ -19,7 +23,7 @@ const Tag: ScreenFC<ScrennTypeEnum.Tag> = () => {
       })
   }, [])
   return (
-    <View>
+    <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
       <List.Section>
         {tags?.length > 0 &&
           tags.map((tag, index) => (
