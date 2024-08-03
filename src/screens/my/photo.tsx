@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import {
   View,
-  FlatList,
   Image,
   Dimensions,
   StyleSheet,
@@ -20,8 +19,11 @@ import { ProgressBar, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 
 const numColumns = 3
+const itemMargin = 0
 const { width, height } = Dimensions.get('window')
-const itemSize = width / numColumns // 每个项的宽度
+const itemSize =
+  (width - 8 * 2 - 1 * (numColumns - 1) - itemMargin * (numColumns * 2)) /
+  numColumns // 每个项的宽度
 
 interface ImageItem {
   id: string
@@ -54,8 +56,28 @@ const HeaderComponent = ({ selectImage }) => {
     </View>
   )
 }
-
+const RenderItem = ({
+  item,
+  setpreviewImage,
+}: {
+  item: ImageItem
+  setpreviewImage: (item: ImageItem | null) => void
+}) => (
+  <View style={[tw``, styles.image, { backgroundColor: '#ddd' }]} key={item.id}>
+    <TouchableOpacity onPress={() => setpreviewImage(item)}>
+      <Image
+        source={{ uri: item.uri }}
+        style={[
+          // tw`size-full`,
+          styles.image,
+          { resizeMode: 'cover' },
+        ]}
+      />
+    </TouchableOpacity>
+  </View>
+)
 const PhotoScreen: React.FC = () => {
+  const theme = useTheme()
   const [images, setImages] = useState<ImageItem[]>([])
   const [previewImage, setpreviewImage] = useState<ImageItem | null>(null)
   const [progress, setProgress] = useState(0)
@@ -111,47 +133,46 @@ const PhotoScreen: React.FC = () => {
     fetchRemotePhotos()
   }, [])
 
-  const renderItem = ({ item }: { item: ImageItem }) => (
-    <View
-      style={[tw`flex-1`, { height: width / numColumns, margin: 1 }]}
-      key={item.id}
-    >
-      <TouchableOpacity onPress={() => setpreviewImage(item)}>
-        <Image
-          source={{ uri: item.uri }}
-          style={[
-            // tw`size-full`,
-            styles.image,
-            { resizeMode: 'cover' },
-          ]}
-        />
-      </TouchableOpacity>
-    </View>
-  )
-
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <HeaderScrollView
         headerElement={<HeaderComponent selectImage={selectImage} />}
         headerContainerStyle={{
           flexDirection: 'row',
           alignItems: 'stretch',
         }}
+        minHeight={0}
       >
-        <View style={[tw`flex-1 p-1 bg-slate-50`, { height }]}>
+        <View style={[tw`flex-1 p-1 pb-10 `, { height, width }]}>
           {progress > 0 && (
             <ProgressBar
               style={{ height: 20, marginTop: 0 }}
               progress={progress}
             />
           )}
-          <FlatList
+          {/* <FlatList
             data={images}
             horizontal
             renderItem={renderItem}
             keyExtractor={item => item.id || item.uri}
             // numColumns={numColumns}
-          />
+          /> */}
+
+          <View
+            style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}
+          >
+            {images?.length > 0 &&
+              images.map((item, index) => {
+                return (
+                  <RenderItem
+                    item={item}
+                    setpreviewImage={setpreviewImage}
+                    key={index}
+                  />
+                )
+              })}
+          </View>
+
           {/* <View style={[tw`absolute bottom-0 left-0 right-0 px-2 py-2`]}>
             <Button title="Select Image" onPress={selectImage} />
           </View> */}
@@ -176,7 +197,7 @@ const PhotoScreen: React.FC = () => {
           />
         </View>
       )}
-    </>
+    </View>
   )
 }
 const styles = StyleSheet.create({
@@ -187,7 +208,7 @@ const styles = StyleSheet.create({
   image: {
     width: itemSize,
     height: itemSize,
-    borderRadius: 5,
+    // borderRadius: 5,
   },
 })
 export default PhotoScreen

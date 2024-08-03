@@ -1,13 +1,19 @@
 import { Dimensions, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React from 'react'
-import { Drawer, useTheme } from 'react-native-paper'
-import tw from 'twrnc'
+import {
+  Drawer,
+  RadioButton,
+  useTheme,
+  Text as PaperText,
+  Button,
+  Divider,
+} from 'react-native-paper'
 import { messageConfirm } from '@/utils/utilsAlert'
 import { logoutUser } from '@/firebase/auth'
 import Toast from 'react-native-toast-message'
 import { StyleSheet } from 'react-native'
-import { Switch } from 'react-native-elements/dist/switch/switch'
 import { useThemePaper } from '@/context/theme-provider'
+import tw from 'twrnc'
 
 const { height, width } = Dimensions.get('window')
 
@@ -20,7 +26,7 @@ export default function Settings({
   onClose,
   showSettings = false,
 }: SettingsProps) {
-  const { isDarkMode, setIsDarkMode } = useThemePaper()
+  const { appTheme, themeList, setAppTheme, isDarkMode } = useThemePaper()
   const theme = useTheme()
 
   const logout = () => {
@@ -62,18 +68,45 @@ export default function Settings({
         style={[
           styles.drawerContainer,
           showSettings && styles.drawerOpen,
-          // tw`bg-gray-100`,
           { backgroundColor: theme.colors.background },
         ]}
       >
-        <Drawer.Item label=" Logout" onPress={logout} />
-        <View style={[tw`flex-row justify-between`]}>
-          <Text style={{ color: theme.colors.onBackground }}>isDarkMode: </Text>
-          <Switch
-            value={isDarkMode}
-            onValueChange={val => setIsDarkMode(val)}
-          />
+        <View>
+          <Text
+            style={[
+              { color: theme.colors.onBackground },
+              theme.fonts.titleSmall,
+            ]}
+          >
+            Theme:{' '}
+          </Text>
+          <RadioButton.Group
+            onValueChange={value => setAppTheme(value)}
+            value={appTheme}
+          >
+            {themeList?.length > 0 &&
+              themeList.map((item, index) => (
+                <View style={styles.radioItem} key={index}>
+                  <RadioButton value={item} />
+                  <PaperText style={[theme.fonts.labelSmall]}>{item}</PaperText>
+                </View>
+              ))}
+          </RadioButton.Group>
         </View>
+        <Divider />
+        <View style={tw`flex-row mt-3`}>
+          <Button
+            dark={isDarkMode}
+            mode="outlined"
+            background={{ borderless: true, foreground: false }}
+            style={{ height: 40, paddingVertical: 2 }}
+            labelStyle={[theme.fonts.labelSmall]}
+            onPress={logout}
+          >
+            Logout
+          </Button>
+        </View>
+        {/* <Drawer.Item label=" Logout" onPress={logout} /> */}
       </Drawer.Section>
     </>
   )
@@ -104,5 +137,11 @@ const styles = StyleSheet.create({
   },
   drawerOpen: {
     right: 0, // Drawer 打开时的样式
+  },
+
+  radioItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 2,
   },
 })

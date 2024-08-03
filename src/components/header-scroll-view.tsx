@@ -13,6 +13,7 @@ type HeaderScrollViewProps = {
   headerElement?: React.ReactElement
   scrollContainerStyle?: object
   scrollViewProps?: object
+  minHeight: number
 }
 
 const HeaderScrollView = ({
@@ -24,12 +25,13 @@ const HeaderScrollView = ({
   headerElement = <Text>Header</Text>,
   scrollContainerStyle = {},
   scrollViewProps = {},
+  minHeight = HEADER_MIN_HEIGHT,
 }: HeaderScrollViewProps) => {
   const scrollY = new Animated.Value(0)
 
   const headerHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    inputRange: [0, HEADER_MAX_HEIGHT - minHeight],
+    outputRange: [HEADER_MAX_HEIGHT, minHeight],
     extrapolate: 'clamp',
   })
 

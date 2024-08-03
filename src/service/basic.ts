@@ -7,7 +7,7 @@ import {
   deleteDocById,
   updateDocData,
 } from '@/firebase/db'
-import { where } from '@react-native-firebase/firestore'
+import { orderBy, where } from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
 // import firestore from '@react-native-firebase/firestore'
 import { serverTimestamp } from '@react-native-firebase/firestore'
@@ -62,7 +62,7 @@ export type Photo = {
   createId?: string
   createdAt?: string
   name?: string
-  url?: string
+  uri?: string
 }
 // 创建文件夹
 export const createFolder = async (
@@ -244,9 +244,18 @@ export const getPhotos = async (): Promise<(DocumentData | Photo)[]> => {
     return Promise.reject('logout')
   }
 
-  return getDocsByCondition(COL_PHOTO, {
-    field: 'createId',
-    operator: '==',
-    value: auth.currentUser.uid,
-  })
+  // return getDocsByCondition(COL_PHOTO, {
+  //   field: 'createId',
+  //   operator: '==',
+  //   value: auth.currentUser.uid,
+  // })
+
+  return getFieldValues(
+    COL_PHOTO,
+    ['name', 'id', 'uri'],
+    [
+      where('createId', '==', auth.currentUser.uid),
+      orderBy('createdAt', 'asc'),
+    ],
+  )
 }
