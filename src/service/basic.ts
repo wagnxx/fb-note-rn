@@ -6,6 +6,7 @@ import {
   DocumentData,
   deleteDocById,
   updateDocData,
+  batchUpdateDocData,
 } from '@/firebase/db'
 import { orderBy, where } from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
@@ -255,7 +256,16 @@ export const getPhotos = async (): Promise<(DocumentData | Photo)[]> => {
     ['name', 'id', 'uri'],
     [
       where('createId', '==', auth.currentUser.uid),
+      where('removed', '!=', true),
+      orderBy('removed'),
       orderBy('createdAt', 'asc'),
     ],
   )
+}
+
+export const batchUpdatePhotos = async (ids, docs) => {
+  if (!auth?.currentUser?.uid) {
+    return Promise.reject('logout')
+  }
+  return batchUpdateDocData(COL_PHOTO, ids, docs)
 }

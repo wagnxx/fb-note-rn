@@ -1,21 +1,31 @@
+import { CheckboxGroup, CheckboxItemProps } from '@/components/group-checkbox'
 import HeaderScrollView from '@/components/header-scroll-view'
-import { COL_PHOTO, getPhotos, uploadImageToFirebase } from '@/service/basic'
+import {
+  batchUpdatePhotos,
+  COL_PHOTO,
+  getPhotos,
+  uploadImageToFirebase,
+} from '@/service/basic'
+import { messageConfirm } from '@/utils/utilsAlert'
 import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   View,
   Image,
   Dimensions,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native'
 import {
   ArrowLeftIcon,
   PlusIcon,
+  TrashIcon,
   XMarkIcon,
 } from 'react-native-heroicons/outline'
 import { launchImageLibrary } from 'react-native-image-picker'
-import { ProgressBar, useTheme } from 'react-native-paper'
+import { Checkbox, ProgressBar, useTheme } from 'react-native-paper'
+import Toast from 'react-native-toast-message'
 import tw from 'twrnc'
 
 const numColumns = 3
@@ -29,9 +39,20 @@ interface ImageItem {
   id: string
   uri: string
 }
-let id = 10000
 
-const HeaderComponent = ({ selectImage }) => {
+const HeaderComponent: React.FC<{
+  selectImageToAdd: () => void
+  selections: string[]
+  showCheckbox: boolean
+  onCloseShowCheckBox: () => void
+  onRemove: () => void
+}> = ({
+  selectImageToAdd,
+  selections,
+  showCheckbox,
+  onCloseShowCheckBox,
+  onRemove,
+}) => {
   const theme = useTheme()
   const navigation = useNavigation()
   const goBack = () => {
@@ -46,46 +67,151 @@ const HeaderComponent = ({ selectImage }) => {
         { backgroundColor: theme.colors.background },
       ]}
     >
+      <StatusBar hidden />
       <TouchableOpacity onPress={goBack}>
         <ArrowLeftIcon color={theme.colors.onBackground} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={selectImage}>
+      {showCheckbox && (
+        <>
+          <TouchableOpacity onPress={onRemove}>
+            <TrashIcon
+              color={
+                selections?.length > 0
+                  ? theme.colors.onBackground
+                  : theme.colors.onSurfaceDisabled
+              }
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onCloseShowCheckBox}>
+            <XMarkIcon color={theme.colors.onBackground} />
+          </TouchableOpacity>
+        </>
+      )}
+      <TouchableOpacity onPress={selectImageToAdd}>
         <PlusIcon size={36} color={theme.colors.onBackground} />
       </TouchableOpacity>
       {/* <Button title="Select Image" onPress={selectImage} /> */}
     </View>
   )
 }
-const RenderItem = ({
+
+const RenderItem: React.FC<
+  {
+    item: ImageItem
+    setpreviewImage: (item: ImageItem | null) => void
+    onItemLongPress: () => void
+    showCheckbox: boolean
+  } & CheckboxItemProps
+> = ({
   item,
   setpreviewImage,
-}: {
-  item: ImageItem
-  setpreviewImage: (item: ImageItem | null) => void
+  onItemLongPress,
+  checkboxItemId,
+  onChange,
+  checked,
+  showCheckbox,
 }) => (
-  <View style={[tw``, styles.image, { backgroundColor: '#ddd' }]} key={item.id}>
-    <TouchableOpacity onPress={() => setpreviewImage(item)}>
+  <View
+    style={[{ backgroundColor: '#ddd', position: 'relative', padding: 4 }]}
+    key={item.id}
+  >
+    <View
+      style={{
+        position: 'absolute',
+        zIndex: 3,
+        left: 0,
+        top: 0,
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
+        width: '50%',
+        height: 40,
+      }}
+    >
+      {showCheckbox && (
+        <Checkbox.Item
+          status={checked ? 'checked' : 'unchecked'}
+          onPress={() => onChange?.(checkboxItemId!)}
+          label=""
+          color="red"
+          position={'trailing'}
+          style={{
+            alignItems: 'flex-start',
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+          }}
+        />
+      )}
+    </View>
+    <TouchableOpacity
+      onPress={() => setpreviewImage(item)}
+      onLongPress={onItemLongPress}
+    >
       <Image
         source={{ uri: item.uri }}
-        style={[
-          // tw`size-full`,
-          styles.image,
-          { resizeMode: 'cover' },
-        ]}
+        style={[{ width: 100, height: 100, resizeMode: 'cover' }]}
       />
     </TouchableOpacity>
   </View>
 )
+
 const PhotoScreen: React.FC = () => {
   const theme = useTheme()
   const [images, setImages] = useState<ImageItem[]>([])
   const [previewImage, setpreviewImage] = useState<ImageItem | null>(null)
   const [progress, setProgress] = useState(0)
+  const [selections, setSelections] = useState([])
+  const [showCheckbox, setShowCheckbox] = useState(false)
+  const checkboxGroupRef = useRef<{ resetSelections: () => void }>(null)
 
+  const onItemLongPress = () => {
+    if (!showCheckbox) setShowCheckbox(true)
+  }
+
+  const closeShowCheckBox = () => {
+    setShowCheckbox(false)
+    checkboxGroupRef.current?.resetSelections()
+  }
+
+  const refreshPage = () => {
+    fetchRemotePhotos()
+    setShowCheckbox(false)
+  }
   const fetchRemotePhotos = () => {
     getPhotos().then(res => {
-      console.log('photos::', res)
+      // console.log('photos::', res)
       setImages(res)
+    })
+  }
+  const onRemove = () => {
+    console.log('remove handle', selections)
+    if (!selections.length) return
+    // batchUpdatePhotos
+    messageConfirm({
+      message: 'Are you sure you want to remove these?',
+    }).then(() => {
+      console.log('sure')
+      batchUpdatePhotos(
+        selections,
+        selections.map(item => ({ id: item, removed: true })),
+      ).then(res => {
+        if (res) {
+          Toast.show({
+            type: 'success',
+            text1: 'removed successfuly',
+            position: 'top',
+            visibilityTime: 3000,
+          })
+          refreshPage()
+          checkboxGroupRef.current?.resetSelections()
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'removed failed',
+            position: 'top',
+            visibilityTime: 3000,
+          })
+        }
+      })
     })
   }
 
@@ -93,7 +219,7 @@ const PhotoScreen: React.FC = () => {
     setProgress(progressText)
   }
 
-  const selectImage = () => {
+  const selectImageToAdd = () => {
     launchImageLibrary(
       { mediaType: 'photo', selectionLimit: 0 },
       async response => {
@@ -129,6 +255,10 @@ const PhotoScreen: React.FC = () => {
     )
   }
 
+  const onSelectionsChange = useCallback(items => {
+    setSelections(items)
+  }, [])
+
   useEffect(() => {
     fetchRemotePhotos()
   }, [])
@@ -136,7 +266,15 @@ const PhotoScreen: React.FC = () => {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <HeaderScrollView
-        headerElement={<HeaderComponent selectImage={selectImage} />}
+        headerElement={
+          <HeaderComponent
+            selectImageToAdd={selectImageToAdd}
+            selections={selections}
+            showCheckbox={showCheckbox}
+            onCloseShowCheckBox={closeShowCheckBox}
+            onRemove={onRemove}
+          />
+        }
         headerContainerStyle={{
           flexDirection: 'row',
           alignItems: 'stretch',
@@ -150,32 +288,25 @@ const PhotoScreen: React.FC = () => {
               progress={progress}
             />
           )}
-          {/* <FlatList
-            data={images}
-            horizontal
-            renderItem={renderItem}
-            keyExtractor={item => item.id || item.uri}
-            // numColumns={numColumns}
-          /> */}
-
           <View
             style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}
           >
-            {images?.length > 0 &&
-              images.map((item, index) => {
-                return (
-                  <RenderItem
-                    item={item}
-                    setpreviewImage={setpreviewImage}
-                    key={index}
-                  />
-                )
-              })}
+            <CheckboxGroup onChange={onSelectionsChange} ref={checkboxGroupRef}>
+              {images?.length > 0 &&
+                images.map((item, index) => {
+                  return (
+                    <RenderItem
+                      showCheckbox={showCheckbox}
+                      onItemLongPress={onItemLongPress}
+                      checkboxItemId={item.id}
+                      item={item}
+                      setpreviewImage={setpreviewImage}
+                      key={index}
+                    />
+                  )
+                })}
+            </CheckboxGroup>
           </View>
-
-          {/* <View style={[tw`absolute bottom-0 left-0 right-0 px-2 py-2`]}>
-            <Button title="Select Image" onPress={selectImage} />
-          </View> */}
         </View>
       </HeaderScrollView>
       {previewImage?.uri && (
@@ -189,11 +320,7 @@ const PhotoScreen: React.FC = () => {
           </View>
           <Image
             source={{ uri: previewImage?.uri }}
-            style={[
-              // tw`size-full`,
-              // styles.image,
-              { height: height * 0.9, width: width * 0.9 },
-            ]}
+            style={[{ height: height * 0.9, width: width * 0.9 }]}
           />
         </View>
       )}
