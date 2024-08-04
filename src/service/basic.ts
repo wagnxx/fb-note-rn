@@ -240,7 +240,9 @@ export const uploadImageToFirebase = ({
 }
 
 // 获取已发布的文章列表
-export const getPhotos = async (): Promise<(DocumentData | Photo)[]> => {
+export const getPhotos = async (
+  isNotRemoved = true,
+): Promise<(DocumentData | Photo)[]> => {
   if (!auth?.currentUser?.uid) {
     return Promise.reject('logout')
   }
@@ -256,7 +258,7 @@ export const getPhotos = async (): Promise<(DocumentData | Photo)[]> => {
     ['name', 'id', 'uri'],
     [
       where('createId', '==', auth.currentUser.uid),
-      where('removed', '!=', true),
+      where('removed', '!=', isNotRemoved),
       orderBy('removed'),
       orderBy('createdAt', 'asc'),
     ],
