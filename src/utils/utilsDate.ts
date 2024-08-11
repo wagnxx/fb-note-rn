@@ -19,7 +19,8 @@ export const transFBDate2Local = (date: Timestamp) => {
 
     return result
   } catch (error) {
-    return date || null
+    console.log('transFBDate error:', error)
+    return null
   }
 }
 

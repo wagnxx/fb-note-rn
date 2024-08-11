@@ -13,6 +13,7 @@ import { useTheme } from 'react-native-paper'
 import { Note, getAllPublishedNotes } from '../service/articles'
 import { transFBDate2Local } from '@/utils/utilsDate'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
+import { extractTextFromHTML } from '@/utils/utilsString'
 import { Timestamp } from '@react-native-firebase/firestore'
 
 const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
@@ -73,7 +74,7 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
                       theme.fonts.titleMedium,
                     ]}
                   >
-                    {item.title}
+                    {extractTextFromHTML(item?.title)}
                   </Text>
                   <Text style={[{ color: theme.colors.secondary }]}>
                     {transFBDate2Local(item?.createTime as Timestamp)}

@@ -5,8 +5,11 @@ import { Note, getNote } from '@/service/articles'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useTheme } from 'react-native-paper'
+import { extractTextFromHTML } from '@/utils/utilsString'
 
-export default function NodeDetail({ navigation }: ScreenProps<ScrennTypeEnum.NodeDetail>) {
+export default function NodeDetail({
+  navigation,
+}: ScreenProps<ScrennTypeEnum.NodeDetail>) {
   const { params } = useRoute<RouteProp<RootStackParamList>>()
   const [note, setNote] = useState<Note | null>(null)
   const theme = useTheme()
@@ -14,6 +17,7 @@ export default function NodeDetail({ navigation }: ScreenProps<ScrennTypeEnum.No
   const fetchNote = (id: string) => {
     getNote(id).then(data => {
       if (data) {
+        data.titleText = extractTextFromHTML(data.title)
         setNote(data)
       } else {
         setNote(null)
@@ -41,10 +45,20 @@ export default function NodeDetail({ navigation }: ScreenProps<ScrennTypeEnum.No
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-        <Text style={[theme.fonts.titleLarge, { color: theme.colors.onSurface }]}>{note?.title}</Text>
+      <View
+        style={{ justifyContent: 'center', flexDirection: 'row', padding: 8 }}
+      >
+        <Text
+          style={[theme.fonts.titleLarge, { color: theme.colors.onSurface }]}
+        >
+          {note?.titleText}
+        </Text>
       </View>
-      <WebView originWhitelist={['*']} source={{ html: htmlContent }} style={{ flex: 1 }} />
+      <WebView
+        originWhitelist={['*']}
+        source={{ html: htmlContent }}
+        style={{ flex: 1 }}
+      />
     </SafeAreaView>
   )
 }
