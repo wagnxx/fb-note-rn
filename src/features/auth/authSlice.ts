@@ -10,6 +10,7 @@ export interface AuthState {
     uid: string | null
     email: string | null
     displayName: string | null
+    photoURL: string | null
     // 其他需要的字段
   } | null
   loadingUser: boolean
@@ -33,8 +34,8 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<AuthState['user'] | null>) => {
       console.log('action:', action)
       if (action.payload) {
-        const { uid, email, displayName } = action.payload
-        state.user = { uid, email, displayName }
+        const { uid, email, displayName, photoURL } = action.payload
+        state.user = { uid, email, displayName, photoURL }
       } else {
         state.user = null
       }

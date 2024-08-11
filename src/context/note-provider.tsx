@@ -7,8 +7,9 @@ import {
   ICurrentFolder,
 } from '@/utils/utilsStorage'
 import { db } from '@/firebase/firebase'
-import { useAuth } from './auth-provider'
 import { extractTextFromHTML } from '@/utils/utilsString'
+import { useSelector } from 'react-redux'
+import { selectAuth } from '@/features/auth/authSlice'
 
 interface NoteContextType {
   folders: Folder[]
@@ -45,7 +46,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [error, setError] = useState(null)
 
-  const { user } = useAuth()
+  const { user } = useSelector(selectAuth)
 
   const noteLength = useMemo(() => allNotesList.length, [allNotesList])
 

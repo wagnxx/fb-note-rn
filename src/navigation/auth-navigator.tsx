@@ -1,10 +1,9 @@
 import { View } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import HomeTabs from '@/screens/home-tabs'
 import LoginScreen from '@/screens/login'
 import NodeDetail from '@/screens/note/detail'
-import { AuthContext } from '@/context/auth-provider'
 import { ActivityIndicator, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { ScrennTypeEnum } from '@/types/screen'
@@ -12,12 +11,33 @@ import Profile from '@/screens/my/profile'
 import CreateNote from '@/screens/note/create'
 import Photo from '@/screens/my/photo'
 import Music from '@/screens/my/music'
+import { observeAuthState, selectAuth } from '@/features/auth/authSlice'
+import { useAppDispatch } from '@/store'
+import { useSelector } from 'react-redux'
 
 const Stack = createStackNavigator()
 
 export default function AuthNavigator() {
   const theme = useTheme()
-  const { user, loadingUser } = useContext(AuthContext)
+  const { user, loadingUser } = useSelector(selectAuth)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null
+
+    const observeAuth = async () => {
+      unsubscribe = await dispatch(observeAuthState())
+    }
+
+    observeAuth()
+
+    // 这里返回清理函数，在组件卸载或依赖项变化时执行
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [dispatch])
 
   if (loadingUser) {
     return (

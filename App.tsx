@@ -9,7 +9,6 @@ import React, { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
 import { ThemePaperProvider } from './src/context/theme-provider'
-import { AuthProvider } from './src/context/auth-provider'
 import AuthNavigator from './src/navigation/auth-navigator'
 import TrackPlayer from 'react-native-track-player'
 import { addEventListeners, setupPlayer } from './src/utils/service'
@@ -33,12 +32,10 @@ function App(): React.JSX.Element {
   return (
     <ThemePaperProvider>
       <Provider store={store}>
-        <AuthProvider>
-          <NavigationContainer>
-            <AuthNavigator />
-            <Toast />
-          </NavigationContainer>
-        </AuthProvider>
+        <NavigationContainer>
+          <AuthNavigator />
+          <Toast />
+        </NavigationContainer>
       </Provider>
     </ThemePaperProvider>
   )

@@ -5,18 +5,19 @@ import {
   Text,
   TouchableHighlight,
 } from 'react-native'
-import React, { useContext } from 'react'
-import { AuthContext } from '@/context/auth-provider'
+import React from 'react'
 import tw from 'twrnc'
 import LinearGradient from 'react-native-linear-gradient'
 import { useThemePaper } from '@/context/theme-provider'
 import { useTheme } from 'react-native-paper'
+import { selectAuth } from '@/features/auth/authSlice'
+import { useSelector } from 'react-redux'
 
 const { width, height } = Dimensions.get('window')
 const uri =
   'https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8zMF9hX3N0dWRpb19zaG90X29mX2NhdF93YXZpbmdfaW1hZ2VzZnVsbF9ib2R5X182YzRmM2YyOC0wMGJjLTQzNTYtYjM3ZC05NDM0NTgwY2FmNDcucG5n.png'
 export default function Avatar({ onPressPhoto = () => {} }) {
-  const { user } = useContext(AuthContext)
+  const { user } = useSelector(selectAuth)
   const { isDarkMode } = useThemePaper()
   const theme = useTheme()
 
