@@ -13,6 +13,8 @@ import { AuthProvider } from './src/context/auth-provider'
 import AuthNavigator from './src/navigation/auth-navigator'
 import TrackPlayer from 'react-native-track-player'
 import { addEventListeners, setupPlayer } from './src/utils/service'
+import { Provider } from 'react-redux'
+import store from './src/store'
 // 注册播放服务
 TrackPlayer.registerPlaybackService(() => addEventListeners)
 function App(): React.JSX.Element {
@@ -30,12 +32,14 @@ function App(): React.JSX.Element {
 
   return (
     <ThemePaperProvider>
-      <AuthProvider>
-        <NavigationContainer>
-          <AuthNavigator />
-          <Toast />
-        </NavigationContainer>
-      </AuthProvider>
+      <Provider store={store}>
+        <AuthProvider>
+          <NavigationContainer>
+            <AuthNavigator />
+            <Toast />
+          </NavigationContainer>
+        </AuthProvider>
+      </Provider>
     </ThemePaperProvider>
   )
 }
