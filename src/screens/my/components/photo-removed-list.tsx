@@ -4,6 +4,7 @@ import {
   Dimensions,
   Image,
   ScrollView,
+  TouchableWithoutFeedback,
 } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeftIcon } from 'react-native-heroicons/outline'
@@ -11,6 +12,7 @@ import { Checkbox, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { getPhotos } from '@/service/basic'
 import { CheckboxGroup, CheckboxItemProps } from '@/components/group-checkbox'
+import { itemSize } from './photo-list'
 
 interface ImageItem {
   id: string
@@ -39,7 +41,14 @@ const RenderItem: React.FC<
   showCheckbox,
 }) => (
   <View
-    style={[{ backgroundColor: '#ddd', position: 'relative' }]}
+    style={[
+      {
+        backgroundColor: '#ddd',
+        position: 'relative',
+        width: itemSize,
+        height: itemSize * 1.4,
+      },
+    ]}
     key={item.id}
   >
     <View
@@ -69,15 +78,15 @@ const RenderItem: React.FC<
         />
       )}
     </View>
-    <TouchableOpacity
+    <TouchableWithoutFeedback
       onPress={() => setpreviewImage(item)}
       onLongPress={onItemLongPress}
     >
       <Image
         source={{ uri: item.uri }}
-        style={[{ width: 100, height: 100, resizeMode: 'cover' }]}
+        style={[{ width: '100%', height: '100%', resizeMode: 'cover' }]}
       />
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   </View>
 )
 
@@ -118,13 +127,13 @@ export default function PhotoRemovedList({ goBack }: PhotoRemovedListProps) {
   }, [])
 
   return (
-    <View style={[tw`p-2`]}>
-      <View>
+    <View style={[tw`py-2`]}>
+      <View style={tw`p-2 `}>
         <TouchableOpacity onPress={goBack}>
           <ArrowLeftIcon color={theme.colors.onBackground} />
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ padding: 0 }}>
         <View style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}>
           <CheckboxGroup onChange={onSelectionsChange} ref={checkboxGroupRef}>
             {images?.length > 0 &&

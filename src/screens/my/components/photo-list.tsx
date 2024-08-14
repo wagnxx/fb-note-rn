@@ -31,7 +31,7 @@ import PhotoPreview, { SwipeDirection } from './photo-preview'
 const numColumns = 3
 const itemMargin = 0
 const { width, height } = Dimensions.get('window')
-const itemSize =
+export const itemSize =
   (width - 8 * 2 - 1 * (numColumns - 1) - itemMargin * (numColumns * 2)) /
   numColumns // 每个项的宽度
 

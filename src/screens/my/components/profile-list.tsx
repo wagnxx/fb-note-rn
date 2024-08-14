@@ -36,11 +36,11 @@ export type ItemType = {
 }
 
 const itemsList: ItemType[] = [
-  {
-    label: '我的申请',
-    icon: require('../../../assets/images/wd-sq.png'),
-    name: Actions.apply,
-  },
+  // {
+  //   label: '我的申请',
+  //   icon: require('../../../assets/images/wd-sq.png'),
+  //   name: Actions.apply,
+  // },
   {
     label: '浏览记录',
     icon: require('../../../assets/images/wd-lljl.png'),
