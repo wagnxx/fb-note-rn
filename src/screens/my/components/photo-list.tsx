@@ -8,7 +8,7 @@ import {
 } from '@/service/basic'
 import { messageConfirm } from '@/utils/utilsAlert'
 import { useNavigation } from '@react-navigation/native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   Image,
@@ -26,6 +26,7 @@ import { launchImageLibrary } from 'react-native-image-picker'
 import { Checkbox, ProgressBar, useTheme } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 import tw from 'twrnc'
+import PhotoPreview, { SwipeDirection } from './photo-preview'
 
 const numColumns = 3
 const itemMargin = 0
@@ -111,7 +112,14 @@ const RenderItem: React.FC<
   showCheckbox,
 }) => (
   <View
-    style={[{ backgroundColor: '#ddd', position: 'relative' }]}
+    style={[
+      {
+        backgroundColor: '#ddd',
+        position: 'relative',
+        width: itemSize,
+        height: itemSize * 1.4,
+      },
+    ]}
     key={item.id}
   >
     <View
@@ -147,7 +155,7 @@ const RenderItem: React.FC<
     >
       <Image
         source={{ uri: item.uri }}
-        style={[{ width: 100, height: 100, resizeMode: 'cover' }]}
+        style={[{ width: '100%', height: '100%', resizeMode: 'cover' }]}
       />
     </TouchableOpacity>
   </View>
@@ -156,11 +164,15 @@ const RenderItem: React.FC<
 const PhotoList: React.FC = () => {
   const theme = useTheme()
   const [images, setImages] = useState<ImageItem[]>([])
-  const [previewImage, setpreviewImage] = useState<ImageItem | null>(null)
+  const [previewIndex, setpreviewIndex] = useState<number>(-1)
   const [progress, setProgress] = useState(0)
   const [selections, setSelections] = useState([])
   const [showCheckbox, setShowCheckbox] = useState(false)
   const checkboxGroupRef = useRef<{ resetSelections: () => void }>(null)
+
+  const previewImage = useMemo(() => {
+    return images[previewIndex]
+  }, [images, previewIndex])
 
   const onItemLongPress = () => {
     if (!showCheckbox) setShowCheckbox(true)
@@ -169,6 +181,20 @@ const PhotoList: React.FC = () => {
   const closeShowCheckBox = () => {
     setShowCheckbox(false)
     checkboxGroupRef.current?.resetSelections()
+  }
+
+  const handleImageSwipe = (dir: SwipeDirection) => {
+    let curIndex = previewIndex
+    if (dir === SwipeDirection.left) {
+      ++curIndex
+    }
+    if (dir === SwipeDirection.right) {
+      --curIndex
+    }
+    if (curIndex < 0 || curIndex >= images.length) {
+      curIndex = -1
+    }
+    setpreviewIndex(curIndex)
   }
 
   const refreshPage = () => {
@@ -263,67 +289,64 @@ const PhotoList: React.FC = () => {
   }, [])
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <HeaderScrollView
-        headerElement={
-          <HeaderComponent
-            selectImageToAdd={selectImageToAdd}
-            selections={selections}
-            showCheckbox={showCheckbox}
-            onCloseShowCheckBox={closeShowCheckBox}
-            onRemove={onRemove}
-          />
-        }
-        headerContainerStyle={{
-          flexDirection: 'row',
-          alignItems: 'stretch',
-        }}
-        minHeight={0}
-      >
-        <View style={[tw`flex-1 p-1 pb-10 `, { height, width }]}>
-          {progress > 0 && (
-            <ProgressBar
-              style={{ height: 20, marginTop: 0 }}
-              progress={progress}
+    <>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        <HeaderScrollView
+          headerElement={
+            <HeaderComponent
+              selectImageToAdd={selectImageToAdd}
+              selections={selections}
+              showCheckbox={showCheckbox}
+              onCloseShowCheckBox={closeShowCheckBox}
+              onRemove={onRemove}
             />
-          )}
-          <View
-            style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}
-          >
-            <CheckboxGroup onChange={onSelectionsChange} ref={checkboxGroupRef}>
-              {images?.length > 0 &&
-                images.map((item, index) => {
-                  return (
-                    <RenderItem
-                      showCheckbox={showCheckbox}
-                      onItemLongPress={onItemLongPress}
-                      checkboxItemId={item.id}
-                      item={item}
-                      setpreviewImage={setpreviewImage}
-                      key={index}
-                    />
-                  )
-                })}
-            </CheckboxGroup>
-          </View>
-        </View>
-      </HeaderScrollView>
-      {previewImage?.uri && (
-        <View
-          style={tw`absolute inset-x-0 inset-y-0 bg-black z-10 flex-1 justify-end items-center gap-2`}
+          }
+          headerContainerStyle={{
+            flexDirection: 'row',
+            alignItems: 'stretch',
+          }}
+          minHeight={30}
         >
-          <View style={tw`self-start`}>
-            <TouchableOpacity onPress={() => setpreviewImage(null)}>
-              <XMarkIcon color={'#fff'} />
-            </TouchableOpacity>
+          <View style={[tw`flex-1  pb-10 `, { height, width }]}>
+            {progress > 0 && (
+              <ProgressBar
+                style={{ height: 20, marginTop: 0 }}
+                progress={progress}
+              />
+            )}
+            <View
+              style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}
+            >
+              <CheckboxGroup
+                onChange={onSelectionsChange}
+                ref={checkboxGroupRef}
+              >
+                {images?.length > 0 &&
+                  images.map((item, index) => {
+                    return (
+                      <RenderItem
+                        showCheckbox={showCheckbox}
+                        onItemLongPress={onItemLongPress}
+                        checkboxItemId={item.id}
+                        item={item}
+                        setpreviewImage={() => setpreviewIndex(index)}
+                        key={index}
+                      />
+                    )
+                  })}
+              </CheckboxGroup>
+            </View>
           </View>
-          <Image
-            source={{ uri: previewImage?.uri }}
-            style={[{ height: height * 0.9, width: width * 0.9 }]}
-          />
-        </View>
+        </HeaderScrollView>
+      </View>
+      {previewImage?.uri && (
+        <PhotoPreview
+          onSwipe={handleImageSwipe}
+          imageUrl={previewImage.uri}
+          onClose={() => setpreviewIndex(-1)}
+        />
       )}
-    </View>
+    </>
   )
 }
 
