@@ -69,7 +69,7 @@ export default function PhotoScreen() {
         ]}
       >
         {showSiderScreen && siderScreenTag === SiderScreenType.normal && (
-          <PhotoList />
+          <PhotoList goBack={onCloseSiderScreen} />
         )}
         {showSiderScreen && siderScreenTag === SiderScreenType.deleted && (
           <PhotoRemovedList goBack={onCloseSiderScreen} />

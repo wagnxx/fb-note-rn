@@ -32,7 +32,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<AuthState['user'] | null>) => {
-      console.log('action:', action)
+      // console.log('action:', action)
       if (action.payload) {
         const { uid, email, displayName, photoURL } = action.payload
         state.user = { uid, email, displayName, photoURL }

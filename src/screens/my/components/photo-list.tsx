@@ -7,7 +7,6 @@ import {
   uploadImageToFirebase,
 } from '@/service/basic'
 import { messageConfirm } from '@/utils/utilsAlert'
-import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
@@ -46,20 +45,22 @@ const HeaderComponent: React.FC<{
   showCheckbox: boolean
   onCloseShowCheckBox: () => void
   onRemove: () => void
+  goBack: () => void
 }> = ({
   selectImageToAdd,
   selections,
   showCheckbox,
   onCloseShowCheckBox,
   onRemove,
+  goBack,
 }) => {
   const theme = useTheme()
-  const navigation = useNavigation()
-  const goBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack()
-    }
-  }
+  // const navigation = useNavigation()
+  // const goBack = () => {
+  //   if (navigation.canGoBack()) {
+  //     navigation.goBack()
+  //   }
+  // }
   return (
     <View
       style={[
@@ -161,7 +162,7 @@ const RenderItem: React.FC<
   </View>
 )
 
-const PhotoList: React.FC = () => {
+const PhotoList: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   const theme = useTheme()
   const [images, setImages] = useState<ImageItem[]>([])
   const [previewIndex, setpreviewIndex] = useState<number>(-1)
@@ -299,6 +300,7 @@ const PhotoList: React.FC = () => {
               showCheckbox={showCheckbox}
               onCloseShowCheckBox={closeShowCheckBox}
               onRemove={onRemove}
+              goBack={goBack}
             />
           }
           headerContainerStyle={{
@@ -307,16 +309,14 @@ const PhotoList: React.FC = () => {
           }}
           minHeight={30}
         >
-          <View style={[tw`flex-1  pb-10 `, { height, width }]}>
+          <View style={[tw` pb-5 `, { width }]}>
             {progress > 0 && (
               <ProgressBar
                 style={{ height: 20, marginTop: 0 }}
                 progress={progress}
               />
             )}
-            <View
-              style={[tw`flex-row flex-1  flex-wrap px-2`, { width, gap: 1 }]}
-            >
+            <View style={[tw`flex-row  flex-wrap px-2`, { width, gap: 1 }]}>
               <CheckboxGroup
                 onChange={onSelectionsChange}
                 ref={checkboxGroupRef}

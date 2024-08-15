@@ -59,6 +59,7 @@ const HeaderScrollView = ({
         )}
         scrollEventThrottle={16}
         {...scrollViewProps}
+        showsVerticalScrollIndicator={false}
       >
         {children}
       </Animated.ScrollView>

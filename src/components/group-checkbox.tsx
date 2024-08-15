@@ -26,11 +26,25 @@ export const Group: React.ForwardRefRenderFunction<
   CheckboxGroupProps
 > = ({ children, onChange }, ref) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const allItems = new Set<string>()
 
   useImperativeHandle(ref, () => ({
     resetSelections: () => {
       setSelectedItems([])
-      onChange?.(selectedItems)
+      onChange?.([])
+    },
+    selectAll: () => {
+      setSelectedItems([...allItems])
+      onChange?.([...allItems])
+    },
+    toggleSelectAll: () => {
+      if (selectedItems.length < allItems.size) {
+        setSelectedItems([...allItems])
+        onChange?.([...allItems])
+      } else {
+        setSelectedItems([])
+        onChange?.([])
+      }
     },
   }))
 
@@ -51,6 +65,7 @@ export const Group: React.ForwardRefRenderFunction<
 
   const enhancedChildren = Children.map(children, child => {
     if (isValidElement(child) && child.props.checkboxItemId) {
+      allItems.add(child.props.checkboxItemId)
       return cloneElement(child, {
         checked: selectedItems.includes(child.props.checkboxItemId),
         onChange: handleCheckboxChange,
