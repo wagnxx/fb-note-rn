@@ -14,6 +14,8 @@ import Music from '@/screens/my/music'
 import { observeAuthState, selectAuth } from '@/features/auth/authSlice'
 import { useAppDispatch } from '@/store'
 import { useSelector } from 'react-redux'
+import Tag from '@/screens/tag'
+import DictEnglish from '@/screens/dict/dict-english'
 
 const Stack = createStackNavigator()
 
@@ -59,17 +61,13 @@ export default function AuthNavigator() {
           {/* 首页带有 bottom tabs screen */}
           <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
           {/* 普通 Stack.Screen 需要登录 */}
-          <Stack.Screen
-            name={ScrennTypeEnum.NodeDetail}
-            component={NodeDetail}
-          />
+          <Stack.Screen name={ScrennTypeEnum.NodeDetail} component={NodeDetail} />
           <Stack.Screen name={ScrennTypeEnum.Profile} component={Profile} />
-          <Stack.Screen
-            name={ScrennTypeEnum.CreateNote}
-            component={CreateNote}
-          />
+          <Stack.Screen name={ScrennTypeEnum.CreateNote} component={CreateNote} />
           <Stack.Screen name={ScrennTypeEnum.Photo} component={Photo} />
           <Stack.Screen name={ScrennTypeEnum.Music} component={Music} />
+          <Stack.Screen name={ScrennTypeEnum.Tag} component={Tag} />
+          <Stack.Screen name={ScrennTypeEnum.DictEnglish} component={DictEnglish} />
         </>
       ) : (
         // 不需要登录的 游客可访问页面

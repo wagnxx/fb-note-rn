@@ -4,9 +4,11 @@ import ProfileListItem from './profile-list-item'
 import tw from 'twrnc'
 import { developWarn } from '@/utils/utilsAlert'
 import {
+  BookOpenIcon,
   FilmIcon,
   MusicalNoteIcon,
   PhotoIcon,
+  TagIcon,
 } from 'react-native-heroicons/outline'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList, ScrennTypeEnum } from '@/types/screen'
@@ -20,6 +22,8 @@ export enum Actions {
   settings,
   video,
   music,
+  dict,
+  tag,
   photo,
 }
 
@@ -71,6 +75,16 @@ const itemsList: ItemType[] = [
     IconElement: prop => <MusicalNoteIcon size={ICON_SIZE} {...prop} />,
     name: Actions.music,
   },
+  {
+    label: '英语单词',
+    IconElement: prop => <BookOpenIcon size={ICON_SIZE} {...prop} />,
+    name: Actions.dict,
+  },
+  {
+    label: 'Tag',
+    IconElement: prop => <TagIcon size={ICON_SIZE} {...prop} />,
+    name: Actions.tag,
+  },
 ]
 
 type ProfileListProps = {
@@ -80,9 +94,7 @@ type ProfileListProps = {
 const avalibleWidth = width - 12 * 4 - 8 * 2
 export const ITEM_WIDTH = avalibleWidth / 5
 const ICON_SIZE = 23.5
-export default function ProfileList({
-  onSettingsDrawerOpen,
-}: ProfileListProps) {
+export default function ProfileList({ onSettingsDrawerOpen }: ProfileListProps) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const theme = useTheme()
 
@@ -97,19 +109,19 @@ export default function ProfileList({
       case Actions.music:
         navigation.navigate(ScrennTypeEnum.Music)
         break
+      case Actions.tag:
+        navigation.navigate(ScrennTypeEnum.Tag)
+        break
+      case Actions.dict:
+        navigation.navigate(ScrennTypeEnum.DictEnglish)
+        break
       default:
         developWarn()
     }
   }
 
   return (
-    <View
-      style={[
-        tw`flex-row gap-3 flex-wrap  flex-1 p-2`,
-        // { backgroundColor: 'red' },
-        // { backgroundColor: theme.colors.background },
-      ]}
-    >
+    <View style={[tw`flex-row gap-3 flex-wrap  flex-1 p-2`]}>
       {itemsList.map((item, index) => (
         <ProfileListItem
           width={ITEM_WIDTH}
