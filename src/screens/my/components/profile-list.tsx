@@ -113,7 +113,7 @@ export default function ProfileList({ onSettingsDrawerOpen }: ProfileListProps) 
         navigation.navigate(ScrennTypeEnum.Tag)
         break
       case Actions.dict:
-        navigation.navigate(ScrennTypeEnum.DictEnglish)
+        navigation.navigate(ScrennTypeEnum.DictEnglish, { screen: 'WordManage' })
         break
       default:
         developWarn()
