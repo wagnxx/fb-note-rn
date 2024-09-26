@@ -4,12 +4,14 @@ import { useDispatch } from 'react-redux'
 import todosReducer from '@/features/todos/todosSlice'
 import notesReducer from '@/features/notes/notesSlice'
 import authReducer from '@/features/auth/authSlice'
+import dictSliceReducer from '@/features/dict/dictSlice'
 
 const store = configureStore({
   reducer: {
     todos: todosReducer,
     notes: notesReducer,
     auth: authReducer,
+    dict: dictSliceReducer,
   },
 
   middleware: getDefaultMiddleware =>
