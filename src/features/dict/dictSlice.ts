@@ -16,12 +16,14 @@ interface DictState {
   dictCollection: string[] //DictInfo[]
   words: { [dictId: string]: WordItem[] } // 每个词典有自己的单词列表
   hasSelectedDict: boolean
+  wordCollections: WordItem[]
 }
 
 const initialState: DictState = {
   dictCollection: ['cet4'],
   words: {},
   hasSelectedDict: false,
+  wordCollections: [],
 }
 
 export const dictSlice = createSlice({
@@ -35,6 +37,15 @@ export const dictSlice = createSlice({
       if (state.dictCollection.includes(action.payload)) return
       state.dictCollection.push(action.payload)
     },
+    toggleWordCollections: (state, action: PayloadAction<WordItem>) => {
+      if (state.wordCollections.some(item => item.name === action.payload.name)) {
+        state.wordCollections = state.wordCollections.filter(
+          item => item.name !== action.payload.name,
+        )
+      } else {
+        state.wordCollections.push(action.payload)
+      }
+    },
     setWordsForDict: (state, action: PayloadAction<{ dictId: string; words: WordItem[] }>) => {
       const { dictId, words } = action.payload
       state.words[dictId] = words
@@ -42,7 +53,8 @@ export const dictSlice = createSlice({
   },
 })
 
-export const { setDictCollection, setWordsForDict, setHasSelectedDict } = dictSlice.actions
+export const { setDictCollection, setWordsForDict, setHasSelectedDict, toggleWordCollections } =
+  dictSlice.actions
 
 export const loadDictCollection = () => async (dispatch: AppDispatch) => {
   try {
@@ -88,5 +100,9 @@ export const insertJsonToDictCollection = (dictInfo: DictInfo) => async (dispatc
 export const selectDictCollection = (state: RootState) => state.dict.dictCollection
 export const selectWordsForDict = (dictId: string) => (state: RootState) =>
   state.dict.words[dictId] || []
+
+export const isArchivedWord = (word: WordItem) => (state: RootState) => {
+  return state.dict.wordCollections.some(item => item.name === word.name)
+}
 
 export default dictSlice.reducer

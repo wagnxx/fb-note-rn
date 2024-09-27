@@ -7,7 +7,7 @@ import { FlatList, View } from 'react-native'
 import { ListBulletIcon, Squares2X2Icon } from 'react-native-heroicons/outline'
 
 const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) => {
-  const { currentWordList } = useDict()
+  const { currentWordList, wordCollections } = useDict()
   const theme = useTheme()
 
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -27,7 +27,7 @@ const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) 
 
   return (
     <View style={[tw``]}>
-      <View style={[tw`flex-row gap-2 justify-between items-center px-2`]}>
+      <View style={[tw`flex-row gap-2 justify-between items-center px-2 my-2`]}>
         <View style={[tw`flex-1`]}>
           <Searchbar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery} />
         </View>
@@ -41,7 +41,9 @@ const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) 
       <FlatList
         data={wordList}
         keyExtractor={item => item.name.toString()}
-        renderItem={({ item }) => <RowItem item={item} showMeaning={showMeaning} />}
+        renderItem={({ item }) => (
+          <RowItem item={item} showMeaning={showMeaning} isLayoutGrid={layoutType === 'grid'} />
+        )}
         style={[tw`px-2 `, { backgroundColor: theme.colors.background }]}
         numColumns={layoutType === 'list' ? 1 : 4}
         key={layoutType === 'list' ? 1 : 4}
