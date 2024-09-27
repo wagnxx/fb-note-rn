@@ -1,19 +1,52 @@
-import React from 'react'
-import { FlatList } from 'react-native'
-import { useSelector } from 'react-redux'
-import { type RootState } from '@/store/index'
+import React, { useCallback, useMemo, useState } from 'react'
+import { useDict } from '@/features/dict/uesDict'
+import tw from 'twrnc'
+import { Searchbar, useTheme } from 'react-native-paper'
 import RowItem from './RowItem'
+import { FlatList, View } from 'react-native'
+import { ListBulletIcon, Squares2X2Icon } from 'react-native-heroicons/outline'
 
-const WordListComponent: React.FC = () => {
-  const colIds = useSelector((state: RootState) => state.dict.dictCollection)
-  const wordList = useSelector((state: RootState) => state.dict.words[colIds[0]])
+const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) => {
+  const { currentWordList } = useDict()
+  const theme = useTheme()
+
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const [layoutType, setLayoutType] = useState<'list' | 'grid'>('list')
+
+  const toggleLayoutType = useCallback(() => {
+    if (layoutType === 'list') {
+      setLayoutType('grid')
+    } else {
+      setLayoutType('list')
+    }
+  }, [layoutType])
+
+  const wordList = useMemo(() => {
+    return currentWordList.filter(item => item.name.includes(searchQuery))
+  }, [currentWordList, searchQuery])
 
   return (
-    <FlatList
-      data={wordList}
-      keyExtractor={item => item.name.toString()}
-      renderItem={({ item }) => <RowItem item={item} />}
-    />
+    <View style={[tw``]}>
+      <View style={[tw`flex-row gap-2 justify-between items-center px-2`]}>
+        <View style={[tw`flex-1`]}>
+          <Searchbar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery} />
+        </View>
+        {layoutType === 'list' && (
+          <ListBulletIcon size={20} color={theme.colors.onBackground} onPress={toggleLayoutType} />
+        )}
+        {layoutType === 'grid' && (
+          <Squares2X2Icon size={20} color={theme.colors.onBackground} onPress={toggleLayoutType} />
+        )}
+      </View>
+      <FlatList
+        data={wordList}
+        keyExtractor={item => item.name.toString()}
+        renderItem={({ item }) => <RowItem item={item} showMeaning={showMeaning} />}
+        style={[tw`px-2 `, { backgroundColor: theme.colors.background }]}
+        numColumns={layoutType === 'list' ? 1 : 4}
+        key={layoutType === 'list' ? 1 : 4}
+      />
+    </View>
   )
 }
 

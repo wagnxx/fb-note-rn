@@ -71,7 +71,7 @@ export const insertJsonToDictCollection = (dictInfo: DictInfo) => async (dispatc
       wordItem => !existingWords.some(existingWord => existingWord.name === wordItem.name),
     )
 
-    const updatedWords = [...existingWords, ...newWords]
+    const updatedWords = [...existingWords, ...newWords].filter(Boolean)
 
     // 保存到 AsyncStorage 中
     await AsyncStorage.setItem(`words_${dictInfo.id}`, JSON.stringify(updatedWords))
