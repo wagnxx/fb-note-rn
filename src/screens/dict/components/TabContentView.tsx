@@ -44,7 +44,7 @@ const TabContentView: React.FC<Props> = ({ category }) => {
             onPress={() => handleTagPress(tag)}
             style={[tw`flex-row justify-between`]}
           >
-            <Text style={[theme.fonts.labelMedium, { color: theme.colors.onPrimary }]}>{tag}</Text>
+            <Text style={[theme.fonts.titleMedium, { color: theme.colors.onPrimary }]}>{tag}</Text>
 
             {selectedTag === tag ? (
               <ChevronRightIcon size={16} color={theme.colors.onPrimary} />
@@ -61,7 +61,7 @@ const TabContentView: React.FC<Props> = ({ category }) => {
             key={item.id}
             onPress={() => dispatch(insertJsonToDictCollection(item))}
           >
-            <Text style={[theme.fonts.labelMedium]}>{item.name}</Text>
+            <Text style={[theme.fonts.labelLarge]}>{item.name}</Text>
           </TouchableOpacity>
         ))}
       </View>

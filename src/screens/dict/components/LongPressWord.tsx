@@ -34,7 +34,9 @@ const LongPressWord = ({ wordItem }: { wordItem: WordItem }) => {
         style={styles.wordButton}
         rippleColor="rgba(255, 255, 255, .32)"
       >
-        <Text style={[theme.fonts.titleMedium]}>{wordItem.name}</Text>
+        <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>
+          {wordItem.name}
+        </Text>
       </TouchableRipple>
 
       <Portal>

@@ -81,9 +81,9 @@ const DictHome: React.FC = () => {
         </TouchableWithoutFeedback>
       </Animated.View>
 
-      <View style={[tw`flex-row justify-between items-center px-2`]}>
-        <Bars3Icon size={20} color={theme.colors.onBackground} onPress={onAnimationStart} />
-        <Text style={[theme.fonts.labelSmall]}>CURRENT DICT: {currentDictInfo?.name || '_'}</Text>
+      <View style={[tw`flex-row justify-between items-center px-2 py-2`]}>
+        <Bars3Icon size={24} color={theme.colors.onBackground} onPress={onAnimationStart} />
+        <Text style={[theme.fonts.labelMedium]}>CURRENT DICT: {currentDictInfo?.name || '_'}</Text>
       </View>
 
       {pageType === 'add_dict' && <AddDict />}
