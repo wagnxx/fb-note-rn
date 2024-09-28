@@ -1,4 +1,4 @@
-import { toggleWordCollections, WordItem } from '@/features/dict/dictSlice'
+import { toggleWordCollections, toggleWordRemoved, WordItem } from '@/features/dict/dictSlice'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { ChevronDownIcon, ChevronUpIcon, StarIcon, TrashIcon } from 'react-native-heroicons/outline'
@@ -40,7 +40,11 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
         {isLayoutGrid ? null : (
           <>
             <View style={[tw`flex-row flex-1 gap-2 justify-end`]}>
-              <TrashIcon size={16} color={theme.colors.onBackground} />
+              <TrashIcon
+                size={16}
+                color={theme.colors.onBackground}
+                onPress={() => dispatch(toggleWordRemoved(item))}
+              />
               {isArchived(item) ? (
                 <StarIconFill
                   size={16}

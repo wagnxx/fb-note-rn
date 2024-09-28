@@ -8,8 +8,17 @@ export const useDict = () => {
   const dictCollection = useSelector((state: RootState) => state.dict.dictCollection)
   const wordsMap = useSelector((state: RootState) => state.dict.words)
   const wordCollections = useSelector((state: RootState) => state.dict.wordCollections)
+  const removedWords = useSelector((state: RootState) => state.dict.removedWords)
 
   const dispatch = useDispatch()
+
+  const currentDictInfo = useMemo(() => {
+    if (selectedDictId) {
+      return dictCollection.find(item => item.id === selectedDictId)
+    } else {
+      return null
+    }
+  }, [dictCollection, selectedDictId])
 
   const currentWordList = useMemo(() => {
     if (selectedDictId) {
@@ -27,6 +36,8 @@ export const useDict = () => {
     currentWordList,
     wordsCount: currentWordList?.length || 0,
     wordCollections,
+    removedWords,
     dictCollection,
+    currentDictInfo,
   }
 }

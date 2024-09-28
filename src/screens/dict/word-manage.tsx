@@ -6,6 +6,7 @@ import { StatusBar, Text, View } from 'react-native'
 import { Button } from 'react-native-paper'
 import tw from 'twrnc'
 import WordArchived from './components/WordArchived'
+import WordRemoved from './components/WordRemoved'
 
 const Tab = createBottomTabNavigator()
 
@@ -34,7 +35,7 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
         <Tab.Screen
           key={'3'}
           name={'Removed'}
-          component={WordListScreen} // Call the external component here
+          component={WordRemoved} // Call the external component here
         />
       </Tab.Navigator>
     </>
