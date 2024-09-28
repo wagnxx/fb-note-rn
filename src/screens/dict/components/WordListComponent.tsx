@@ -7,7 +7,7 @@ import { FlatList, View } from 'react-native'
 import { ListBulletIcon, Squares2X2Icon } from 'react-native-heroicons/outline'
 
 const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) => {
-  const { currentWordList, wordCollections } = useDict()
+  const { currentWordList } = useDict()
   const theme = useTheme()
 
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -22,7 +22,7 @@ const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) 
   }, [layoutType])
 
   const wordList = useMemo(() => {
-    return currentWordList.filter(item => item.name.includes(searchQuery))
+    return currentWordList?.filter(Boolean).filter(item => item.name.includes(searchQuery)) || []
   }, [currentWordList, searchQuery])
 
   return (

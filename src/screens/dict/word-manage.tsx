@@ -2,39 +2,42 @@ import React, { useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import WordListComponent from './components/WordListComponent'
 import { useDict } from '@/features/dict/uesDict'
-import { Text, View } from 'react-native'
+import { StatusBar, Text, View } from 'react-native'
 import { Button } from 'react-native-paper'
 import tw from 'twrnc'
 import WordArchived from './components/WordArchived'
 
 const Tab = createBottomTabNavigator()
 
-const WordManage: React.FC = () => {
+const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
   return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarIcon: () => null,
-        tabBarIconStyle: { display: 'none' },
-        tabBarLabelPosition: 'beside-icon',
-        headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        key={'1'}
-        name={'wordList'}
-        component={WordListScreen} // Call the external component here
-      />
-      <Tab.Screen
-        key={'2'}
-        name={'Archive'}
-        component={WordArchived} // Call the external component here
-      />
-      <Tab.Screen
-        key={'3'}
-        name={'Removed'}
-        component={WordListScreen} // Call the external component here
-      />
-    </Tab.Navigator>
+    <>
+      <StatusBar hidden={true} />
+      <Tab.Navigator
+        screenOptions={{
+          tabBarIcon: () => null,
+          tabBarIconStyle: { display: 'none' },
+          tabBarLabelPosition: 'beside-icon',
+          headerShown: false,
+        }}
+      >
+        <Tab.Screen
+          key={'1'}
+          name={'wordList'}
+          component={WordListScreen} // Call the external component here
+        />
+        <Tab.Screen
+          key={'2'}
+          name={'Archive'}
+          component={WordArchived} // Call the external component here
+        />
+        <Tab.Screen
+          key={'3'}
+          name={'Removed'}
+          component={WordListScreen} // Call the external component here
+        />
+      </Tab.Navigator>
+    </>
   )
 }
 

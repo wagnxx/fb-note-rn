@@ -39,29 +39,30 @@ const LongPressWord = ({ wordItem }: { wordItem: WordItem }) => {
 
       <Portal>
         <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>{wordItem.name}</Dialog.Title>
+          <Dialog.Title>
+            <Text>{wordItem.name}</Text>
+            {isArchived(wordItem) ? (
+              <StarIconFill
+                size={16}
+                color={'#ffeb3b'}
+                onPress={() => dispatch(toggleWordCollections(wordItem))}
+              />
+            ) : (
+              <StarIcon
+                size={16}
+                color={theme.colors.onBackground}
+                onPress={() => dispatch(toggleWordCollections(wordItem))}
+              />
+            )}
+          </Dialog.Title>
           <Dialog.Content>
-            <View>
-              <View>
-                {isArchived(wordItem) ? (
-                  <StarIconFill
-                    size={16}
-                    color={'#ffeb3b'}
-                    onPress={() => dispatch(toggleWordCollections(wordItem))}
-                  />
-                ) : (
-                  <StarIcon
-                    size={16}
-                    color={theme.colors.onBackground}
-                    onPress={() => dispatch(toggleWordCollections(wordItem))}
-                  />
-                )}
-              </View>
-              <View style={[tw`flex-row gap-4`]}>
+            <View style={[tw`gap-1`]}>
+              <View />
+              <View style={[tw`flex-row gap-2 items-center`]}>
                 <Text style={[theme.fonts.labelSmall]}>UK /{wordItem.ukphone}/</Text>
                 <SpeechButton word={wordItem.name} isAmerican={false} />
               </View>
-              <View style={[tw`flex-row gap-4`]}>
+              <View style={[tw`flex-row gap-2 items-center`]}>
                 <Text style={[theme.fonts.labelSmall]}>US /{wordItem.usphone}/</Text>
                 <SpeechButton word={wordItem.name} isAmerican={true} />
               </View>

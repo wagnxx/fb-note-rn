@@ -13,16 +13,16 @@ export interface WordItem {
 }
 
 interface DictState {
-  dictCollection: string[] //DictInfo[]
+  dictCollection: DictInfo[] //DictInfo[]
   words: { [dictId: string]: WordItem[] } // 每个词典有自己的单词列表
-  hasSelectedDict: boolean
+  selectedDictId: string | null
   wordCollections: WordItem[]
 }
 
 const initialState: DictState = {
-  dictCollection: ['cet4'],
+  dictCollection: [], //['cet4'],
   words: {},
-  hasSelectedDict: false,
+  selectedDictId: null,
   wordCollections: [],
 }
 
@@ -30,12 +30,21 @@ export const dictSlice = createSlice({
   name: 'dict',
   initialState,
   reducers: {
-    setHasSelectedDict: (state, action: PayloadAction<boolean>) => {
-      state.hasSelectedDict = action.payload
+    resetState: (state, action: PayloadAction<any>) => {
+      state.dictCollection = []
+      state.words = {}
+      state.selectedDictId = null
+      state.wordCollections = []
     },
-    setDictCollection: (state, action: PayloadAction<string>) => {
-      if (state.dictCollection.includes(action.payload)) return
+    setSelectedDictId: (state, action: PayloadAction<string>) => {
+      state.selectedDictId = action.payload
+      AsyncStorage.setItem('selectedDictId', state.selectedDictId)
+      console.log('setSelectedDictId', state.selectedDictId)
+    },
+    setDictCollection: (state, action: PayloadAction<DictInfo>) => {
+      if (state.dictCollection.some(item => item.id === action.payload.id)) return
       state.dictCollection.push(action.payload)
+      AsyncStorage.setItem('dictCollection', JSON.stringify(state.dictCollection))
     },
     toggleWordCollections: (state, action: PayloadAction<WordItem>) => {
       if (state.wordCollections.some(item => item.name === action.payload.name)) {
@@ -53,16 +62,43 @@ export const dictSlice = createSlice({
   },
 })
 
-export const { setDictCollection, setWordsForDict, setHasSelectedDict, toggleWordCollections } =
-  dictSlice.actions
+export const {
+  setDictCollection,
+  setWordsForDict,
+  setSelectedDictId,
+  toggleWordCollections,
+  resetState,
+} = dictSlice.actions
 
-export const loadDictCollection = () => async (dispatch: AppDispatch) => {
+export const loadSelectedDict = async (dispatch: AppDispatch) => {
+  try {
+    const selectedDictId = await AsyncStorage.getItem('selectedDictId')
+    if (selectedDictId) {
+      const jsonValue = await AsyncStorage.getItem(`words_${selectedDictId}`)
+      const existingWords: WordItem[] = jsonValue ? JSON.parse(jsonValue) : []
+      dispatch(setSelectedDictId(selectedDictId))
+      dispatch(setWordsForDict({ dictId: selectedDictId, words: existingWords }))
+    }
+  } catch (error) {
+    console.error('Error loading dictCollection:', error)
+  }
+}
+
+export const loadDictCollection = async (dispatch: AppDispatch) => {
   try {
     const jsonValue = await AsyncStorage.getItem('dictCollection')
     if (jsonValue) {
       const collection = JSON.parse(jsonValue)
       dispatch(setDictCollection(collection))
     }
+  } catch (error) {
+    console.error('Error loading dictCollection:', error)
+  }
+}
+export const clearAllStorage = async (dispatch: AppDispatch) => {
+  try {
+    await AsyncStorage.clear()
+    dispatch(resetState(null))
   } catch (error) {
     console.error('Error loading dictCollection:', error)
   }
@@ -90,8 +126,7 @@ export const insertJsonToDictCollection = (dictInfo: DictInfo) => async (dispatc
 
     // 更新状态
     dispatch(setWordsForDict({ dictId: dictInfo.id, words: updatedWords }))
-    dispatch(setHasSelectedDict(updatedWords.length > 0))
-    dispatch(setDictCollection(dictInfo.id))
+    dispatch(setDictCollection(dictInfo))
   } catch (error) {
     console.error('Error inserting JSON words:', error)
   }

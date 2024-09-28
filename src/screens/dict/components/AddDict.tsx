@@ -6,7 +6,7 @@ import { dictionaryResources } from '@/features/dict/dict_info'
 const Tab = createBottomTabNavigator()
 const categories = Array.from(new Set(dictionaryResources.map(item => item.category)))
 
-const DictListComponent: React.FC = () => {
+const AddDict: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -34,4 +34,4 @@ const TabContentScreen: React.FC<{ route: any }> = ({ route }) => {
   return <TabContentView category={category} />
 }
 
-export default DictListComponent
+export default AddDict
