@@ -16,8 +16,10 @@ interface DictState {
   dictCollection: DictInfo[]
   words: { [dictId: string]: WordItem[] }
   selectedDictId: string | null
-  wordCollections: WordItem[]
-  removedWords: WordItem[]
+  wordsCollection: WordItem[]
+  wordsRemoved: WordItem[]
+  wordsCollectionInitial: WordItem[]
+  wordsRemovedInitial: WordItem[]
   wordsDocId: string | null
 }
 
@@ -25,8 +27,10 @@ const initialState: DictState = {
   dictCollection: [],
   words: {},
   selectedDictId: null,
-  wordCollections: [],
-  removedWords: [],
+  wordsCollection: [],
+  wordsRemoved: [],
+  wordsCollectionInitial: [],
+  wordsRemovedInitial: [],
   wordsDocId: '',
 }
 
@@ -38,8 +42,8 @@ export const dictSlice = createSlice({
       state.dictCollection = []
       state.words = {}
       state.selectedDictId = null
-      state.wordCollections = []
-      state.removedWords = []
+      state.wordsCollection = []
+      state.wordsRemoved = []
       AsyncStorage.clear() // Clear storage on reset
     },
     setSelectedDictId: (state, action: PayloadAction<string>) => {
@@ -53,25 +57,31 @@ export const dictSlice = createSlice({
         AsyncStorage.setItem('dictCollection', JSON.stringify(state.dictCollection))
       }
     },
-    toggleWordCollections: (state, action: PayloadAction<WordItem>) => {
-      const existingItem = state.wordCollections.find(item => item.name === action.payload.name)
-      if (existingItem) {
-        state.wordCollections = state.wordCollections.filter(
-          item => item.name !== action.payload.name,
+    toggleWordCollections: (
+      state,
+      action: PayloadAction<{ wordItem: WordItem; isIn: boolean }>,
+    ) => {
+      // console.log('toggleWordCollections action:', action)
+      // const existingItem = state.wordsCollection.find(item => item.name === action.payload.name)
+      console.log('action.payload.isIn ::', action.payload.isIn)
+      if (!action.payload.isIn) {
+        state.wordsCollection = state.wordsCollection.filter(
+          item => item.name !== action.payload.wordItem.name,
         )
       } else {
-        state.wordCollections.push(action.payload)
+        state.wordsCollection = [...state.wordsCollection, action.payload.wordItem]
       }
-      AsyncStorage.setItem('wordCollections', JSON.stringify(state.wordCollections)) // Persist after toggle
+      console.log('after toggleWordCollections', state.wordsCollection)
+      AsyncStorage.setItem('wordsCollection', JSON.stringify(state.wordsCollection)) // Persist after toggle
     },
     toggleWordRemoved: (state, action: PayloadAction<WordItem>) => {
-      const existingItem = state.removedWords.find(item => item.name === action.payload.name)
+      const existingItem = state.wordsRemoved.find(item => item.name === action.payload.name)
       if (existingItem) {
-        state.removedWords = state.removedWords.filter(item => item.name !== action.payload.name)
+        state.wordsRemoved = state.wordsRemoved.filter(item => item.name !== action.payload.name)
       } else {
-        state.removedWords.push(action.payload)
+        state.wordsRemoved = [...state.wordsRemoved, action.payload]
       }
-      AsyncStorage.setItem('removedWords', JSON.stringify(state.removedWords)) // Persist after toggle
+      AsyncStorage.setItem('wordsRemoved', JSON.stringify(state.wordsRemoved)) // Persist after toggle
     },
     setWordsForDict: (state, action: PayloadAction<{ dictId: string; words: WordItem[] }>) => {
       const { dictId, words } = action.payload
@@ -82,12 +92,14 @@ export const dictSlice = createSlice({
       state.wordsDocId = action.payload // Persist words for the dict
     },
     setWordRemoved: (state, action: PayloadAction<WordItem[]>) => {
-      state.removedWords = action.payload
-      AsyncStorage.setItem('removedWords', JSON.stringify(state.removedWords)) // Persist after toggle
+      state.wordsRemoved = action.payload
+      state.wordsRemovedInitial = action.payload
+      AsyncStorage.setItem('wordsRemoved', JSON.stringify(state.wordsRemoved)) // Persist after toggle
     },
     setWordCollections: (state, action: PayloadAction<WordItem[]>) => {
-      state.wordCollections = action.payload
-      AsyncStorage.setItem('wordCollections', JSON.stringify(state.wordCollections)) // Persist after toggle
+      state.wordsCollection = action.payload
+      state.wordsCollectionInitial = action.payload
+      AsyncStorage.setItem('wordsCollection', JSON.stringify(state.wordsCollection)) // Persist after toggle
     },
   },
 })
@@ -162,7 +174,7 @@ export const selectWordsForDict = (dictId: string) => (state: RootState) =>
   state.dict.words[dictId] || []
 
 export const isArchivedWord = (word: WordItem) => (state: RootState) => {
-  return state.dict.wordCollections.some(item => item.name === word.name)
+  return state.dict.wordsCollection.some(item => item.name === word.name)
 }
 
 export default dictSlice.reducer

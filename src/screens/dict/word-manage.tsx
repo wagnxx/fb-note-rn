@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import WordListComponent from './components/WordListComponent'
 import { useDict } from '@/features/dict/uesDict'
@@ -16,13 +16,17 @@ const Tab = createBottomTabNavigator()
 const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
   const dispatch = useDispatch()
 
-  getCurrentUserWordsCol().then(data => {
-    if (!data?.length) return
-    const row = data[0]
-    dispatch(setWordsDocId(row.id!))
-    dispatch(setWordCollections(row.archived))
-    dispatch(setWordRemoved(row.removed))
-  })
+  useEffect(() => {
+    getCurrentUserWordsCol().then(data => {
+      console.log('getCurrentUserWordsCol data:', data)
+      if (!data?.length) return
+      const row = data[0]
+      dispatch(setWordsDocId(row.id!))
+      dispatch(setWordCollections(row.archived))
+      dispatch(setWordRemoved(row.removed))
+    })
+  }, [dispatch])
+
   return (
     <>
       <StatusBar hidden={true} />

@@ -16,7 +16,7 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
   showMeaning,
   isLayoutGrid = false,
 }) => {
-  const { wordCollections } = useDict()
+  const { wordsCollection } = useDict()
   const [showItemMeaning, setShowItemMeaning] = useState(showMeaning)
   const theme = useTheme()
 
@@ -28,9 +28,9 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
 
   const isArchived = useCallback(
     (word: WordItem) => {
-      return wordCollections.some(item => item.name === word.name)
+      return wordsCollection.some(item => item.name === word.name)
     },
-    [wordCollections],
+    [wordsCollection],
   )
   return (
     <View style={[tw`gap-2 py-1 px-1`]}>
@@ -49,13 +49,19 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
                 <StarIconFill
                   size={16}
                   color={'#ffeb3b'}
-                  onPress={() => dispatch(toggleWordCollections(item))}
+                  onPress={() => dispatch(toggleWordCollections({ wordItem: item, isIn: false }))}
+                  // onPress={() => {
+                  //   console.log('cancel')
+                  // }}
                 />
               ) : (
                 <StarIcon
                   size={16}
                   color={theme.colors.onBackground}
-                  onPress={() => dispatch(toggleWordCollections(item))}
+                  onPress={() => dispatch(toggleWordCollections({ wordItem: item, isIn: true }))}
+                  // onPress={() => {
+                  //   console.log('confirm')
+                  // }}
                 />
               )}
             </View>

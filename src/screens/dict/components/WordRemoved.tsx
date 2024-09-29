@@ -7,12 +7,12 @@ import tw from 'twrnc'
 import LongPressWord from './LongPressWord'
 
 const WordRemoved = () => {
-  const { removedWords } = useDict()
+  const { wordsRemoved } = useDict()
   const theme = useTheme()
 
   return (
     <FlatList
-      data={removedWords}
+      data={wordsRemoved}
       keyExtractor={item => item.name.toString()}
       renderItem={({ item }) => <RowItem item={item} />}
       style={[tw`px-2 `, { backgroundColor: theme.colors.background }]}

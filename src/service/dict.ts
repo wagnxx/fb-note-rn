@@ -25,7 +25,7 @@ export type Note = {
   contentText?: string
 }
 
-export const addWordsCol = (doc: WordsCol) => {
+export const createPersonWordsCol = (doc: Partial<WordsCol>) => {
   if (auth?.currentUser?.uid) {
     doc.uid = auth.currentUser.uid
     return addDocToCol(COL_ARTICLES, doc)

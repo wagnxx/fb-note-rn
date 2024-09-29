@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AppState, AppStateStatus, BackHandler } from 'react-native'
 import DictHome from './dict-home'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const DictContainer = () => {
   const dictHomeRef = useRef<{ saveData: () => void; fetchDataFromRemote: () => void }>(null)
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState)
@@ -10,6 +10,7 @@ const DictContainer = () => {
     (nextAppState: AppStateStatus) => {
       if (nextAppState === 'background') {
         // 保存数据
+
         dictHomeRef.current?.saveData()
       }
 
@@ -42,6 +43,7 @@ const DictContainer = () => {
     console.log(
       '========================= .  Dict Container opend =====================================================',
     )
+    console.log('AsyncStorage.keys', AsyncStorage.getAllKeys())
   }, [])
 
   return <DictHome ref={dictHomeRef} />

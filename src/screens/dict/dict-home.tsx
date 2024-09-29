@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   forwardRef,
   useCallback,
@@ -20,53 +19,88 @@ import WordManage from './word-manage'
 import { Bars3Icon, ChevronDoubleLeftIcon } from 'react-native-heroicons/outline'
 import DictSettings from './components/DictSettings'
 import { useDict } from '@/features/dict/uesDict'
+import { createPersonWordsCol, updateWordsCol } from '@/service/dict'
 
 const { width, height } = Dimensions.get('window')
 
 const DictHome = (props, ref) => {
   const theme = useTheme()
-  const { currentDictInfo } = useDict()
+  const { currentDictInfo, hasWordsCollectionChanged, wordsDocId, wordsCollection, wordsRemoved } =
+    useDict()
   const selectedDictId = useSelector((state: RootState) => state.dict.selectedDictId)
   const [pageType, setPageType] = useState<PageTypes>(null)
 
   const sidebarAnim = useRef(new Animated.Value(width)).current
 
-  const setTargetPageType = useCallback(pType => {
-    setPageType(pType)
-    if (pType) {
-      onAnimationEnd()
-    }
-  }, [])
-
-  const onAnimationStart = () => {
+  const onAnimationStart = useCallback(() => {
     Animated.timing(sidebarAnim, {
       toValue: 0,
       duration: 300,
       useNativeDriver: true,
     }).start()
-  }
+  }, [sidebarAnim])
 
-  const onAnimationEnd = () => {
+  const onAnimationEnd = useCallback(() => {
     Animated.timing(sidebarAnim, {
       toValue: -width,
       duration: 300,
       useNativeDriver: true,
     }).start()
-  }
+  }, [sidebarAnim])
 
+  const setTargetPageType = useCallback(
+    (pType: PageTypes) => {
+      setPageType(pType)
+      if (pType) {
+        onAnimationEnd()
+      }
+    },
+    [onAnimationEnd],
+  )
   useEffect(() => {
     if (!selectedDictId) {
       onAnimationStart()
     }
-  }, [selectedDictId])
+  }, [onAnimationStart, selectedDictId])
 
   useImperativeHandle(ref, () => {
     return {
       saveData() {
-        console.log('App is in the background, saving data...')
+        console.log(
+          ' =========================== App is in the background, saving data...===========================',
+        )
+        if (hasWordsCollectionChanged) {
+          console.log('hasWordsCollectionChanged in forwardRef comp:::')
+          if (wordsDocId) {
+            // update
+            updateWordsCol({
+              archived: wordsCollection,
+              removed: wordsRemoved,
+              id: wordsDocId,
+            }).then(res => {
+              if (res) {
+                console.log('update success.')
+              } else {
+                console.log('update failed')
+              }
+            })
+          } else {
+            // create
+            createPersonWordsCol({
+              archived: wordsCollection,
+              removed: wordsRemoved,
+            }).then(res => {
+              if (res) {
+                console.log('create success.')
+              } else {
+                console.log('create failed')
+              }
+            })
+          }
+        }
       },
     }
-  }, [])
+  }, [hasWordsCollectionChanged, wordsCollection, wordsDocId, wordsRemoved])
 
   return (
     <View style={[tw`flex-auto`]}>

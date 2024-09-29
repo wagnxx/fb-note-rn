@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { useDict } from '@/features/dict/uesDict'
 import tw from 'twrnc'
 import { Searchbar, useTheme } from 'react-native-paper'
 import RowItem from './RowItem'
 import { FlatList, View } from 'react-native'
 import { ListBulletIcon, Squares2X2Icon } from 'react-native-heroicons/outline'
+import { useDict } from '@/features/dict/uesDict'
 
 const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) => {
   const { currentWordList } = useDict()

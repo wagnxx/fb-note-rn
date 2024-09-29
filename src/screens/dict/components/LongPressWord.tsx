@@ -12,7 +12,7 @@ import { useDict } from '@/features/dict/uesDict'
 
 const LongPressWord = ({ wordItem }: { wordItem: WordItem }) => {
   const [visible, setVisible] = useState(false)
-  const { wordCollections } = useDict()
+  const { wordsCollection } = useDict()
   const showDialog = () => setVisible(true)
   const hideDialog = () => setVisible(false)
 
@@ -22,9 +22,9 @@ const LongPressWord = ({ wordItem }: { wordItem: WordItem }) => {
 
   const isArchived = useCallback(
     (word: WordItem) => {
-      return wordCollections.some(item => item.name === word.name)
+      return wordsCollection.some(item => item.name === word.name)
     },
-    [wordCollections],
+    [wordsCollection],
   )
 
   return (
