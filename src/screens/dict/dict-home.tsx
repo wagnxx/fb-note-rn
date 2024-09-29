@@ -1,5 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { PageTypes } from './components/DictSettings'
@@ -16,7 +23,7 @@ import { useDict } from '@/features/dict/uesDict'
 
 const { width, height } = Dimensions.get('window')
 
-const DictHome: React.FC = () => {
+const DictHome = (props, ref) => {
   const theme = useTheme()
   const { currentDictInfo } = useDict()
   const selectedDictId = useSelector((state: RootState) => state.dict.selectedDictId)
@@ -52,6 +59,14 @@ const DictHome: React.FC = () => {
       onAnimationStart()
     }
   }, [selectedDictId])
+
+  useImperativeHandle(ref, () => {
+    return {
+      saveData() {
+        console.log('App is in the background, saving data...')
+      },
+    }
+  }, [])
 
   return (
     <View style={[tw`flex-auto`]}>
@@ -93,4 +108,4 @@ const DictHome: React.FC = () => {
   )
 }
 
-export default DictHome
+export default forwardRef(DictHome)

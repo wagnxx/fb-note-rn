@@ -18,6 +18,7 @@ interface DictState {
   selectedDictId: string | null
   wordCollections: WordItem[]
   removedWords: WordItem[]
+  wordsDocId: string | null
 }
 
 const initialState: DictState = {
@@ -26,6 +27,7 @@ const initialState: DictState = {
   selectedDictId: null,
   wordCollections: [],
   removedWords: [],
+  wordsDocId: '',
 }
 
 export const dictSlice = createSlice({
@@ -76,6 +78,17 @@ export const dictSlice = createSlice({
       state.words[dictId] = words
       AsyncStorage.setItem(`words_${dictId}`, JSON.stringify(words)) // Persist words for the dict
     },
+    setWordsDocId: (state, action: PayloadAction<string | null>) => {
+      state.wordsDocId = action.payload // Persist words for the dict
+    },
+    setWordRemoved: (state, action: PayloadAction<WordItem[]>) => {
+      state.removedWords = action.payload
+      AsyncStorage.setItem('removedWords', JSON.stringify(state.removedWords)) // Persist after toggle
+    },
+    setWordCollections: (state, action: PayloadAction<WordItem[]>) => {
+      state.wordCollections = action.payload
+      AsyncStorage.setItem('wordCollections', JSON.stringify(state.wordCollections)) // Persist after toggle
+    },
   },
 })
 
@@ -86,6 +99,9 @@ export const {
   toggleWordCollections,
   toggleWordRemoved,
   resetState,
+  setWordsDocId,
+  setWordRemoved,
+  setWordCollections,
 } = dictSlice.actions
 
 const loadFromAsyncStorage = async (key: string) => {

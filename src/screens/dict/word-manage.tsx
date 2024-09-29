@@ -7,10 +7,22 @@ import { Button } from 'react-native-paper'
 import tw from 'twrnc'
 import WordArchived from './components/WordArchived'
 import WordRemoved from './components/WordRemoved'
+import { getCurrentUserWordsCol } from '@/service/dict'
+import { useDispatch } from 'react-redux'
+import { setWordCollections, setWordRemoved, setWordsDocId } from '@/features/dict/dictSlice'
 
 const Tab = createBottomTabNavigator()
 
 const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
+  const dispatch = useDispatch()
+
+  getCurrentUserWordsCol().then(data => {
+    if (!data?.length) return
+    const row = data[0]
+    dispatch(setWordsDocId(row.id!))
+    dispatch(setWordCollections(row.archived))
+    dispatch(setWordRemoved(row.removed))
+  })
   return (
     <>
       <StatusBar hidden={true} />

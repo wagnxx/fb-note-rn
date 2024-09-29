@@ -15,7 +15,7 @@ import { observeAuthState, selectAuth } from '@/features/auth/authSlice'
 import { useAppDispatch } from '@/store'
 import { useSelector } from 'react-redux'
 import Tag from '@/screens/tag'
-import DictHome from '@/screens/dict/dict-home'
+import DictContainer from '@/screens/dict/dict-container'
 
 const Stack = createStackNavigator()
 
@@ -51,7 +51,7 @@ export default function AuthNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName="DictEnglish"
+      initialRouteName="HomeTabs"
       screenOptions={{
         headerShown: false,
       }}
@@ -67,7 +67,7 @@ export default function AuthNavigator() {
           <Stack.Screen name={ScrennTypeEnum.Photo} component={Photo} />
           <Stack.Screen name={ScrennTypeEnum.Music} component={Music} />
           <Stack.Screen name={ScrennTypeEnum.Tag} component={Tag} />
-          <Stack.Screen name={ScrennTypeEnum.DictEnglish} component={DictHome} />
+          <Stack.Screen name={ScrennTypeEnum.DictEnglish} component={DictContainer} />
         </>
       ) : (
         // 不需要登录的 游客可访问页面
