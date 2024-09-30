@@ -34,12 +34,12 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
   )
   return (
     <View style={[tw`gap-2 py-1 px-1`]}>
-      <View style={[tw`flex-row items-center gap-2 justify-between`]}>
+      <View style={[tw`flex-row items-center gap-4 justify-between`]}>
         {/* <Text style={[theme.fonts.titleMedium]}>{item.name}</Text> */}
         <LongPressWord wordItem={item} />
         {isLayoutGrid ? null : (
           <>
-            <View style={[tw`flex-row flex-1 gap-2 justify-end`]}>
+            <View style={[tw`flex-row flex-1 gap-4 justify-end`]}>
               <TrashIcon
                 size={16}
                 color={theme.colors.onBackground}
@@ -49,7 +49,7 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
                 <StarIconFill
                   size={16}
                   color={'#ffeb3b'}
-                  onPress={() => dispatch(toggleWordCollections({ wordItem: item, isIn: false }))}
+                  onPress={() => dispatch(toggleWordCollections(item))}
                   // onPress={() => {
                   //   console.log('cancel')
                   // }}
@@ -58,7 +58,7 @@ const RowItem: FC<{ item: WordItem; showMeaning: boolean; isLayoutGrid: boolean 
                 <StarIcon
                   size={16}
                   color={theme.colors.onBackground}
-                  onPress={() => dispatch(toggleWordCollections({ wordItem: item, isIn: true }))}
+                  onPress={() => dispatch(toggleWordCollections(item))}
                   // onPress={() => {
                   //   console.log('confirm')
                   // }}

@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { DictInfo, dictionaryResources } from '@/features/dict/dict_info'
-import { insertJsonToDictCollection } from '@/features/dict/dictSlice'
 import { AppDispatch } from '@/store'
 import tw from 'twrnc'
 import { Divider, useTheme } from 'react-native-paper'
 import { ChevronRightIcon } from 'react-native-heroicons/outline'
+import { useDict } from '@/features/dict/uesDict'
+import { insertJsonToDictCollection } from '@/features/dict/dictSlice'
 
 interface Props {
   category: string
@@ -16,7 +17,7 @@ const TabContentView: React.FC<Props> = ({ category }) => {
   const [tagDict, setTagDict] = useState<DictInfo[]>([])
   const dispatch = useDispatch<AppDispatch>()
   const theme = useTheme()
-
+  const { dictCollection, currentDictInfo } = useDict()
   const [selectedTag, setSelectedTag] = useState('')
 
   const list: DictInfo[] = dictionaryResources.filter(item => item.category === category)
@@ -26,6 +27,10 @@ const TabContentView: React.FC<Props> = ({ category }) => {
     const filteredItems = list.filter(item => item.tags.includes(tag))
     setTagDict(filteredItems)
     setSelectedTag(tag)
+  }
+
+  const hasAdded = (id: string) => {
+    return dictCollection.some(item => item.id === id)
   }
 
   return (
@@ -58,10 +63,13 @@ const TabContentView: React.FC<Props> = ({ category }) => {
         <Divider />
         {tagDict.map(item => (
           <TouchableOpacity
+            disabled={hasAdded(item.id)}
             key={item.id}
             onPress={() => dispatch(insertJsonToDictCollection(item))}
           >
-            <Text style={[theme.fonts.labelLarge]}>{item.name}</Text>
+            <Text disabled={hasAdded(item.id)} style={[theme.fonts.labelLarge]}>
+              {item.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>

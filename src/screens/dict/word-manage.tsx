@@ -10,11 +10,13 @@ import WordRemoved from './components/WordRemoved'
 import { getCurrentUserWordsCol } from '@/service/dict'
 import { useDispatch } from 'react-redux'
 import { setWordCollections, setWordRemoved, setWordsDocId } from '@/features/dict/dictSlice'
+import { eventBus } from '@/utils/utilsEventBus'
 
 const Tab = createBottomTabNavigator()
 
 const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
   const dispatch = useDispatch()
+  const [tabVisible, setTabVisible] = useState(true)
 
   useEffect(() => {
     getCurrentUserWordsCol().then(data => {
@@ -27,6 +29,17 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
     })
   }, [dispatch])
 
+  useEffect(() => {
+    const listener = (message: boolean) => {
+      setTabVisible(message)
+    }
+
+    eventBus.on<boolean>('update-tabVisible', listener)
+    return () => {
+      eventBus.off<boolean>('update-tabVisible', listener) // 清理
+    }
+  }, [])
+
   return (
     <>
       <StatusBar hidden={true} />
@@ -36,6 +49,7 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
           tabBarIconStyle: { display: 'none' },
           tabBarLabelPosition: 'beside-icon',
           headerShown: false,
+          tabBarStyle: { display: tabVisible ? 'flex' : 'none' },
         }}
       >
         <Tab.Screen

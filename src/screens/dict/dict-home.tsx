@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { PageTypes } from './components/DictSettings'
 import { Animated, Dimensions, StatusBar, Text, TouchableWithoutFeedback } from 'react-native'
@@ -20,6 +20,8 @@ import { Bars3Icon, ChevronDoubleLeftIcon } from 'react-native-heroicons/outline
 import DictSettings from './components/DictSettings'
 import { useDict } from '@/features/dict/uesDict'
 import { createPersonWordsCol, updateWordsCol } from '@/service/dict'
+import StorageManage from './components/StorageManage'
+import { loadSelectedDict } from '@/features/dict/dictSlice'
 
 const { width, height } = Dimensions.get('window')
 
@@ -31,6 +33,8 @@ const DictHome = (props, ref) => {
   const [pageType, setPageType] = useState<PageTypes>(null)
 
   const sidebarAnim = useRef(new Animated.Value(width)).current
+
+  const dispatch = useDispatch()
 
   const onAnimationStart = useCallback(() => {
     Animated.timing(sidebarAnim, {
@@ -62,6 +66,10 @@ const DictHome = (props, ref) => {
       onAnimationStart()
     }
   }, [onAnimationStart, selectedDictId])
+
+  useEffect(() => {
+    loadSelectedDict(dispatch)()
+  }, [dispatch])
 
   useImperativeHandle(ref, () => {
     return {
@@ -137,6 +145,7 @@ const DictHome = (props, ref) => {
 
       {pageType === 'add_dict' && <AddDict />}
       {pageType === 'select_dict' && <SelectDict />}
+      {pageType === 'storage_manage' && <StorageManage />}
       {(pageType === 'word_manage' || (pageType === null && selectedDictId)) && <WordManage />}
     </View>
   )

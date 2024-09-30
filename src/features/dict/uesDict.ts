@@ -1,7 +1,6 @@
 import { RootState } from '@/store'
-import { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { loadSelectedDict } from './dictSlice'
+import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 export const useDict = () => {
   const selectedDictId = useSelector((state: RootState) => state.dict.selectedDictId)
@@ -22,8 +21,6 @@ export const useDict = () => {
     )
   }, [wordsCollection, wordsCollectionInitial, wordsRemoved, wordsRemovedInitial])
 
-  const dispatch = useDispatch()
-
   const currentDictInfo = useMemo(() => {
     if (selectedDictId) {
       return dictCollection.find(item => item.id === selectedDictId)
@@ -39,10 +36,6 @@ export const useDict = () => {
       return []
     }
   }, [selectedDictId, wordsMap])
-
-  useEffect(() => {
-    loadSelectedDict(dispatch)
-  }, [dispatch])
 
   return {
     currentWordList,

@@ -48,28 +48,25 @@ export const dictSlice = createSlice({
     },
     setSelectedDictId: (state, action: PayloadAction<string>) => {
       state.selectedDictId = action.payload
-      AsyncStorage.setItem('selectedDictId', action.payload)
-      console.log('setSelectedDictId', action.payload)
+      AsyncStorage.setItem('selectedDictId', JSON.stringify(action.payload))
+      console.log('setSelectedDictId', JSON.stringify(action.payload))
     },
     setDictCollection: (state, action: PayloadAction<DictInfo>) => {
       if (!state.dictCollection.some(item => item.id === action.payload.id)) {
-        state.dictCollection.push(action.payload)
+        state.dictCollection = [...state.dictCollection, action.payload]
         AsyncStorage.setItem('dictCollection', JSON.stringify(state.dictCollection))
       }
     },
-    toggleWordCollections: (
-      state,
-      action: PayloadAction<{ wordItem: WordItem; isIn: boolean }>,
-    ) => {
+    toggleWordCollections: (state, action: PayloadAction<WordItem>) => {
       // console.log('toggleWordCollections action:', action)
-      // const existingItem = state.wordsCollection.find(item => item.name === action.payload.name)
-      console.log('action.payload.isIn ::', action.payload.isIn)
-      if (!action.payload.isIn) {
+      const existingItem = state.wordsCollection.find(item => item.name === action.payload.name)
+      // console.log('action.payload.isIn ::', action.payload.isIn)
+      if (existingItem) {
         state.wordsCollection = state.wordsCollection.filter(
-          item => item.name !== action.payload.wordItem.name,
+          item => item.name !== action.payload.name,
         )
       } else {
-        state.wordsCollection = [...state.wordsCollection, action.payload.wordItem]
+        state.wordsCollection = [...state.wordsCollection, action.payload]
       }
       console.log('after toggleWordCollections', state.wordsCollection)
       AsyncStorage.setItem('wordsCollection', JSON.stringify(state.wordsCollection)) // Persist after toggle
@@ -136,8 +133,10 @@ export const loadSelectedDict = (dispatch: AppDispatch) => async () => {
 
 export const loadDictCollection = (dispatch: AppDispatch) => async () => {
   const collection = await loadFromAsyncStorage('dictCollection')
+  console.log('loadDictCollection collection::', collection)
   if (collection) {
     collection.forEach(dict => dispatch(setDictCollection(dict)))
+    dispatch(setDictCollection(collection))
   }
 }
 

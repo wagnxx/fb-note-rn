@@ -7,12 +7,12 @@ import { Button, Divider } from 'react-native-paper'
 import tw from 'twrnc'
 
 const SelectDict = () => {
-  const { dictCollection } = useDict()
+  const { dictCollection, currentDictInfo } = useDict()
 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    loadDictCollection(dispatch)
+    loadDictCollection(dispatch)()
   }, [dispatch])
 
   const [showData, setShowData] = useState(false)
@@ -26,11 +26,13 @@ const SelectDict = () => {
       {showData && <Text>{JSON.stringify(dictCollection, null, 2)}</Text>}
       <Divider style={[tw`my-2`]} />
       {dictCollection.map(dict => (
-        <View key={dict.id}>
-          <TouchableOpacity onPress={() => dispatch(setSelectedDictId(dict.id))}>
-            <Text>{dict.name}</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          disabled={dict.id === currentDictInfo?.id}
+          key={dict.id}
+          onPress={() => dispatch(setSelectedDictId(dict.id))}
+        >
+          <Text disabled={dict.id === currentDictInfo?.id}>{dict.name}</Text>
+        </TouchableOpacity>
       ))}
     </View>
   )
