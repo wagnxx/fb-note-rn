@@ -50,7 +50,6 @@ yarn ios
 
 | catergary  | light(rgba) | dark(rgba) |
 | ---------  | ----------- | ---------- |
-
 | BackgroundColor | rgba(255,255,255, 1) |  rgba(0,0,0,1) |
 | SecondaryTextColor | rgba(145,145,145, 1) |  rgba(192,192,192,1) |
 | AccentColor | rgba(0,0,0, 1) |  rgba(250,207,252,1) |
