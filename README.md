@@ -44,3 +44,15 @@ npm run ios
 # OR using Yarn
 yarn ios
 ```
+
+
+## 通用theme （swiftUI）
+
+| catergary  | light(rgba) | dark(rgba) |
+| ---------  | ----------- | ---------- |
+
+| BackgroundColor | rgba(255,255,255, 1) |  rgba(0,0,0,1) |
+| SecondaryTextColor | rgba(145,145,145, 1) |  rgba(192,192,192,1) |
+| AccentColor | rgba(0,0,0, 1) |  rgba(250,207,252,1) |
+| GreenColor | rgba(0,143,0, 1) |  rgba(115,250,121,1) |
+| RedColor | rgba(148,22,81, 1) |  rgba(255,47,146,1) |
