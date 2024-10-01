@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import WordListComponent from './components/WordListComponent'
 import { useDict } from '@/features/dict/uesDict'
 import { StatusBar, Text, View } from 'react-native'
-import { Button } from 'react-native-paper'
+import { Button, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import WordArchived from './components/WordArchived'
 import WordRemoved from './components/WordRemoved'
@@ -15,6 +15,7 @@ import { eventBus } from '@/utils/utilsEventBus'
 const Tab = createBottomTabNavigator()
 
 const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
+  const theme = useTheme()
   const dispatch = useDispatch()
   const [tabVisible, setTabVisible] = useState(true)
 
@@ -41,7 +42,7 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
   }, [])
 
   return (
-    <>
+    <View style={[tw`flex-1`, { backgroundColor: theme.colors.background }]}>
       <StatusBar hidden={true} />
       <Tab.Navigator
         screenOptions={{
@@ -50,6 +51,10 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
           tabBarLabelPosition: 'beside-icon',
           headerShown: false,
           tabBarStyle: { display: tabVisible ? 'flex' : 'none' },
+
+          tabBarActiveBackgroundColor: theme.colors.background,
+          tabBarInactiveBackgroundColor: theme.colors.background,
+          tabBarActiveTintColor: theme.colors.onBackground,
         }}
       >
         <Tab.Screen
@@ -68,18 +73,24 @@ const WordManage: React.FC<{ backDictHome?: () => void }> = () => {
           component={WordRemoved} // Call the external component here
         />
       </Tab.Navigator>
-    </>
+    </View>
   )
 }
 
 // Extract the component definition out of the render
 const WordListScreen: React.FC<{ route: any }> = ({ route }) => {
+  const theme = useTheme()
   const [showMeaning, setshowMeaning] = useState(false)
   const { wordsCount } = useDict()
   return (
     <View>
-      <View style={[tw`flex-row justify-between items-center px-2`]}>
-        <Text>COUNT({wordsCount})</Text>
+      <View
+        style={[
+          tw`flex-row justify-between items-center px-2`,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <Text style={[{ color: theme.colors.onBackground }]}>COUNT({wordsCount})</Text>
         <Button onPress={() => setshowMeaning(!showMeaning)}>Show Meaning</Button>
       </View>
       <WordListComponent showMeaning={showMeaning} />

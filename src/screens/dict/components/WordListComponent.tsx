@@ -48,7 +48,7 @@ const WordListComponent: React.FC<{ showMeaning: boolean }> = ({ showMeaning }) 
   })
 
   return (
-    <View style={[tw`h-full`]}>
+    <View style={[tw`h-full`, { backgroundColor: theme.colors.background }]}>
       <View style={[tw`flex-row gap-2 justify-between items-center px-2 my-2`]}>
         <View style={[tw`flex-1`]}>
           <Searchbar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery} />

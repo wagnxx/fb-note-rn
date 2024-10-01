@@ -1,21 +1,27 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDict } from '@/features/dict/uesDict'
-import { loadDictCollection, setSelectedDictId } from '@/features/dict/dictSlice'
-import { useDispatch } from 'react-redux'
-import { Button, Divider } from 'react-native-paper'
+import { setSelectedDictId } from '@/features/dict/dictSlice'
+import { Button, Divider, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 
 const SelectDict = () => {
+  const theme = useTheme()
   const { dictCollection, currentDictInfo } = useDict()
 
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    loadDictCollection(dispatch)()
-  }, [dispatch])
-
   const [showData, setShowData] = useState(false)
+
+  const dictList = useMemo(() => {
+    return dictCollection
+      .filter(Boolean)
+      .filter(item => item.length)
+      .reduce((r, cur) => {
+        if (!r.some(item => item.id === cur.id)) {
+          r.push(cur)
+        }
+        return r
+      }, [])
+  }, [dictCollection])
 
   return (
     <View style={[tw` px-2 pb-10`]}>
@@ -23,15 +29,21 @@ const SelectDict = () => {
         <Text>colids:</Text>
         <Button onPress={() => setShowData(!showData)}>Show Data</Button>
       </View>
-      {showData && <Text>{JSON.stringify(dictCollection, null, 2)}</Text>}
+      {showData && <Text>{JSON.stringify(dictList, null, 2)}</Text>}
       <Divider style={[tw`my-2`]} />
-      {dictCollection.map(dict => (
+
+      {dictList.map(dict => (
         <TouchableOpacity
           disabled={dict.id === currentDictInfo?.id}
           key={dict.id}
           onPress={() => dispatch(setSelectedDictId(dict.id))}
         >
-          <Text disabled={dict.id === currentDictInfo?.id}>{dict.name}</Text>
+          <Text
+            disabled={dict.id === currentDictInfo?.id}
+            style={{ color: theme.colors.onBackground }}
+          >
+            {dict.name}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>

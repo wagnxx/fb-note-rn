@@ -2,11 +2,14 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import TabContentView from './TabContentView'
 import { dictionaryResources } from '@/features/dict/dict_info'
+import { useTheme } from 'react-native-paper'
 
 const Tab = createBottomTabNavigator()
 const categories = Array.from(new Set(dictionaryResources.map(item => item.category)))
 
 const AddDict: React.FC = () => {
+  const theme = useTheme()
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -14,6 +17,9 @@ const AddDict: React.FC = () => {
         tabBarIconStyle: { display: 'none' },
         tabBarLabelPosition: 'beside-icon',
         headerShown: false,
+        tabBarActiveBackgroundColor: theme.colors.background,
+        tabBarInactiveBackgroundColor: theme.colors.background,
+        tabBarActiveTintColor: theme.colors.onBackground,
       }}
     >
       {categories.map(category => (

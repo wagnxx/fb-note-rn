@@ -37,6 +37,7 @@ const TabContentView: React.FC<Props> = ({ category }) => {
     <ScrollView
       style={{}}
       contentContainerStyle={{
+        flex: 1,
         padding: 10,
         flexDirection: 'row',
         backgroundColor: theme.colors.background,
@@ -49,17 +50,21 @@ const TabContentView: React.FC<Props> = ({ category }) => {
             onPress={() => handleTagPress(tag)}
             style={[tw`flex-row justify-between`]}
           >
-            <Text style={[theme.fonts.titleMedium, { color: theme.colors.onPrimary }]}>{tag}</Text>
+            <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>
+              {tag}
+            </Text>
 
             {selectedTag === tag ? (
-              <ChevronRightIcon size={16} color={theme.colors.onPrimary} />
+              <ChevronRightIcon size={16} color={theme.colors.onBackground} />
             ) : null}
           </TouchableOpacity>
         ))}
       </View>
       <View style={[tw`bg-gray-300 w-1`]} />
       <View style={[tw`flex-1 pl-2 gap-2`]}>
-        <Text style={[theme.fonts.titleMedium]}>Tag json file list</Text>
+        <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>
+          Tag json file list
+        </Text>
         <Divider />
         {tagDict.map(item => (
           <TouchableOpacity
@@ -67,7 +72,13 @@ const TabContentView: React.FC<Props> = ({ category }) => {
             key={item.id}
             onPress={() => dispatch(insertJsonToDictCollection(item))}
           >
-            <Text disabled={hasAdded(item.id)} style={[theme.fonts.labelLarge]}>
+            <Text
+              disabled={hasAdded(item.id)}
+              style={[
+                theme.fonts.labelLarge,
+                { color: hasAdded(item.id) ? theme.colors.onSecondary : theme.colors.onBackground },
+              ]}
+            >
               {item.name}
             </Text>
           </TouchableOpacity>

@@ -51,11 +51,13 @@ export const dictSlice = createSlice({
       AsyncStorage.setItem('selectedDictId', JSON.stringify(action.payload))
       console.log('setSelectedDictId', JSON.stringify(action.payload))
     },
-    setDictCollection: (state, action: PayloadAction<DictInfo>) => {
+    addDictCollection: (state, action: PayloadAction<DictInfo>) => {
       if (!state.dictCollection.some(item => item.id === action.payload.id)) {
         state.dictCollection = [...state.dictCollection, action.payload]
-        AsyncStorage.setItem('dictCollection', JSON.stringify(state.dictCollection))
+      } else {
+        // state.dictCollection = state.dictCollection.filter(item => item.id !== action.payload.id)
       }
+      AsyncStorage.setItem('dictCollection', JSON.stringify(state.dictCollection))
     },
     toggleWordCollections: (state, action: PayloadAction<WordItem>) => {
       // console.log('toggleWordCollections action:', action)
@@ -102,7 +104,7 @@ export const dictSlice = createSlice({
 })
 
 export const {
-  setDictCollection,
+  addDictCollection,
   setWordsForDict,
   setSelectedDictId,
   toggleWordCollections,
@@ -124,6 +126,7 @@ const loadFromAsyncStorage = async (key: string) => {
 
 export const loadSelectedDict = (dispatch: AppDispatch) => async () => {
   const selectedDictId = await loadFromAsyncStorage('selectedDictId')
+  console.log('selectedDictId::', selectedDictId)
   if (selectedDictId) {
     const existingWords: WordItem[] = (await loadFromAsyncStorage(`words_${selectedDictId}`)) || []
     dispatch(setSelectedDictId(selectedDictId))
@@ -135,8 +138,7 @@ export const loadDictCollection = (dispatch: AppDispatch) => async () => {
   const collection = await loadFromAsyncStorage('dictCollection')
   console.log('loadDictCollection collection::', collection)
   if (collection) {
-    collection.forEach(dict => dispatch(setDictCollection(dict)))
-    dispatch(setDictCollection(collection))
+    collection.forEach(dict => dispatch(addDictCollection(dict)))
   }
 }
 
@@ -162,7 +164,7 @@ export const insertJsonToDictCollection = (dictInfo: DictInfo) => async (dispatc
 
     await AsyncStorage.setItem(`words_${dictInfo.id}`, JSON.stringify(updatedWords))
     dispatch(setWordsForDict({ dictId: dictInfo.id, words: updatedWords }))
-    dispatch(setDictCollection(dictInfo))
+    dispatch(addDictCollection(dictInfo))
   } catch (error) {
     console.error('Error inserting JSON words:', error)
   }

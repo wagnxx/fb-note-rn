@@ -97,7 +97,7 @@ const StorageManage = () => {
           <View style={[tw``]}>
             {storageKeys.map(key => (
               <TouchableOpacity key={key} onPress={() => getCurrentJson(key)}>
-                <Text>{key}</Text>
+                <Text style={{ color: theme.colors.onBackground }}>{key}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -126,7 +126,9 @@ const StorageManage = () => {
             </Button>
           </View>
           <ScrollView>
-            <Text>{JSON.stringify(currentJson, null, 1)}</Text>
+            <Text style={[theme.fonts.bodySmall, { color: theme.colors.onBackground }]}>
+              {JSON.stringify(currentJson, null, 1)}
+            </Text>
           </ScrollView>
         </View>
       )}

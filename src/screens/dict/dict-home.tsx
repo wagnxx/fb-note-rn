@@ -21,7 +21,7 @@ import DictSettings from './components/DictSettings'
 import { useDict } from '@/features/dict/uesDict'
 import { createPersonWordsCol, updateWordsCol } from '@/service/dict'
 import StorageManage from './components/StorageManage'
-import { loadSelectedDict } from '@/features/dict/dictSlice'
+import { loadDictCollection, loadSelectedDict } from '@/features/dict/dictSlice'
 
 const { width, height } = Dimensions.get('window')
 
@@ -69,6 +69,7 @@ const DictHome = (props, ref) => {
 
   useEffect(() => {
     loadSelectedDict(dispatch)()
+    loadDictCollection(dispatch)()
   }, [dispatch])
 
   useImperativeHandle(ref, () => {
@@ -111,7 +112,7 @@ const DictHome = (props, ref) => {
   }, [hasWordsCollectionChanged, wordsCollection, wordsDocId, wordsRemoved])
 
   return (
-    <View style={[tw`flex-auto`]}>
+    <View style={[tw`flex-auto`, { backgroundColor: theme.colors.background }]}>
       <StatusBar hidden={true} />
       <Animated.View
         style={[
@@ -140,7 +141,9 @@ const DictHome = (props, ref) => {
 
       <View style={[tw`flex-row justify-between items-center px-2 py-2`]}>
         <Bars3Icon size={24} color={theme.colors.onBackground} onPress={onAnimationStart} />
-        <Text style={[theme.fonts.labelMedium]}>CURRENT DICT: {currentDictInfo?.name || '_'}</Text>
+        <Text style={[theme.fonts.labelMedium, { color: theme.colors.onBackground }]}>
+          CURRENT DICT: {currentDictInfo?.name || '_'}
+        </Text>
       </View>
 
       {pageType === 'add_dict' && <AddDict />}
