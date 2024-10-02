@@ -95,3 +95,69 @@ const defaultOptions: FormatOptions = {
   dateStyle: 'medium',
   timeStyle: 'medium',
 }
+
+// 定义一个类型 T，它至少应该有一个 createTime 字段
+interface TimeField {
+  createTime: Timestamp
+}
+
+// 定义通用的分组类型
+export type Grouped<T> = {
+  today: T[]
+  yesterday: T[]
+  last7Days: T[]
+  last30Days: T[]
+  earlier: T[]
+  monthly: Record<string, T[]> // 按月份分组的记录
+}
+
+export const groupByTime = <T extends TimeField>(data: T[]): Grouped<T> => {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today)
+  yesterday.setDate(today.getDate() - 1)
+  const sevenDaysAgo = new Date(today)
+  sevenDaysAgo.setDate(today.getDate() - 7)
+  const thirtyDaysAgo = new Date(today)
+  thirtyDaysAgo.setDate(today.getDate() - 30)
+
+  const grouped: Grouped<T> = {
+    today: [],
+    yesterday: [],
+    last7Days: [],
+    last30Days: [],
+    monthly: {}, // 按月份分组的对象
+    earlier: [],
+  }
+
+  data.forEach(item => {
+    const createTime = item.createTime.toDate() // 转换为 Date 对象
+
+    if (createTime >= today) {
+      grouped.today.push(item)
+    } else if (createTime >= yesterday) {
+      grouped.yesterday.push(item)
+    } else if (createTime >= sevenDaysAgo) {
+      grouped.last7Days.push(item)
+    } else if (createTime >= thirtyDaysAgo) {
+      grouped.last30Days.push(item)
+    } else {
+      // 处理每年和每月的分组
+      const year = createTime.getFullYear()
+      const month = createTime.toLocaleString('default', { month: 'long' }) // 获取月份名称
+
+      if (year === now.getFullYear()) {
+        // 本年度的分组
+        if (!grouped.monthly[month]) {
+          grouped.monthly[month] = []
+        }
+        grouped.monthly[month].push(item)
+      } else {
+        // 早于当前年份的条目
+        grouped.earlier.push(item)
+      }
+    }
+  })
+
+  return grouped
+}

@@ -71,6 +71,11 @@ const TabContentView: React.FC<Props> = ({ category }) => {
             disabled={hasAdded(item.id)}
             key={item.id}
             onPress={() => dispatch(insertJsonToDictCollection(item))}
+            style={[
+              {
+                backgroundColor: theme.colors.secondary,
+              },
+            ]}
           >
             <Text
               disabled={hasAdded(item.id)}
