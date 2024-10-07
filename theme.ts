@@ -18,7 +18,7 @@ const LightTheme = {
     secondary: 'rgba(145,145,145,0.5)', // 轻微降级的 onBackground
     onSecondary: 'rgba(0,0,0,1)', // 与 onSurface 一致
     surface: '#f5f5f5',
-    onBackground: 'rgba(145,145,145,1)', // SecondaryTextColor
+    onBackground: 'rgba(51,51,51,1)', // SecondaryTextColor
     onPrimary: 'rgba(255,255,255,1)', // Light text on primary
     onSurface: 'rgba(0,0,0,1)', // Text color on surface
     secondaryContainer: 'rgba(237,231,246,1)', // 项目背景色
@@ -37,7 +37,7 @@ const DarkTheme = {
     secondary: 'rgba(192,192,192,0.5)', // 轻微降级的 onBackground
     onSecondary: 'rgba(255,255,255,1)', // 与 onSurface 一致
     surface: '#121212',
-    onBackground: 'rgba(192,192,192,1)', // SecondaryTextColor
+    onBackground: 'rgba(255,255,255,1)', // SecondaryTextColor
     onPrimary: 'rgba(0,0,0,1)', // Dark text on primary
     onSurface: 'rgba(255,255,255,1)', // Text color on surface
     secondaryContainer: 'rgba(18,18,18,1)', // 项目背景色

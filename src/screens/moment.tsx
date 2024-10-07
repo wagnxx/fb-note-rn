@@ -1,14 +1,7 @@
-import {
-  View,
-  Text,
-  StatusBar,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-} from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, StatusBar, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native'
+import React, { FC, ReactNode, useEffect, useState } from 'react'
 import tw from 'twrnc'
-import { useTheme } from 'react-native-paper'
+import { Card, Text, useTheme } from 'react-native-paper'
 import { Note, getAllPublishedNotes } from '../service/articles'
 import { groupByTime, Grouped, transFBDate2Local } from '@/utils/utilsDate'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
@@ -57,6 +50,7 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
           <View style={tw`justify-center flex-row px-2`}>
             <Text style={[theme.fonts.titleMedium]}>All published notes</Text>
           </View>
+
           {Object.keys(groupedNotes).map(group => (
             <View key={group}>
               {
@@ -66,23 +60,17 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
                     {Object.keys(groupedNotes.monthly).length > 0 ? (
                       Object.keys(groupedNotes.monthly).map(month => (
                         <View key={month}>
-                          <Text
-                            style={[
-                              theme.fonts.titleSmall,
-                              { marginTop: 20, color: theme.colors.onBackground },
-                            ]}
-                          >
-                            {month}
-                          </Text>
-                          {groupedNotes.monthly[month].map((item, index) => (
-                            <ListItem
-                              item={item}
-                              key={index}
-                              tw={tw}
-                              theme={theme}
-                              navigation={navigation}
-                            />
-                          ))}
+                          <GroupCard title={month}>
+                            {groupedNotes.monthly[month].map((item, index) => (
+                              <ListItem
+                                item={item}
+                                key={index}
+                                tw={tw}
+                                theme={theme}
+                                navigation={navigation}
+                              />
+                            ))}
+                          </GroupCard>
                         </View>
                       ))
                     ) : (
@@ -92,23 +80,17 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
                 ) : groupedNotes[group]?.length > 0 ? (
                   // 显示其他分组的数据
                   <>
-                    <Text
-                      style={[
-                        theme.fonts.titleSmall,
-                        { marginTop: 20, color: theme.colors.onBackground },
-                      ]}
-                    >
-                      {group}
-                    </Text>
-                    {groupedNotes[group].map((item, index) => (
-                      <ListItem
-                        item={item}
-                        key={index}
-                        tw={tw}
-                        theme={theme}
-                        navigation={navigation}
-                      />
-                    ))}
+                    <GroupCard title={group}>
+                      {groupedNotes[group].map((item, index) => (
+                        <ListItem
+                          item={item}
+                          key={index}
+                          tw={tw}
+                          theme={theme}
+                          navigation={navigation}
+                        />
+                      ))}
+                    </GroupCard>
                   </>
                 ) : null // 不渲染任何内容，如果没有数据
               }
@@ -123,8 +105,16 @@ const Moment: ScreenFC<ScrennTypeEnum.Moment> = ({ navigation }) => {
 const ListItem = ({ item, navigation, theme, tw }) => (
   <View
     style={[
-      tw`flex-row items-center justify-between mb-2 rounded-md`,
+      tw`flex-row items-center justify-between mb-2 mt-1 py-2 px-1 rounded-md`,
       // { backgroundColor: theme.colors.secondaryContainer },
+      {
+        backgroundColor: theme.colors.secondaryContainer, // 恢复背景颜色
+        shadowColor: '#000', // iOS 阴影颜色
+        shadowOffset: { width: 0, height: 2 }, // iOS 阴影偏移
+        shadowOpacity: 0.1, // iOS 阴影透明度
+        shadowRadius: 3.84, // iOS 阴影半径
+        elevation: 5, // Android 阴影高度
+      },
     ]}
   >
     {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
@@ -138,9 +128,9 @@ const ListItem = ({ item, navigation, theme, tw }) => (
       <Text
         style={[
           {
-            color: theme.colors.onSecondaryContainer,
+            color: theme.colors.onBackground,
           },
-          theme.fonts.bodyMedium,
+          theme.fonts.bodySmall,
         ]}
       >
         {extractTextFromHTML(item?.title)}
@@ -151,5 +141,14 @@ const ListItem = ({ item, navigation, theme, tw }) => (
     </TouchableOpacity>
   </View>
 )
+
+const GroupCard: FC<{ title: string; children: ReactNode }> = ({ title, children }) => {
+  return (
+    <Card style={{ marginTop: 20 }}>
+      <Card.Title title={title} titleStyle={{}} />
+      <Card.Content>{children}</Card.Content>
+    </Card>
+  )
+}
 
 export default Moment
