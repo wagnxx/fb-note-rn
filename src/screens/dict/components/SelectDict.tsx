@@ -4,12 +4,15 @@ import { useDict } from '@/features/dict/uesDict'
 import { setSelectedDictId } from '@/features/dict/dictSlice'
 import { Button, Divider, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
+import { useDispatch } from 'react-redux'
 
 const SelectDict = () => {
   const theme = useTheme()
   const { dictCollection, currentDictInfo } = useDict()
 
   const [showData, setShowData] = useState(false)
+
+  const dispatch = useDispatch()
 
   const dictList = useMemo(() => {
     return dictCollection

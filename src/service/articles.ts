@@ -15,6 +15,7 @@ import {
   serverTimestamp,
   where,
 } from '@react-native-firebase/firestore'
+import { DocType } from '@/screens/note/create'
 
 export const COL_ARTICLES = 'articles'
 
@@ -29,6 +30,7 @@ export type Note = {
   createId?: string
   titleText?: string
   contentText?: string
+  docType?: DocType
 }
 
 export const createNote = (doc: Note) => {
@@ -40,9 +42,7 @@ export const createNote = (doc: Note) => {
   return Promise.reject('logout')
 }
 
-export const updateNote = async (
-  doc: Partial<Note>,
-): Promise<boolean | null> => {
+export const updateNote = async (doc: Partial<Note>): Promise<boolean | null> => {
   if (auth?.currentUser?.uid) {
     doc.createId = auth.currentUser.uid
     return updateDocData(COL_ARTICLES, doc.id!, doc)
@@ -61,9 +61,9 @@ export const batchUpdateNote = async (
   return Promise.reject('logout')
 }
 
-export const getAllNotes: (
+export const getAllNotes: (folderId?: string) => Promise<DocumentData & Partial<Note>[]> = (
   folderId?: string,
-) => Promise<DocumentData & Partial<Note>[]> = (folderId?: string) => {
+) => {
   if (!auth?.currentUser?.uid) {
     return Promise.reject('logout')
   }
@@ -76,9 +76,7 @@ export const getAllNotes: (
     where('title', '>', ''),
     orderBy('title', 'desc'),
     orderBy('createTime', 'desc'),
-  ].filter(
-    (condition): condition is QueryFieldFilterConstraint => condition !== null,
-  ) // 过滤掉 null 或 undefined
+  ].filter((condition): condition is QueryFieldFilterConstraint => condition !== null) // 过滤掉 null 或 undefined
 
   return getFieldValues<Partial<Note>>(
     COL_ARTICLES,
