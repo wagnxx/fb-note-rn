@@ -27,7 +27,7 @@ const UnionPage = ({ guidePage, targetPage }, ref) => {
   }))
 
   return (
-    <View style={[tw`flex-1 bg-green-500`]}>
+    <View style={[tw`flex-1`]}>
       {guidePage}
 
       <Animated.View

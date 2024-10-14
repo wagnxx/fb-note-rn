@@ -20,15 +20,14 @@ import { useTheme } from 'react-native-paper'
 import { RichEditor, actions } from 'react-native-pell-rich-editor'
 import tw from 'twrnc'
 import ToolBar from './tool-bar'
-import { RootStackParamList } from '@/types/screen'
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { formatDate } from '@/utils/utilsDate'
 
 const iconSize = 18
 
 const colorGray50 = 'rgb(249 250 251)'
 
-const CreateHTMLNote = ({ onSave }) => {
+const CreateHTMLNote = ({ onSave, initNote }) => {
   const headingRichText = useRef<RichEditor>(null)
   const contentRichText = useRef<RichEditor>(null)
   const [title, setTitle] = useState('')
@@ -39,10 +38,6 @@ const CreateHTMLNote = ({ onSave }) => {
 
   const [isFocus, setIsFocus] = useState(false)
   const [isFirstLoadWithoutInteraction, setIsFirstLoadWithoutInteraction] = useState(true)
-
-  const {
-    params: { id: folderId },
-  } = useRoute<RouteProp<RootStackParamList>>()
 
   const contentLen = useMemo(() => content.length, [content])
 
@@ -83,6 +78,13 @@ const CreateHTMLNote = ({ onSave }) => {
   const goBack = () => {
     navigation.goBack()
   }
+
+  useEffect(() => {
+    if (initNote) {
+      setTitle(initNote.title)
+      setContent(initNote.content)
+    }
+  }, [initNote])
 
   useEffect(() => {
     const date = formatDate(new Date(), {
@@ -154,7 +156,7 @@ const CreateHTMLNote = ({ onSave }) => {
           ref={headingRichText}
           style={styles.headingEditor}
           placeholder="Heading"
-          initialContentHTML=""
+          initialContentHTML={initNote?.title || ''}
           editorStyle={{
             contentCSSText: 'font-size: 25px;',
             backgroundColor: colorGray50,
@@ -167,7 +169,7 @@ const CreateHTMLNote = ({ onSave }) => {
           ref={contentRichText}
           style={styles.editor}
           placeholder="Start writing here..."
-          initialContentHTML=""
+          initialContentHTML={initNote?.content || ''}
           editorStyle={{
             contentCSSText: 'font-size: 20px;',
             backgroundColor: colorGray50,

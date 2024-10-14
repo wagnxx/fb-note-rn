@@ -2,7 +2,15 @@ import { Dimensions, Text, View } from 'react-native'
 import React from 'react'
 import NoteList from './note-list'
 import { ScrennTypeEnum } from '@/types/screen'
+import { Note } from '@/service/articles'
 const { height } = Dimensions.get('window')
+
+type ItemPressActionType = 'detail' | 'edit'
+export type PressItemParams = {
+  item: Partial<Note>
+  type: ItemPressActionType
+}
+
 export default function NodeListScreen({
   list,
   isShowBottomAction,
@@ -26,15 +34,25 @@ export default function NodeListScreen({
     )
   }
 
+  const onPressItemHandler = ({ item, type }: PressItemParams) => {
+    if (!item || !type) return
+    switch (type) {
+      case 'detail':
+        navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })
+        break
+      case 'edit':
+        navigation.navigate(ScrennTypeEnum.CreateNote, { docId: item.id, id: item.folderId })
+        break
+    }
+  }
+
   return (
     <View style={{ minHeight: height }}>
       <NoteList
         list={list}
-        showCheckBox={isShowBottomAction}
+        isEditModel={isShowBottomAction}
         onCheckBoxChange={onNoteCheckBoxChange}
-        onPressItem={item =>
-          navigation.navigate(ScrennTypeEnum.NodeDetail, { id: item.id })
-        }
+        onPressItem={onPressItemHandler}
       />
     </View>
   )

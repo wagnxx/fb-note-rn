@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native'
 import { color } from 'react-native-elements/dist/helpers'
 import { CheckIcon } from 'react-native-heroicons/outline'
@@ -10,7 +10,7 @@ import tw from 'twrnc'
 
 const { height: screenHeight } = Dimensions.get('window')
 const iconSize = 18
-const MarkdownEditor = ({ onSave }) => {
+const MarkdownEditor = ({ onSave, initNote }) => {
   const [title, setconTitle] = useState('')
   const [content, setcontent] = useState('')
   const [isFocus, setIsFocus] = useState(false)
@@ -40,6 +40,13 @@ const MarkdownEditor = ({ onSave }) => {
       console.log('onSave end.')
     })
   }
+
+  useEffect(() => {
+    if (initNote) {
+      setconTitle(initNote.title)
+      setcontent(initNote.content)
+    }
+  }, [initNote])
 
   return (
     <View style={[tw`flex-1 py-2`, { backgroundColor: theme.colors.background }]}>

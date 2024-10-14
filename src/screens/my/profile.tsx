@@ -35,6 +35,7 @@ import NodeListScreen from './components/node-list-screen'
 import { messageConfirm } from '@/utils/utilsAlert'
 import Toast from 'react-native-toast-message'
 import NoteSearch from './components/note-search'
+import { useFocusEffect } from '@react-navigation/native'
 
 const TabScreenTypes = {
   draft: 'draft',
@@ -108,9 +109,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
   }, [draftList, publishedList])
 
   const bottomActionItemStyle = useMemo(() => {
-    const color = bottomActionDisabled
-      ? theme.colors.onSurfaceDisabled
-      : theme.colors.onSurface
+    const color = bottomActionDisabled ? theme.colors.onSurfaceDisabled : theme.colors.onSurface
     return {
       color,
       iconProps: {
@@ -231,10 +230,9 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
             <Animated.ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={[{ paddingTop: HEADER_MAX_HEIGHT }]}
-              onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: false },
-              )}
+              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+                useNativeDriver: false,
+              })}
               scrollEventThrottle={16}
             >
               <NodeListScreen
@@ -251,10 +249,9 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
             <Animated.ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={[{ paddingTop: HEADER_MAX_HEIGHT }]}
-              onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: false },
-              )}
+              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+                useNativeDriver: false,
+              })}
               scrollEventThrottle={16}
             >
               <NodeListScreen
@@ -270,6 +267,17 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
       }
     },
     [scrollY, draftList, showBottomActionBar, navigation, publishedList],
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      // 页面被打开或聚焦时执行
+      setShowBottomActionBar(false)
+
+      return () => {
+        // 页面失去焦点时执行
+      }
+    }, []),
   )
 
   if (loading) {
@@ -296,12 +304,8 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        <Animated.View
-          style={[{ transform: [{ translateY: titleTranslateY }] }]}
-        >
-          <Pressable
-            onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}
-          >
+        <Animated.View style={[{ transform: [{ translateY: titleTranslateY }] }]}>
+          <Pressable onPress={() => setShowFolderManageDrawer(!showFolderManageDrawer)}>
             <View style={tw` flex-row items-center gap-1 px-2 py-2`}>
               <Animated.Text
                 style={[
@@ -323,15 +327,11 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           </Pressable>
         </Animated.View>
 
-        <View
-          style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}
-        >
+        <View style={[tw`flex-row justify-end items-center flex-1 gap-3 py-2 px-2`]}>
           <TouchableOpacity onPress={() => setShowSearchNoteDrawer(true)}>
             <MagnifyingGlassIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setShowBottomActionBar(!showBottomActionBar)}
-          >
+          <TouchableOpacity onPress={() => setShowBottomActionBar(!showBottomActionBar)}>
             <PencilSquareIcon size={20} color={theme.colors.onBackground} />
           </TouchableOpacity>
         </View>
@@ -376,9 +376,7 @@ const Profile: ScreenFC<ScrennTypeEnum.Profile> = ({ navigation }) => {
           >
             <TouchableOpacity onPress={() => setShowMovedDrawer(true)}>
               <View style={tw` items-center `}>
-                <ArrowRightStartOnRectangleIcon
-                  {...bottomActionItemStyle.iconProps}
-                />
+                <ArrowRightStartOnRectangleIcon {...bottomActionItemStyle.iconProps} />
                 <Text {...bottomActionItemStyle.textProps}>Move</Text>
               </View>
             </TouchableOpacity>

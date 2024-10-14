@@ -1,14 +1,14 @@
 import { View, Dimensions, StyleSheet } from 'react-native'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CreateHTMLNote from './components/html-editor'
 import { RootStackParamList, ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import tw from 'twrnc'
-import { Button } from 'react-native-paper'
+import { Button, useTheme } from 'react-native-paper'
 import MarkdownEditor from './components/markdown-editor'
 import UnionPage from '@/components/union-page'
 import { messageConfirm } from '@/utils/utilsAlert'
 import { extractTextFromHTML } from '@/utils/utilsString'
-import { createNote } from '@/service/articles'
+import { createNote, getNote, Note, updateNote } from '@/service/articles'
 import Toast from 'react-native-toast-message'
 import { RouteProp, useRoute } from '@react-navigation/native'
 const { width: screenWidth } = Dimensions.get('window')
@@ -21,19 +21,19 @@ export const DOC_TYPES = {
 export type DocType = (typeof DOC_TYPES)[keyof typeof DOC_TYPES] | null // 这样会得到 'md' | 'html' | null
 
 const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
+  const [note, setNote] = useState<Note | null>(null) // init data
   const unionPageRef = useRef<{ show: () => void }>()
   const [docType, setdocType] = useState<DocType>(null)
   // const navigation = useNavigation()
+  const theme = useTheme()
+  const { params } = useRoute<RouteProp<RootStackParamList>>()
 
   const setDoctTypeHandle = (typ: DocType) => {
     setdocType(typ)
     unionPageRef?.current?.show()
   }
-  const {
-    params: { id: folderId },
-  } = useRoute<RouteProp<RootStackParamList>>()
 
-  const save = useCallback(
+  const saveDocHandler = useCallback(
     async ({ title, content }) => {
       if (!title || !content) return
 
@@ -42,7 +42,18 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
         await messageConfirm({
           message: `Are you sure you want to create Note ${titleText} ?`,
         })
-        return createNote({ title, content, folderId, docType })
+
+        let actionFn
+        const actionParams = { title, content, folderId: params?.id, docType }
+
+        if (params?.docId) {
+          actionFn = updateNote
+          actionParams.id = params.docId
+        } else {
+          actionFn = createNote
+        }
+
+        return actionFn(actionParams)
           .then(res => {
             if (res) {
               Toast.show({
@@ -66,14 +77,32 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
           })
       } catch (error) {}
     },
-    [docType, folderId, navigation],
+    [docType, navigation, params],
   )
 
   const mainPage = useMemo(() => {
-    if (docType === DOC_TYPES.html) return <CreateHTMLNote onSave={save} />
-    if (docType === DOC_TYPES.md) return <MarkdownEditor onSave={save} />
+    if (docType === DOC_TYPES.html)
+      return <CreateHTMLNote onSave={saveDocHandler} initNote={note} />
+    if (docType === DOC_TYPES.md) return <MarkdownEditor onSave={saveDocHandler} initNote={note} />
     return null
-  }, [docType, save])
+  }, [docType, note, saveDocHandler])
+
+  const fetchNote = useCallback(() => {
+    if (!params?.docId) return
+    getNote(params.docId).then(data => {
+      if (data) {
+        setNote(data)
+        const dtype = data.docType || 'html'
+        setDoctTypeHandle(dtype)
+      } else {
+        setNote(null)
+      }
+    })
+  }, [params])
+
+  useEffect(() => {
+    fetchNote()
+  }, [fetchNote])
 
   const guideJSX = (
     <View style={styles.container}>
@@ -97,7 +126,7 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
   )
 
   return (
-    <View style={[tw`flex-1`]}>
+    <View style={[tw`flex-1`, { backgroundColor: theme.colors.secondaryContainer }]}>
       <UnionPage ref={unionPageRef} guidePage={guideJSX} targetPage={mainPage} />
     </View>
   )

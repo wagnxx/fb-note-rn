@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StackNavigationProp } from '@react-navigation/stack'
 import type { RouteProp, ParamListBase } from '@react-navigation/native'
 import { FC } from 'react'
@@ -27,6 +28,7 @@ export enum ScrennTypeEnum {
 
 interface ScreenParamsType {
   id: string
+  [key: string]: any
 }
 
 export type RootStackParamList = Record<keyof typeof ScrennTypeEnum, ScreenParamsType | undefined>

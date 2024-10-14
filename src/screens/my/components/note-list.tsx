@@ -5,19 +5,25 @@ import { useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { Note } from '@/service/articles'
 import { Timestamp } from '@react-native-firebase/firestore'
-import { CheckCircleIcon } from 'react-native-heroicons/outline'
+import { CheckCircleIcon, PencilIcon } from 'react-native-heroicons/outline'
 import { CheckBox } from 'react-native-elements'
+import { PressItemParams } from './node-list-screen'
 type NoteListProps = {
   list: Partial<Note>[]
-  showCheckBox: boolean
+  isEditModel: boolean
   onCheckBoxChange: (selectedIds: string[]) => void
-  onPressItem?: (item: Partial<Note>) => void
+  onPressItem?: (props: PressItemParams) => void
 }
 
 // eslint-disable-next-line unused-imports/no-unused-vars-ts
-const voidFunc = (item: Partial<Note>) => {}
+const voidFunc = (props: PressItemParams) => {}
 
-const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBox, onCheckBoxChange }) => {
+const NoteList: FC<NoteListProps> = ({
+  list,
+  onPressItem = voidFunc,
+  isEditModel,
+  onCheckBoxChange,
+}) => {
   const theme = useTheme()
   const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>({})
 
@@ -41,10 +47,10 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBo
   }, [checkedMap, onCheckBoxChange])
 
   useEffect(() => {
-    if (!showCheckBox) {
+    if (!isEditModel) {
       setCheckedMap({})
     }
-  }, [showCheckBox])
+  }, [isEditModel])
 
   return list.map((item, index) => (
     <View
@@ -56,7 +62,7 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBo
     >
       {/* <UserCircleIcon size={30} color={'#aaa'} /> */}
 
-      <TouchableOpacity onPress={() => !showCheckBox && onPressItem(item)}>
+      <TouchableOpacity onPress={() => !isEditModel && onPressItem({ item, type: 'detail' })}>
         <View>
           <Text
             style={[
@@ -74,13 +80,22 @@ const NoteList: FC<NoteListProps> = ({ list, onPressItem = voidFunc, showCheckBo
         </View>
       </TouchableOpacity>
 
-      {showCheckBox && (
-        <CheckBox
-          checked={!!checkedMap[item.id]}
-          checkedIcon={<CheckCircleIcon size={22} color={theme.colors.onBackground} />}
-          uncheckedIcon={<CheckCircleIcon size={22} color={theme.colors.outline} />}
-          onPress={() => checkItemHandle(item)}
-        />
+      {isEditModel && (
+        <View style={[tw`flex-row items-center`]}>
+          <PencilIcon
+            size={20}
+            color={theme.colors.onBackground}
+            onPress={() => {
+              onPressItem({ item, type: 'edit' })
+            }}
+          />
+          <CheckBox
+            checked={!!checkedMap[item.id]}
+            checkedIcon={<CheckCircleIcon size={22} color={theme.colors.onBackground} />}
+            uncheckedIcon={<CheckCircleIcon size={22} color={theme.colors.outline} />}
+            onPress={() => checkItemHandle(item)}
+          />
+        </View>
       )}
     </View>
   ))
