@@ -16,6 +16,7 @@ import { useAppDispatch } from '@/store'
 import { useSelector } from 'react-redux'
 import Tag from '@/screens/tag'
 import DictContainer from '@/screens/dict/dict-container'
+import RecentRemovedNote from '@/screens/note/recent-removed'
 
 const Stack = createStackNavigator()
 
@@ -64,6 +65,7 @@ export default function AuthNavigator() {
           <Stack.Screen name={ScrennTypeEnum.NodeDetail} component={NodeDetail} />
           <Stack.Screen name={ScrennTypeEnum.Profile} component={Profile} />
           <Stack.Screen name={ScrennTypeEnum.CreateNote} component={CreateNote} />
+          <Stack.Screen name={ScrennTypeEnum.RecentRemovedNote} component={RecentRemovedNote} />
           <Stack.Screen name={ScrennTypeEnum.Photo} component={Photo} />
           <Stack.Screen name={ScrennTypeEnum.Music} component={Music} />
           <Stack.Screen name={ScrennTypeEnum.Tag} component={Tag} />

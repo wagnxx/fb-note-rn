@@ -2,7 +2,6 @@ import {
   DocumentData,
   addDocToCol,
   batchUpdateDocData,
-  deleteDocsByIds,
   getDocData,
   getFieldValues,
   updateDocData,
@@ -31,6 +30,9 @@ export type Note = {
   titleText?: string
   contentText?: string
   docType?: DocType
+
+  isDeleted?: boolean
+  deletedAt?: FieldValue
 }
 
 export const createNote = (doc: Note) => {
@@ -48,6 +50,33 @@ export const updateNote = async (doc: Partial<Note>): Promise<boolean | null> =>
     return updateDocData(COL_ARTICLES, doc.id!, doc)
   }
   return Promise.reject('logout')
+}
+
+export const deleteNotes = (ids: string[]) => {
+  const docs = ids.map(item => ({ id: item, isDeleted: true, delatedAt: serverTimestamp() }))
+  return batchUpdateNote(ids, docs)
+}
+
+export const restoreNotes = (ids: string[]) => {
+  const docs = ids.map(item => ({ id: item, isDeleted: false }))
+  return batchUpdateNote(ids, docs)
+}
+
+export const getRecentRemovedNotes: () => Promise<DocumentData & Partial<Note>[]> = () => {
+  if (!auth?.currentUser?.uid) {
+    return Promise.reject('logout')
+  }
+  const conditions: QueryFieldFilterConstraint[] = [
+    where('createId', '==', auth.currentUser.uid),
+    where('isDeleted', '==', true),
+    // orderBy('deletedAt', 'desc'),
+  ].filter((condition): condition is QueryFieldFilterConstraint => condition !== null) // 过滤掉 null 或 undefined
+
+  return getFieldValues<Partial<Note>>(
+    COL_ARTICLES,
+    ['title', 'id', 'createTime', 'deletedAt', 'published'],
+    conditions,
+  )
 }
 
 export const batchUpdateNote = async (
@@ -92,8 +121,8 @@ export const getAllPublishedNotes = () => {
     COL_ARTICLES,
     ['title', 'id', 'createTime', 'createId'],
     [
+      where('isDeleted', 'in', [false, null]),
       where('title', '>', ''),
-      // where('content', '>', ''),
       where('published', '==', true),
       orderBy('title', 'asc'),
       // orderBy('content', 'asc'),
@@ -102,4 +131,4 @@ export const getAllPublishedNotes = () => {
   )
 }
 
-export const deleteNotes = (ids: string[]) => deleteDocsByIds(COL_ARTICLES, ids)
+// export const deleteNotes = (ids: string[]) => deleteDocsByIds(COL_ARTICLES, ids)

@@ -2,10 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { Folder, getFolders } from '@/service/basic'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { COL_ARTICLES, Note } from '@/service/articles'
-import {
-  getCurrentFolderFromStorage,
-  ICurrentFolder,
-} from '@/utils/utilsStorage'
+import { getCurrentFolderFromStorage, ICurrentFolder } from '@/utils/utilsStorage'
 import { db } from '@/firebase/firebase'
 import { extractTextFromHTML } from '@/utils/utilsString'
 import { useSelector } from 'react-redux'
@@ -17,6 +14,7 @@ interface NoteContextType {
   refreshNote: () => void
   findNotesBykeyword: (k: string) => Note[]
   noteList: Partial<Note>[]
+  allNotesList: Partial<Note>[]
   noteLoading: boolean
   currentFolder: ICurrentFolder
   setCurrentFolder: React.Dispatch<React.SetStateAction<ICurrentFolder>>
@@ -29,6 +27,7 @@ export const NoteContext = createContext<NoteContextType>({
   refreshNote: () => {},
   findNotesBykeyword: () => [],
   noteList: [],
+  allNotesList: [],
   noteLoading: true,
   currentFolder: null,
   setCurrentFolder: () => {},
@@ -36,9 +35,7 @@ export const NoteContext = createContext<NoteContextType>({
 })
 
 // Create the NoteProvider component
-export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [allNotesList, setAllNotesList] = useState<Note[]>([])
   const [folders, setFolders] = useState<Folder[]>([])
   const [currentFolder, setCurrentFolder] = useState<ICurrentFolder>(null)
@@ -74,6 +71,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({
     const unsubscribe = db
       .collection(COL_ARTICLES)
       .where('createId', '==', user.uid)
+      .where('isDeleted', 'in', [false, null])
       .onSnapshot(
         querySnapshot => {
           const notesList = querySnapshot.docs.map(doc => ({
@@ -156,6 +154,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({
     refreshNote,
     setCurrentFolder,
     noteLength,
+    allNotesList,
   }
 
   return <NoteContext.Provider value={values}>{children}</NoteContext.Provider>

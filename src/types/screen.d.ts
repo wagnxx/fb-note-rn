@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StackNavigationProp } from '@react-navigation/stack'
 import type { RouteProp, ParamListBase } from '@react-navigation/native'
 import { FC } from 'react'
@@ -19,6 +18,7 @@ export enum ScrennTypeEnum {
   Photo = 'Photo',
   Music = 'Music',
   CreateNote = 'CreateNote',
+  RecentRemovedNote = 'RecentRemovedNote',
   Tag = 'Tag',
   DictEnglish = 'DictEnglish',
   // bottome
