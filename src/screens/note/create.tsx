@@ -44,7 +44,7 @@ const CreateNote: ScreenFC<ScrennTypeEnum.CreateNote> = ({ navigation }) => {
         })
 
         let actionFn
-        const actionParams = { title, content, folderId: params?.id, docType }
+        const actionParams = { title, content, folderId: params?.id, docType, isDeleted: false }
 
         if (params?.docId) {
           actionFn = updateNote
