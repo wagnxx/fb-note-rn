@@ -22,6 +22,7 @@ import { useDict } from '@/features/dict/uesDict'
 import { createPersonWordsCol, updateWordsCol } from '@/service/dict'
 import StorageManage from './components/StorageManage'
 import { loadDictCollection, loadSelectedDict } from '@/features/dict/dictSlice'
+import WordRoot from './word-root'
 
 const { width, height } = Dimensions.get('window')
 
@@ -150,6 +151,7 @@ const DictHome = (props, ref) => {
       {pageType === 'select_dict' && <SelectDict />}
       {pageType === 'storage_manage' && <StorageManage />}
       {(pageType === 'word_manage' || (pageType === null && selectedDictId)) && <WordManage />}
+      {pageType === 'word_root' && <WordRoot />}
     </View>
   )
 }

@@ -3,7 +3,13 @@ import React, { FC } from 'react'
 import tw from 'twrnc'
 import { Button } from 'react-native-paper'
 
-export type PageTypes = 'add_dict' | 'select_dict' | 'word_manage' | 'storage_manage' | null
+export type PageTypes =
+  | 'add_dict'
+  | 'select_dict'
+  | 'word_manage'
+  | 'storage_manage'
+  | 'word_root'
+  | null
 
 const DictSettings: FC<{ setPageType: (val: PageTypes) => void; style: ViewStyle }> = ({
   setPageType,
@@ -18,6 +24,7 @@ const DictSettings: FC<{ setPageType: (val: PageTypes) => void; style: ViewStyle
       <Button onPress={() => onButtonPress('select_dict')}>Select dict</Button>
       <Button onPress={() => onButtonPress('word_manage')}>Word Manage</Button>
       <Button onPress={() => onButtonPress('storage_manage')}>Storage Manage</Button>
+      <Button onPress={() => onButtonPress('word_root')}>Word Root</Button>
     </View>
   )
 }
