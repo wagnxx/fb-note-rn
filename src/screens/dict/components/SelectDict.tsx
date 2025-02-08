@@ -1,12 +1,18 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useMemo, useState } from 'react'
+import React, { FC, useMemo, useState } from 'react'
 import { useDict } from '@/features/dict/uesDict'
 import { setSelectedDictId } from '@/features/dict/dictSlice'
 import { Button, Divider, useTheme } from 'react-native-paper'
 import tw from 'twrnc'
 import { useDispatch } from 'react-redux'
+import { PageTypes } from './DictSettings'
+import { DictInfo } from '@/features/dict/dict_info'
 
-const SelectDict = () => {
+const MAX_DICT_COUNT = 2
+
+const SelectDict: FC<{ setTargetPageType: (pType: PageTypes) => void }> = ({
+  setTargetPageType,
+}) => {
   const theme = useTheme()
   const { dictCollection, currentDictInfo } = useDict()
 
@@ -14,7 +20,7 @@ const SelectDict = () => {
 
   const dispatch = useDispatch()
 
-  const dictList = useMemo(() => {
+  const dictList: DictInfo[] = useMemo(() => {
     return dictCollection
       .filter(Boolean)
       .filter(item => item.length)
@@ -23,7 +29,7 @@ const SelectDict = () => {
           r.push(cur)
         }
         return r
-      }, [])
+      }, [] as DictInfo[])
   }, [dictCollection])
 
   return (
@@ -31,6 +37,12 @@ const SelectDict = () => {
       <View style={[tw`flex-row items-center`]}>
         <Text>colids:</Text>
         <Button onPress={() => setShowData(!showData)}>Show Data</Button>
+        <Button
+          onPress={() => setTargetPageType('add_dict')}
+          disabled={dictList.length >= MAX_DICT_COUNT}
+        >
+          Add Dict
+        </Button>
       </View>
       {showData && <Text>{JSON.stringify(dictList, null, 2)}</Text>}
       <Divider style={[tw`my-2`]} />

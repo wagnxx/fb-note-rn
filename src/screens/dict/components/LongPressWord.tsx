@@ -69,7 +69,9 @@ const LongPressWord = ({ wordItem }: { wordItem: WordItem }) => {
                 <SpeechButton word={wordItem.name} isAmerican={true} />
               </View>
 
-              <Text style={[tw``, theme.fonts.labelMedium]}>{wordItem.trans.toLocaleString()}</Text>
+              <Text style={[tw``, theme.fonts.labelMedium]}>
+                {wordItem.trans?.toLocaleString()}
+              </Text>
             </View>
           </Dialog.Content>
           <Dialog.Actions>

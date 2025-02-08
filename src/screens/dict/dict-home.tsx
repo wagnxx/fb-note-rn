@@ -125,8 +125,8 @@ const DictHome = (props, ref) => {
         <TouchableWithoutFeedback onPress={onAnimationEnd}>
           <View style={[tw`h-full`, { backgroundColor: 'rgba(0,0,0,0.3)' }]}>
             <TouchableWithoutFeedback>
-              <View style={[tw`w-1/2, h-full`, { backgroundColor: theme.colors.surface }]}>
-                <View style={[tw`flex-row justify-end py-2 px-2`]}>
+              <View style={[tw`w-2/5, h-full`, { backgroundColor: theme.colors.surface }]}>
+                <View style={[tw`flex-row  justify-start py-2 px-2`]}>
                   <ChevronDoubleLeftIcon
                     size={20}
                     color={theme.colors.onBackground}
@@ -148,7 +148,7 @@ const DictHome = (props, ref) => {
       </View>
 
       {pageType === 'add_dict' && <AddDict />}
-      {pageType === 'select_dict' && <SelectDict />}
+      {pageType === 'select_dict' && <SelectDict setTargetPageType={setTargetPageType} />}
       {pageType === 'storage_manage' && <StorageManage />}
       {(pageType === 'word_manage' || (pageType === null && selectedDictId)) && <WordManage />}
       {pageType === 'word_root' && <WordRoot />}

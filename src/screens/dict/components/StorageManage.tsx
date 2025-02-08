@@ -79,6 +79,10 @@ const StorageManage = () => {
 
   return (
     <View style={[tw`p-2`]}>
+      <Text style={[tw``, theme.fonts.bodySmall, { color: theme.colors.onBackground }]}>
+        The remove button only deletes the data from storage and does not affect the application's
+        state.
+      </Text>
       <View style={[tw`justify-between flex-row items-center`]}>
         <Text style={[theme.fonts.titleMedium, { color: theme.colors.onBackground }]}>
           KEYS LIST
