@@ -57,10 +57,11 @@ export default function AuthNavigator() {
         headerShown: false,
       }}
     >
+      {/* 首页带有 bottom tabs screen */}
+      <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
+
       {user ? (
         <>
-          {/* 首页带有 bottom tabs screen */}
-          <Stack.Screen name={ScrennTypeEnum.HomeTabs} component={HomeTabs} />
           {/* 普通 Stack.Screen 需要登录 */}
           <Stack.Screen name={ScrennTypeEnum.NodeDetail} component={NodeDetail} />
           <Stack.Screen name={ScrennTypeEnum.Profile} component={Profile} />
@@ -72,8 +73,10 @@ export default function AuthNavigator() {
           <Stack.Screen name={ScrennTypeEnum.DictEnglish} component={DictContainer} />
         </>
       ) : (
-        // 不需要登录的 游客可访问页面
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <>
+          {/* // 不需要登录的 游客可访问页面 */}
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </>
       )}
     </Stack.Navigator>
   )

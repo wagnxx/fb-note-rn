@@ -8,7 +8,7 @@ module.exports = {
     'prettier', // 确保 ESLint 配置中的规则不会与 Prettier 规则冲突
     'plugin:prettier/recommended', // 自动启用 Prettier 插件，并将 Prettier 规则作为 ESLint 错误
   ],
-  plugins: ['prettier', 'unused-imports'],
+  plugins: ['prettier', 'unused-imports', 'plugin:react/jsx-runtime'],
   rules: {
     'prettier/prettier': 'error',
 

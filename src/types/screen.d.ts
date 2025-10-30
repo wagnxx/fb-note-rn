@@ -23,6 +23,7 @@ export enum ScrennTypeEnum {
   DictEnglish = 'DictEnglish',
   // bottome
   Moment = 'Moment',
+  Tool = 'Tool',
   My = 'My',
 }
 
