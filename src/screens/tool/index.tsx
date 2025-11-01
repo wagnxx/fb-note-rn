@@ -9,6 +9,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Feather from 'react-native-vector-icons/Feather';
+import tw from 'twrnc'
+
 
 type ToolItem = {
   key: string;
@@ -39,6 +41,7 @@ export default function ToolIndex() {
       </View>
 
       {/* 工具列表 */}
+ 
       <FlatList
         data={TOOL_LIST}
         keyExtractor={(item) => item.key}
@@ -51,7 +54,9 @@ export default function ToolIndex() {
             <Text style={styles.itemText}>{item.title}</Text>
           </TouchableOpacity>
         )}
+        horizontal={true}
       />
+     
     </View>
   );
 }
@@ -75,12 +80,14 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   listContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20, 
   },
   item: {
     backgroundColor: '#f3f4f6',
     padding: 16,
-    marginBottom: 12,
+    alignSelf: 'flex-start',
+    marginRight: 12,
     borderRadius: 16,
     shadowColor: '#000',
     shadowOpacity: 0.05,
