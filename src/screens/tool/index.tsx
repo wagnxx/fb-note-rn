@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Feather from 'react-native-vector-icons/Feather';
 import tw from 'twrnc'
+import { StatusBar } from 'react-native';
 
 
 type ToolItem = {
@@ -32,6 +33,7 @@ export default function ToolIndex() {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} translucent={true} />
       {/* 顶部标题栏 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -100,3 +102,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+
+// ScannerScreen
+              {/* <BarcodeScanner onDetected={handleDetected} active={isScanning}  onError={() => setIsScanning(false)}/> */}
