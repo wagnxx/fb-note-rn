@@ -1,20 +1,13 @@
 import { auth, loginUser } from '@/firebase/auth'
-import { LoginScreenProps } from '@/types/navigation'
-import { useNavigation } from '@react-navigation/native'
+// import { LoginScreenProps } from '@/types/navigation'
 import React, { FC } from 'react'
 import { View, StyleSheet, SafeAreaView } from 'react-native'
-import {
-  TextInput,
-  Button,
-  Card,
-  Title,
-  HelperText,
-  Snackbar,
-} from 'react-native-paper'
+import { TextInput, Button, Card, Title, HelperText, Snackbar } from 'react-native-paper'
 
 import tw from 'twrnc'
 
-const LoginScreen: FC<LoginScreenProps> = ({ navigation }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const LoginScreen: FC<{ navigation: any }> = ({ navigation }) => {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [usernameError, setUsernameError] = React.useState('')
@@ -46,10 +39,7 @@ const LoginScreen: FC<LoginScreenProps> = ({ navigation }) => {
       .then(res => {
         if (res) {
           setVisible(true)
-          console.log(
-            'login after, auth?.currentUser is ::::',
-            auth?.currentUser,
-          )
+          console.log('login after, auth?.currentUser is ::::', auth?.currentUser)
           navigation.navigate('HomeTabs', { screen: 'tag' })
           // navigate
         } else {

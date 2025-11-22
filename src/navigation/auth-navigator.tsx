@@ -1,16 +1,14 @@
-import { View } from 'react-native'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import HomeTabs from '@/screens/home-tabs'
 import LoginScreen from '@/screens/login'
 import NodeDetail from '@/screens/note/detail'
-import { ActivityIndicator, useTheme } from 'react-native-paper'
-import tw from 'twrnc'
+import { useTheme } from 'react-native-paper'
 import { ScrennTypeEnum } from '@/types/screen'
-import Profile from '@/screens/my/profile'
+import Profile from '@/screens/account/profile'
 import CreateNote from '@/screens/note/create'
-import Photo from '@/screens/my/photo'
-import Music from '@/screens/my/music'
+import Photo from '@/screens/account/photo'
+import Music from '@/screens/account/music'
 import { observeAuthState, selectAuth } from '@/features/auth/authSlice'
 import { useAppDispatch } from '@/store'
 import { useSelector } from 'react-redux'
@@ -42,13 +40,13 @@ export default function AuthNavigator() {
     }
   }, [dispatch])
 
-  if (loadingUser) {
-    return (
-      <View style={tw`flex-1 justify-center items-center`}>
-        <ActivityIndicator size="large" color={theme.colors.outline} />
-      </View>
-    )
-  }
+  // if (loadingUser) {
+  //   return (
+  //     <View style={tw`flex-1 justify-center items-center`}>
+  //       <ActivityIndicator size="large" color={theme.colors.outline} />
+  //     </View>
+  //   )
+  // }
 
   return (
     <Stack.Navigator

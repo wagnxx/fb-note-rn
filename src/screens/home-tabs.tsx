@@ -5,18 +5,16 @@
  * @format
  */
 
-import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { HomeIcon, UserIcon } from 'react-native-heroicons/outline'
 import Moment from './moment'
-import My from './my/my'
 import { ScreenFC, ScrennTypeEnum } from '@/types/screen'
 import { useTheme } from 'react-native-paper'
 import { useSelector } from 'react-redux'
 import { selectAuth } from '@/features/auth/authSlice'
 import WrenchScrewdriverIcon from 'react-native-heroicons/outline/WrenchScrewdriverIcon'
-import Tool from './tool'
 import ToolNavigator from './tool/ToolNavigator'
+import Me from './account/me'
 
 const Tab = createBottomTabNavigator()
 
@@ -47,13 +45,11 @@ const HomeTabs: ScreenFC<ScrennTypeEnum.HomeTabs> = ({ navigation, route }) => {
       <Tab.Screen
         name={ScrennTypeEnum.Tool}
         component={ToolNavigator}
-        options={{ tabBarIcon: WrenchScrewdriverIcon  }}
+        options={{ tabBarIcon: WrenchScrewdriverIcon }}
       />
 
-      {/* 右边 tab：My（需登录） */}
-      {user && (
-        <Tab.Screen name={ScrennTypeEnum.My} component={My} options={{ tabBarIcon: UserIcon }} />
-      )}
+      {/* 右边 tab：Me（不需登录） */}
+      <Tab.Screen name={ScrennTypeEnum.Me} component={Me} options={{ tabBarIcon: UserIcon }} />
     </Tab.Navigator>
   )
 }
