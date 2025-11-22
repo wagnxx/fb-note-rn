@@ -1,5 +1,4 @@
 import { Dimensions, Text, TouchableWithoutFeedback, View } from 'react-native'
-import React from 'react'
 import {
   Drawer,
   RadioButton,
@@ -14,6 +13,9 @@ import Toast from 'react-native-toast-message'
 import { StyleSheet } from 'react-native'
 import { useThemePaper } from '@/context/theme-provider'
 import tw from 'twrnc'
+import { useSelector } from 'react-redux'
+import { selectAuth } from '@/features/auth/authSlice'
+import { useNavigation } from '@react-navigation/native'
 
 const { height, width } = Dimensions.get('window')
 
@@ -22,13 +24,11 @@ type SettingsProps = {
   showSettings: boolean
 }
 
-export default function Settings({
-  onClose,
-  showSettings = false,
-}: SettingsProps) {
+export default function Settings({ onClose, showSettings = false }: SettingsProps) {
   const { appTheme, themeList, setAppTheme, isDarkMode } = useThemePaper()
   const theme = useTheme()
-
+  const { user } = useSelector(selectAuth)
+  const navigation = useNavigation()
   const logout = () => {
     messageConfirm({
       message: 'Are you sure to logout?',
@@ -56,6 +56,11 @@ export default function Settings({
       })
   }
 
+  const login = () => {
+    navigation.navigate('Login' as never)
+  }
+  //  onPress: () => navigation.navigate(ScrennTypeEnum.Login),
+  // useNavigation
   return (
     <>
       {showSettings && (
@@ -72,18 +77,10 @@ export default function Settings({
         ]}
       >
         <View>
-          <Text
-            style={[
-              { color: theme.colors.onBackground },
-              theme.fonts.titleSmall,
-            ]}
-          >
+          <Text style={[{ color: theme.colors.onBackground }, theme.fonts.titleSmall]}>
             Theme:{' '}
           </Text>
-          <RadioButton.Group
-            onValueChange={value => setAppTheme(value)}
-            value={appTheme}
-          >
+          <RadioButton.Group onValueChange={value => setAppTheme(value)} value={appTheme}>
             {themeList?.length > 0 &&
               themeList.map((item, index) => (
                 <View style={styles.radioItem} key={index}>
@@ -95,16 +92,29 @@ export default function Settings({
         </View>
         <Divider />
         <View style={tw`flex-row mt-3`}>
-          <Button
-            dark={isDarkMode}
-            mode="outlined"
-            background={{ borderless: true, foreground: false }}
-            style={{ height: 40, paddingVertical: 2 }}
-            labelStyle={[theme.fonts.labelSmall]}
-            onPress={logout}
-          >
-            Logout
-          </Button>
+          {user ? (
+            <Button
+              dark={isDarkMode}
+              mode="outlined"
+              background={{ borderless: true, foreground: false }}
+              style={{ height: 40, paddingVertical: 2 }}
+              labelStyle={[theme.fonts.labelSmall]}
+              onPress={logout}
+            >
+              Logout
+            </Button>
+          ) : (
+            <Button
+              dark={isDarkMode}
+              mode="outlined"
+              background={{ borderless: true, foreground: false }}
+              style={{ height: 40, paddingVertical: 2 }}
+              labelStyle={[theme.fonts.labelSmall]}
+              onPress={login}
+            >
+              Login
+            </Button>
+          )}
         </View>
         {/* <Drawer.Item label=" Logout" onPress={logout} /> */}
       </Drawer.Section>

@@ -24,7 +24,7 @@ export enum ScrennTypeEnum {
   // bottome
   Moment = 'Moment',
   Tool = 'Tool',
-  My = 'My',
+  Me = 'Me',
 }
 
 interface ScreenParamsType {

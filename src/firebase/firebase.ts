@@ -1,5 +1,6 @@
-import firebase from '@react-native-firebase/app'
-import { getFirestore, onSnapshot } from '@react-native-firebase/firestore'
+// import firebase from '@react-native-firebase/app'
+// import { getFirestore, onSnapshot } from '@react-native-firebase/firestore'
+import { getFirestore  } from '@react-native-firebase/firestore'
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -23,12 +24,34 @@ const firebaseConfig = {
 }
 
 let app
+/**
+ * web api 不适合RN
+ 在 React Native Firebase：
+
+✔ 不需要配置 apiKey / authDomain / projectId 等字段
+✔ 不使用 JS 初始化
+✔ 不使用 firebase.initializeApp(firebaseConfig)
+
+RN Firebase 100％使用 原生初始化：
+
+Android 依赖：google-services.json
+
+iOS 依赖：GoogleService-Info.plist
+
+🔹 也就是说：
+
+你必须提供 google-services.json，否则 RN Firebase 无法工作，也无法自动初始化 DEFAULT app。
+ */
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-  app = firebase.initializeApp(firebaseConfig)
-}
-console.log('Initialize Firebase succesfully ,firebase app length:::::::::::', firebase.apps.length)
+// if (!firebase.apps.length) {
+//   app = firebase.initializeApp(firebaseConfig)
+// }
+// console.log('Initialize Firebase succesfully ,firebase app length:::::::::::', firebase.apps.length)
+
+// const db = getFirestore()
+// export { firebase, app, db, onSnapshot }
+
 
 const db = getFirestore()
-export { firebase, app, db, onSnapshot }
+export { db }

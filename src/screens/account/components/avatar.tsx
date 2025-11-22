@@ -1,17 +1,11 @@
-import {
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Text,
-  TouchableHighlight,
-} from 'react-native'
-import React from 'react'
+import { Dimensions, Image, SafeAreaView, Text, TouchableHighlight } from 'react-native'
 import tw from 'twrnc'
 import LinearGradient from 'react-native-linear-gradient'
 import { useThemePaper } from '@/context/theme-provider'
-import { useTheme } from 'react-native-paper'
+import { Button, useTheme } from 'react-native-paper'
 import { selectAuth } from '@/features/auth/authSlice'
 import { useSelector } from 'react-redux'
+import { useNavigation } from '@react-navigation/native'
 
 const { width, height } = Dimensions.get('window')
 const uri =
@@ -20,6 +14,12 @@ export default function Avatar({ onPressPhoto = () => {} }) {
   const { user } = useSelector(selectAuth)
   const { isDarkMode } = useThemePaper()
   const theme = useTheme()
+
+  const navigation = useNavigation()
+
+  const handleLogin = () => {
+    navigation.navigate('Login' as never)
+  }
 
   return (
     <SafeAreaView
@@ -48,14 +48,29 @@ export default function Avatar({ onPressPhoto = () => {} }) {
         style={{ width: 80, height: 80, borderRadius: 50, overflow: 'hidden' }}
         onPress={onPressPhoto}
       >
-        <Image
-          source={{ uri: user?.photoURL || uri }}
-          style={{ width: 80, height: 80 }}
-        />
+        <Image source={{ uri: user?.photoURL || uri }} style={{ width: 80, height: 80 }} />
       </TouchableHighlight>
-      <Text style={[{ color: theme.colors.onBackground }]}>
-        {user?.displayName || user?.email}
-      </Text>
+      {user ? (
+        <Text style={[{ color: theme.colors.onBackground }]}>
+          {user?.displayName || user?.email}
+        </Text>
+      ) : (
+        <Button
+          labelStyle={{
+            fontSize: 12,
+            lineHeight: 16,
+            fontStyle: 'normal',
+            fontWeight: '500',
+            letterSpacing: 0.5,
+          }}
+          contentStyle={{ paddingVertical: 0 }}
+          textColor="#f88"
+          onPress={handleLogin}
+        >
+          Login
+        </Button>
+      )}
+
       <Text style={[{ color: theme.colors.onBackground }]}>{user?.uid}</Text>
     </SafeAreaView>
   )

@@ -2,6 +2,11 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+project.ext.react = [
+        enableHermes: true
+]
+
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -133,21 +138,30 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
-
     implementation project(':react-native-vision-camera')
     // implementation project(':vision-camera-code-scanner')
-
     // ⚠️ 显式添加 ML Kit，保证 Java 编译器能找到 Barcode 类
     implementation 'com.google.mlkit:barcode-scanning:17.0.0'
 
+    // Firebase BoM 用于管理所有 Firebase Android SDK 版本
+    // @react-native-firebase/app 是核心模块，Android 端依赖由 BoM 注入，不需要额外写 firebase-core
+//    implementation platform('com.google.firebase:firebase-bom:34.6.0') // firebase-auth-24.0.1-api 这个库是用 Kotlin 2.1.0 编译的，当前使用的 Kotlin 编译器版本是 1.9.0
+    implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    // Firebase 产品依赖，不需要指定版本，由 BoM 管理
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
 
 
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-android")
-    } else {
-        implementation jscFlavor
-    }
+
+    implementation 'com.facebook.react:hermes-android'
+
+//    if (hermesEnabled.toBoolean()) {
+//    if (project.ext.react.enableHermes) {
+//        implementation("com.facebook.react:hermes-android")
+//    } else {
+//        implementation jscFlavor
+//    }
 
      // 添加本地库依赖
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
@@ -155,3 +169,4 @@ dependencies {
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,91 @@
+{
+    "project_info": {
+        "project_number": "787796736883",
+        "firebase_url": "https://fb-dev-fde3a-default-rtdb.firebaseio.com",
+        "project_id": "fb-dev-fde3a",
+        "storage_bucket": "fb-dev-fde3a.appspot.com"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:787796736883:android:6bb37db1dc0ea9230da306",
+                "android_client_info": {
+                    "package_name": "com.note"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "787796736883-ckua0kueoqi65170hoc88ausv0jq2crt.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyBILdedntrQYEw9c2TbFesxY6khseLyqe8"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "787796736883-ckua0kueoqi65170hoc88ausv0jq2crt.apps.googleusercontent.com",
+                            "client_type": 3
+                        },
+                        {
+                            "client_id": "787796736883-flcj57554n687psbbffmmukc37n4289b.apps.googleusercontent.com",
+                            "client_type": 2,
+                            "ios_info": {
+                                "bundle_id": "com.xxiong.myApp"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:787796736883:android:824e4ab517d9fefe0da306",
+                "android_client_info": {
+                    "package_name": "mob.godutch.easychat"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "787796736883-8t2bn6bbppa723fd44c696neeve2gqqs.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "mob.godutch.easychat",
+                        "certificate_hash": "b97a24293d5b0eac84b0cd2127e1dc648c97faf6"
+                    }
+                },
+                {
+                    "client_id": "787796736883-ckua0kueoqi65170hoc88ausv0jq2crt.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyBILdedntrQYEw9c2TbFesxY6khseLyqe8"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "787796736883-ckua0kueoqi65170hoc88ausv0jq2crt.apps.googleusercontent.com",
+                            "client_type": 3
+                        },
+                        {
+                            "client_id": "787796736883-flcj57554n687psbbffmmukc37n4289b.apps.googleusercontent.com",
+                            "client_type": 2,
+                            "ios_info": {
+                                "bundle_id": "com.xxiong.myApp"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

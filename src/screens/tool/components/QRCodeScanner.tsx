@@ -1,40 +1,112 @@
-import { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { Camera, useCameraDevice } from 'react-native-vision-camera'
-import { useBarcodeScanner } from '@mgcrea/vision-camera-barcode-scanner'
-import { runOnJS } from 'react-native-reanimated'
-import type { Barcode } from '@mgcrea/vision-camera-barcode-scanner'
+import React, { useMemo, useRef, useState } from 'react'
+import { View, Text, StyleSheet, Alert } from 'react-native'
+import { Camera, Code, Frame, useCameraDevice } from 'react-native-vision-camera'
+import { Barcode, useBarcodeScanner } from '@mgcrea/vision-camera-barcode-scanner'
+import { useRunOnJS } from 'react-native-worklets-core'
+import { CameraHighlights } from './CameraHighlights'
+import RNFS from 'react-native-fs'
+import { Image } from 'react-native'
 
-export default function BarcodeScannerScreen() {
-  const device = useCameraDevice('back')
-
+type Props = {
+  // onDetected: (code: string, imagePath?: string) : void: (code: string, imagePath?: string) : void
+  onDetected: (code: string, imagePath?: string) => void
+}
+const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
+  const [isActive, setIsActive] = useState<boolean>(true)
+  const [selected, setSelected] = useState<Code | null>(null)
   const [barcodes, setBarcodes] = useState<Barcode[]>([])
-  const [selected, setSelected] = useState<Barcode | null>(null)
+  const [photoCachePath, setPhotoCachePath] = useState<string | null>(null)
 
-  // 主线程处理扫描结果
-  const handleBarcodes = (newBarcodes: Barcode[]) => {
-    setBarcodes(newBarcodes)
-    if (newBarcodes.length > 0 && !selected) {
-      setSelected(newBarcodes[0])
+  const device = useCameraDevice('back')
+  const camera = useRef<Camera>(null)
+  const scannrerRef = useRef<boolean>(false)
+
+  const handleBarcodeScanned = useRunOnJS(async (codes: Barcode[], frame: Frame) => {
+    if (scannrerRef.current) return
+    scannrerRef.current = true
+
+    setBarcodes(codes)
+    if (!codes.length || !camera?.current) return
+    try {
+      const photo = await camera.current.takePhoto()
+      setPhotoCachePath(photo.path)
+      console.log('takephoto success: ', photo.path)
+    } catch (error) {
+      console.error('takephoto error: ', error)
+      setPhotoCachePath(null)
     }
-  }
+    setIsActive(false)
+  }, [])
 
-  const { props: cameraProps } = useBarcodeScanner({
+  const { props: cameraProps, highlights } = useBarcodeScanner({
     fps: 5,
-    barcodeTypes: ['qr', 'ean-13', 'code-128'],
-    onBarcodeScanned: (newBarcodes: Barcode[]) => {
-      'worklet'
-      runOnJS(handleBarcodes)(newBarcodes)
-    },
+    barcodeTypes: ['qr', 'ean-13'], // optional
+    onBarcodeScanned: handleBarcodeScanned,
   })
+
+  const highlightsWithMeta = useMemo(() => {
+    const result = (highlights || []).map((h, index) => ({
+      key: h.key,
+      size: h.size,
+      origin: h.origin,
+      meta: barcodes[index],
+    }))
+    return result
+  }, [highlights])
+
+  const handleSelectHighlight = async (meta: Barcode) => {
+    Alert.alert(`你点击条码: ${meta.value}`, 'want to take photo?', [
+      {
+        text: '取消',
+        style: 'cancel',
+        onPress: () => {
+          setPhotoCachePath(null)
+        },
+      },
+      {
+        text: '拍照',
+        onPress: async () => {
+          if (!photoCachePath) return
+          const savedPath = await moveToHistory(photoCachePath)
+          onDetected(meta.value!, savedPath)
+          setPhotoCachePath(null)
+        },
+      },
+    ])
+  }
 
   if (!device) return <Text style={styles.loading}>Loading Camera...</Text>
 
   return (
     <View style={{ flex: 1 }}>
       {/* Camera 预览 */}
-      <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} {...cameraProps} />
-
+      {isActive ? (
+        <Camera
+          ref={camera}
+          style={StyleSheet.absoluteFill}
+          device={device}
+          {...cameraProps}
+          photo={true}
+          isActive={true}
+        />
+      ) : photoCachePath ? (
+        <Image
+          source={{ uri: 'file://' + photoCachePath }}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+        />
+      ) : (
+        <Text>No Photo</Text>
+      )}
+      {
+        // 条码高亮显示组件
+        // highlightsWithMeta.length > 0 && (
+        <CameraHighlights<Barcode>
+          highlights={highlightsWithMeta}
+          color="green"
+          onSelect={handleSelectHighlight}
+        />
+      }
       {/* 状态文字 */}
       <View style={styles.overlay}>
         {selected ? (
@@ -45,31 +117,6 @@ export default function BarcodeScannerScreen() {
           <Text style={styles.text}>Scanning...</Text>
         )}
       </View>
-
-      {/* 渲染条码框 */}
-      {barcodes.map((code, idx) => {
-        if (!code.boundingBox) return null
-        const isSelected = code === selected
-        const { origin, size } = code.boundingBox
-
-        return (
-          <TouchableOpacity
-            key={idx}
-            style={[
-              styles.marker,
-              {
-                left: origin.x,
-                top: origin.y,
-                width: size.width,
-                height: size.height,
-                borderColor: isSelected ? 'white' : 'lime',
-                borderWidth: isSelected ? 3 : 2,
-              },
-            ]}
-            onPress={() => setSelected(code)}
-          />
-        )
-      })}
     </View>
   )
 }
@@ -100,4 +147,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 50,
   },
+  highlight: {
+    position: 'absolute',
+    borderWidth: 2,
+    borderRadius: 2,
+    zIndex: 9999,
+  },
 })
+
+const moveToHistory = async (tmpPath: string) => {
+  const destPath = RNFS.DocumentDirectoryPath + `/history-${Date.now()}.jpg`
+  await RNFS.copyFile(tmpPath, destPath)
+  return destPath
+}
+
+export default QRCodeScanner

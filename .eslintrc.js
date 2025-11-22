@@ -7,8 +7,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier', // 确保 ESLint 配置中的规则不会与 Prettier 规则冲突
     'plugin:prettier/recommended', // 自动启用 Prettier 插件，并将 Prettier 规则作为 ESLint 错误
+    'plugin:react/jsx-runtime',
   ],
-  plugins: ['prettier', 'unused-imports', 'plugin:react/jsx-runtime'],
+  plugins: ['prettier', 'unused-imports'],
   rules: {
     'prettier/prettier': 'error',
 
@@ -38,4 +39,14 @@ module.exports = {
     'react-native/no-inline-styles': 'off',
     'object-property-newline': 'off',
   },
+
+  // ✅ 只对 src 目录下的文件生效
+  overrides: [
+    {
+      files: ['src/**/*.{ts,tsx}'], // 指定作用目录和文件类型
+      rules: {
+        // 如果需要针对 src 下文件的特殊规则，可以在这里覆盖
+      },
+    },
+  ],
 }
