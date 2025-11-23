@@ -17,6 +17,8 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import { XMarkIcon } from 'react-native-heroicons/outline'
 import QRCodeScanner from './components/QRCodeScanner'
 import { WebView } from 'react-native-webview'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { addRecord, setScanning } from '@/features/tool/sleces/scannerSlice'
 
 /**
  * ✅ 添加 image 字段
@@ -29,9 +31,12 @@ interface ScanRecord {
 
 export default function ScannerScreen() {
   const [tab, setTab] = useState<'scan' | 'history'>('scan')
-  const [isScanning, setIsScanning] = useState(false)
-  const [history, setHistory] = useState<ScanRecord[]>([])
+
   const [detail, setDetail] = useState<ScanRecord | null>(null) // 点击历史显示详情
+
+  const { isScanning } = useAppSelector(state => state.scanner)
+  const history = useAppSelector(state => state.scanner.history)
+  const dispatch = useAppDispatch()
 
   /**
    * 扫码成功（带图片）
@@ -43,8 +48,10 @@ export default function ScannerScreen() {
       image: imagePath, // ← 保存图片
     }
 
-    setHistory(prev => [newRecord, ...prev])
-    setIsScanning(false)
+    // setHistory(prev => [newRecord, ...prev])
+    // setIsScanning(false)
+    dispatch(addRecord(newRecord))
+    dispatch(setScanning(false))
     Alert.alert('扫码成功', code)
   }
 
@@ -82,7 +89,7 @@ export default function ScannerScreen() {
 
   const handleSwitchTab = (target: 'scan' | 'history') => {
     setTab(target)
-    if (target === 'history') setIsScanning(false)
+    if (target === 'history') dispatch(setScanning(false))
   }
 
   return (
@@ -122,7 +129,7 @@ export default function ScannerScreen() {
       {tab === 'scan' ? (
         <View style={tw`flex-1 justify-center items-center`}>
           <TouchableOpacity
-            onPress={() => setIsScanning(true)}
+            onPress={() => dispatch(setScanning(true))}
             style={tw`mt-10 bg-blue-600 px-6 py-3 rounded-full`}
           >
             <Text style={tw`text-white text-base font-medium`}>开始扫码</Text>
@@ -146,12 +153,12 @@ export default function ScannerScreen() {
       <Modal visible={isScanning} animationType="slide">
         <QRCodeScanner
           onDetected={handleDetected} // 带图片返回
-          onClose={() => setIsScanning(false)}
+          // onClose={() => setIsScanning(false)}
         />
 
         <TouchableOpacity
           style={tw`absolute top-10 right-4 bg-black opacity-40 p-2 rounded-full`}
-          onPress={() => setIsScanning(false)}
+          onPress={() => dispatch(setScanning(false))}
         >
           <XMarkIcon style={tw`text-white text-base font-medium`} />
         </TouchableOpacity>

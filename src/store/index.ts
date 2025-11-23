@@ -5,6 +5,7 @@ import todosReducer from '@/features/todos/todosSlice'
 import notesReducer from '@/features/notes/notesSlice'
 import authReducer from '@/features/auth/authSlice'
 import dictSliceReducer from '@/features/dict/dictSlice'
+import scnnerReducer from '@/features/tool/sleces/scannerSlice'
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     notes: notesReducer,
     auth: authReducer,
     dict: dictSliceReducer,
+    scanner: scnnerReducer,
   },
 
   middleware: getDefaultMiddleware =>

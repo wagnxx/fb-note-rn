@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, Alert } from 'react-native'
 import { Camera, Code, Frame, useCameraDevice } from 'react-native-vision-camera'
 import { Barcode, useBarcodeScanner } from '@mgcrea/vision-camera-barcode-scanner'
@@ -15,18 +15,45 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
   const [isActive, setIsActive] = useState<boolean>(true)
   const [selected, setSelected] = useState<Code | null>(null)
   const [barcodes, setBarcodes] = useState<Barcode[]>([])
+  // const [highlightsTemp, sethighlightsTemp] = useState<Highlight[]>([])
   const [photoCachePath, setPhotoCachePath] = useState<string | null>(null)
+  const [didConfirm, setDidConfirm] = useState(false) // 用户是否点击“拍照/保存”
 
   const device = useCameraDevice('back')
   const camera = useRef<Camera>(null)
   const scannrerRef = useRef<boolean>(false)
 
+  useEffect(() => {
+    if (didConfirm && photoCachePath) {
+      RNFS.unlink(photoCachePath).catch(err => {
+        console.error('删除缓存照片失败: ', err)
+      })
+    }
+  }, [didConfirm, photoCachePath])
+
   const handleBarcodeScanned = useRunOnJS(async (codes: Barcode[], frame: Frame) => {
-    if (scannrerRef.current) return
-    scannrerRef.current = true
+    if (!camera?.current) {
+      console.log('No camera ref!')
+      return
+    }
+
+    if (scannrerRef.current) {
+      console.log('Already scannerd!')
+      return
+    }
+
+    console.log(
+      `adjust codes and highlightsTemp codes.length: ${codes.length}, highlights.length: ${highlights.length}`,
+      { codes, highlights },
+    )
+    if (!codes.length) return
 
     setBarcodes(codes)
-    if (!codes.length || !camera?.current) return
+    // sethighlightsTemp(highlights)
+
+    scannrerRef.current = true
+    console.log('scannerd first time!')
+
     try {
       const photo = await camera.current.takePhoto()
       setPhotoCachePath(photo.path)
@@ -43,16 +70,20 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
     barcodeTypes: ['qr', 'ean-13'], // optional
     onBarcodeScanned: handleBarcodeScanned,
   })
-
   const highlightsWithMeta = useMemo(() => {
-    const result = (highlights || []).map((h, index) => ({
-      key: h.key,
-      size: h.size,
-      origin: h.origin,
-      meta: barcodes[index],
+    return barcodes.map((b, index) => ({
+      key: `barcode-${index}`,
+      size: {
+        width: b.boundingBox.size.width,
+        height: b.boundingBox.size.height,
+      },
+      origin: {
+        x: b.boundingBox.origin.x,
+        y: b.boundingBox.origin.y,
+      },
+      meta: b, // 整个 Barcode 传进去
     }))
-    return result
-  }, [highlights])
+  }, [barcodes])
 
   const handleSelectHighlight = async (meta: Barcode) => {
     Alert.alert(`你点击条码: ${meta.value}`, 'want to take photo?', [
@@ -70,6 +101,7 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
           const savedPath = await moveToHistory(photoCachePath)
           onDetected(meta.value!, savedPath)
           setPhotoCachePath(null)
+          setDidConfirm(true)
         },
       },
     ])
