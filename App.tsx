@@ -13,7 +13,8 @@ import AuthNavigator from './src/navigation/auth-navigator'
 import TrackPlayer from 'react-native-track-player'
 import { addEventListeners, setupPlayer } from './src/utils/service'
 import { Provider } from 'react-redux'
-import store from './src/store'
+import { store, persistor } from './src/store'
+import { PersistGate } from 'redux-persist/integration/react'
 // 注册播放服务
 TrackPlayer.registerPlaybackService(() => addEventListeners)
 function App(): React.JSX.Element {
@@ -32,10 +33,12 @@ function App(): React.JSX.Element {
   return (
     <ThemePaperProvider>
       <Provider store={store}>
-        <NavigationContainer>
-          <AuthNavigator />
-          <Toast />
-        </NavigationContainer>
+        <PersistGate loading={null} persistor={persistor}>
+          <NavigationContainer>
+            <AuthNavigator />
+            <Toast />
+          </NavigationContainer>
+        </PersistGate>
       </Provider>
     </ThemePaperProvider>
   )
