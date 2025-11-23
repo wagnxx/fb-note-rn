@@ -14,6 +14,7 @@ export enum ScrennTypeEnum {
   HomeTabs = 'HomeTabs',
   NodeDetail = 'NodeDetail',
   Login = 'Login',
+  ResetPassword = 'ResetPassword',
   Profile = 'Profile',
   Photo = 'Photo',
   Music = 'Music',

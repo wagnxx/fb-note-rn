@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux'
 import Tag from '@/screens/tag'
 import DictContainer from '@/screens/dict/dict-container'
 import RecentRemovedNote from '@/screens/note/recent-removed'
+import ResetPasswordScreen from '@/screens/ResetPasswordScreen'
 
 const Stack = createStackNavigator()
 
@@ -76,6 +77,7 @@ export default function AuthNavigator() {
           <Stack.Screen name="Login" component={LoginScreen} />
         </>
       )}
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
   )
 }

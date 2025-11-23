@@ -19,8 +19,12 @@
 // } from 'firebase/auth'
 
 import firebaseAuth from '@react-native-firebase/auth'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+
+import { FIREBASE_OAUTH_CLIENT_ID } from '@env'
 
 const auth = firebaseAuth()
+const { GoogleAuthProvider } = firebaseAuth
 
 const { createUserWithEmailAndPassword, signOut } = auth
 
@@ -61,4 +65,46 @@ const logoutUser = async () => {
   return null
 }
 
-export { auth, loginUser, registerUser, logoutUser }
+// Google 登录方法
+GoogleSignin.configure({
+  webClientId: FIREBASE_OAUTH_CLIENT_ID,
+})
+
+async function googleLogin() {
+  try {
+    // 确保 GoogleSignin 初始化过
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
+
+    // 触发 Google 登录
+    const userInfo = await GoogleSignin.signIn()
+
+    if (!userInfo || userInfo.type !== 'success' || !userInfo.data) {
+      throw new Error('Google Sign-In did not return idToken.')
+    }
+
+    // 使用 Google idToken 构建 Firebase 凭证
+    const googleCredential = GoogleAuthProvider.credential(userInfo.data.idToken)
+
+    // Firebase 登录
+    const firebaseUserCredential = await auth.signInWithCredential(googleCredential)
+
+    console.log('Firebase User:', firebaseUserCredential.user)
+
+    return firebaseUserCredential.user
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error('Google login error:', error?.message || error)
+    return null
+  }
+}
+
+/**
+ * 发送密码重置邮件
+ * @param email 用户邮箱
+ * @returns Promise<void>
+ */
+const sendPasswordResetEmail = async (email: string) => {
+  if (!email) throw new Error('Email is required')
+  return
+}
+export { auth, loginUser, registerUser, logoutUser, googleLogin, sendPasswordResetEmail }

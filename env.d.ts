@@ -7,4 +7,5 @@ declare module '@env' {
   export const FIREBASE_APP_ID: string
   export const FIREBASE_MEASUREMENT_ID: string
   export const FIREBASE_DATABASE_URL: string
+  export const FIREBASE_OAUTH_CLIENT_ID: string
 }

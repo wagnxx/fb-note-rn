@@ -12,6 +12,14 @@
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
 
+    <meta-data
+      android:name="com.google.android.gms.client_id"
+      android:value="your-web-client-id.apps.googleusercontent.com"/>
+    <meta-data
+      android:name="com.google.android.gms.version"
+      android:value="@integer/google_play_services_version"/>
+
+
 
     <!-- android:label="@string/app_name" -->
     <application
