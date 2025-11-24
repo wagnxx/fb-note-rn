@@ -1,107 +1,124 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, Alert } from 'react-native'
-import { Camera, Code, Frame, useCameraDevice } from 'react-native-vision-camera'
+import { Camera, Frame, useCameraDevice } from 'react-native-vision-camera'
 import { Barcode, useBarcodeScanner } from '@mgcrea/vision-camera-barcode-scanner'
 import { useRunOnJS } from 'react-native-worklets-core'
-import { CameraHighlights } from './CameraHighlights'
 import RNFS from 'react-native-fs'
-import { Image } from 'react-native'
+import { CameraHighlightsWithMeta } from './CameraHighlightsWithMeta'
+import Clipboard from '@react-native-clipboard/clipboard'
 
 type Props = {
-  // onDetected: (code: string, imagePath?: string) : void: (code: string, imagePath?: string) : void
   onDetected: (code: string, imagePath?: string) => void
+  onClose?: () => void
 }
-const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
+const QRCodeScanner: React.FC<Props> = ({ onDetected, onClose }) => {
   const [isActive, setIsActive] = useState<boolean>(true)
-  const [selected, setSelected] = useState<Code | null>(null)
   const [barcodes, setBarcodes] = useState<Barcode[]>([])
-  // const [highlightsTemp, sethighlightsTemp] = useState<Highlight[]>([])
+  const [scannrerKey, setscannrerKey] = useState<number>(0)
   const [photoCachePath, setPhotoCachePath] = useState<string | null>(null)
-  const [didConfirm, setDidConfirm] = useState(false) // 用户是否点击“拍照/保存”
 
   const device = useCameraDevice('back')
   const camera = useRef<Camera>(null)
-  const scannrerRef = useRef<boolean>(false)
 
   useEffect(() => {
-    if (didConfirm && photoCachePath) {
-      RNFS.unlink(photoCachePath).catch(err => {
-        console.error('删除缓存照片失败: ', err)
-      })
+    // todo nothing
+    return () => {
+      if (photoCachePath) {
+        RNFS.unlink(photoCachePath)
+          .then(() => {
+            console.log('删除缓存照片: ', photoCachePath)
+          })
+          .catch(err => {
+            console.log('删除缓存照片失败: ', err)
+          })
+      }
     }
-  }, [didConfirm, photoCachePath])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleBarcodeScanned = useRunOnJS(async (codes: Barcode[], frame: Frame) => {
     if (!camera?.current) {
       console.log('No camera ref!')
       return
     }
-
-    if (scannrerRef.current) {
-      console.log('Already scannerd!')
-      return
-    }
-
-    console.log(
-      `adjust codes and highlightsTemp codes.length: ${codes.length}, highlights.length: ${highlights.length}`,
-      { codes, highlights },
-    )
-    if (!codes.length) return
-
+    if (codes.length === 0) return
     setBarcodes(codes)
-    // sethighlightsTemp(highlights)
-
-    scannrerRef.current = true
-    console.log('scannerd first time!')
-
     try {
       const photo = await camera.current.takePhoto()
       setPhotoCachePath(photo.path)
       console.log('takephoto success: ', photo.path)
+      setIsActive(false)
     } catch (error) {
-      console.error('takephoto error: ', error)
+      console.log('takephoto error: ', error)
+      if (scannrerKey < 4) {
+        setscannrerKey(prev => prev + 1)
+        console.log('reload camera')
+      } else {
+        Alert.alert('Error', '无法拍照，请重试', [
+          {
+            text: '确定',
+            onPress: () => {
+              onClose?.()
+            },
+          },
+        ])
+      }
       setPhotoCachePath(null)
     }
-    setIsActive(false)
+    // setIsActive(false)
   }, [])
 
   const { props: cameraProps, highlights } = useBarcodeScanner({
     fps: 5,
     barcodeTypes: ['qr', 'ean-13'], // optional
+    scanMode: 'once',
     onBarcodeScanned: handleBarcodeScanned,
   })
   const highlightsWithMeta = useMemo(() => {
-    return barcodes.map((b, index) => ({
-      key: `barcode-${index}`,
-      size: {
-        width: b.boundingBox.size.width,
-        height: b.boundingBox.size.height,
-      },
-      origin: {
-        x: b.boundingBox.origin.x,
-        y: b.boundingBox.origin.y,
-      },
-      meta: b, // 整个 Barcode 传进去
+    if (highlights.length !== barcodes.length) return []
+
+    const results = highlights.map((h, index) => ({
+      size: h.size,
+      origin: h.origin,
+      meta: barcodes[index], // 整个 Barcode 传进去
     }))
-  }, [barcodes])
+    return results
+  }, [barcodes, highlights])
 
   const handleSelectHighlight = async (meta: Barcode) => {
-    Alert.alert(`你点击条码: ${meta.value}`, 'want to take photo?', [
+    if (!photoCachePath) {
+      Alert.alert('提示', '没有可用的扫码图片，请重新扫描', [
+        {
+          text: '确定',
+          onPress: () => {
+            onClose?.()
+          },
+        },
+      ])
+      return
+    }
+
+    Alert.alert(`识别到条码: ${meta.value}`, '是否将此条码保存到历史记录？', [
       {
-        text: '取消',
+        text: '不用',
         style: 'cancel',
         onPress: () => {
           setPhotoCachePath(null)
         },
       },
       {
-        text: '拍照',
+        text: '保存并复制',
         onPress: async () => {
           if (!photoCachePath) return
+
           const savedPath = await moveToHistory(photoCachePath)
+
+          // 复制条码内容
+          Clipboard.setString(meta.value || '')
+
           onDetected(meta.value!, savedPath)
+
           setPhotoCachePath(null)
-          setDidConfirm(true)
         },
       },
     ])
@@ -111,43 +128,25 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Camera 预览 */}
-      {isActive ? (
-        <Camera
-          ref={camera}
-          style={StyleSheet.absoluteFill}
-          device={device}
-          {...cameraProps}
-          photo={true}
-          isActive={true}
-        />
-      ) : photoCachePath ? (
-        <Image
-          source={{ uri: 'file://' + photoCachePath }}
-          style={StyleSheet.absoluteFill}
-          resizeMode="cover"
-        />
-      ) : (
-        <Text>No Photo</Text>
-      )}
-      {
-        // 条码高亮显示组件
-        // highlightsWithMeta.length > 0 && (
-        <CameraHighlights<Barcode>
-          highlights={highlightsWithMeta}
-          color="green"
-          onSelect={handleSelectHighlight}
-        />
-      }
+      <Camera
+        key={scannrerKey}
+        ref={camera}
+        style={StyleSheet.absoluteFill}
+        device={device}
+        {...cameraProps}
+        photo={true}
+        isActive={isActive}
+      />
+
+      <CameraHighlightsWithMeta<Barcode>
+        highlights={highlightsWithMeta}
+        color="green"
+        onSelect={handleSelectHighlight}
+      />
+
       {/* 状态文字 */}
       <View style={styles.overlay}>
-        {selected ? (
-          <Text style={styles.text}>
-            Selected ({selected.type}): {selected.value}
-          </Text>
-        ) : (
-          <Text style={styles.text}>Scanning...</Text>
-        )}
+        <Text style={styles.text}>Scanning...</Text>
       </View>
     </View>
   )

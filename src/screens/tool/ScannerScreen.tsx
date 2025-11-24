@@ -18,7 +18,7 @@ import { XMarkIcon } from 'react-native-heroicons/outline'
 import QRCodeScanner from './components/QRCodeScanner'
 import { WebView } from 'react-native-webview'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { addRecord, setScanning } from '@/features/tool/sleces/scannerSlice'
+import { addRecord, removeRecord, setScanning } from '@/features/tool/sleces/scannerSlice'
 
 /**
  * ✅ 添加 image 字段
@@ -38,6 +38,10 @@ export default function ScannerScreen() {
   const history = useAppSelector(state => state.scanner.history)
   const dispatch = useAppDispatch()
 
+  const setScanningState = (value: boolean) => {
+    dispatch(setScanning(value))
+  }
+
   /**
    * 扫码成功（带图片）
    */
@@ -48,11 +52,8 @@ export default function ScannerScreen() {
       image: imagePath, // ← 保存图片
     }
 
-    // setHistory(prev => [newRecord, ...prev])
-    // setIsScanning(false)
     dispatch(addRecord(newRecord))
     dispatch(setScanning(false))
-    Alert.alert('扫码成功', code)
   }
 
   /**
@@ -62,26 +63,47 @@ export default function ScannerScreen() {
     setDetail(item)
   }
 
-  const renderHistoryItem = ({ item }: { item: ScanRecord }) => {
+  const renderHistoryItem = ({ item, index }: { item: ScanRecord; index: number }) => {
     const handleCopy = () => {
       Clipboard.setString(item.code)
-      if (Platform.OS === 'android') ToastAndroid.show('已复制到剪贴板', ToastAndroid.SHORT)
-      else Alert.alert('已复制', item.code)
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('已复制到剪贴板', ToastAndroid.SHORT)
+      } else {
+        Alert.alert('已复制', item.code)
+      }
+    }
+
+    const handleDelete = () => {
+      Alert.alert('确认删除', '你确定要删除此条历史记录吗？', [
+        { text: '取消', style: 'cancel' },
+        { text: '删除', style: 'destructive', onPress: () => dispatch(removeRecord(index)) },
+      ])
     }
 
     return (
       <TouchableOpacity
         style={tw`p-3 mb-2 bg-gray-100 rounded-xl`}
-        onPress={() => handleOpenDetail(item)} // ← 打开详情
+        onPress={() => handleOpenDetail(item)}
+        activeOpacity={0.8}
       >
         <View style={tw`flex-row justify-between items-center`}>
+          {/* 左侧：二维码文本 */}
           <Text style={tw`text-gray-800 font-medium flex-1 mr-2`} numberOfLines={1}>
             {item.code}
           </Text>
-          <TouchableOpacity onPress={handleCopy}>
-            <Icon name="copy" size={18} color="#555" />
-          </TouchableOpacity>
+
+          {/* 右侧两个图标：复制 / 删除 */}
+          <View style={tw`flex-row items-center`}>
+            <TouchableOpacity onPress={handleCopy} style={tw`mr-3`}>
+              <Icon name="copy" size={18} color="#555" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleDelete}>
+              <Icon name="trash" size={20} color="#d11" />
+            </TouchableOpacity>
+          </View>
         </View>
+
         <Text style={tw`text-gray-500 text-sm mt-1`}>{new Date(item.time).toLocaleString()}</Text>
       </TouchableOpacity>
     )
@@ -153,7 +175,7 @@ export default function ScannerScreen() {
       <Modal visible={isScanning} animationType="slide">
         <QRCodeScanner
           onDetected={handleDetected} // 带图片返回
-          // onClose={() => setIsScanning(false)}
+          onClose={() => setScanningState(false)}
         />
 
         <TouchableOpacity
@@ -181,6 +203,7 @@ export default function ScannerScreen() {
                 source={{ uri: 'file://' + detail.image }}
                 style={tw`w-full h-60 bg-black`}
                 resizeMode="contain"
+                alt={detail.code}
               />
             ) : (
               <View style={tw`w-full h-40 bg-gray-200 justify-center items-center`}>

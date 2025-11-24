@@ -10,7 +10,7 @@ export type CameraHighlightProps<T = any> = {
   color?: string
   meta?: T
 }
-export const CameraHighlights = <T,>({
+export const CameraHighlightsWithMeta = <T,>({
   highlights,
   color = 'red',
   onSelect,
