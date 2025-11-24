@@ -19,6 +19,7 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected, onClose }) => {
 
   const device = useCameraDevice('back')
   const camera = useRef<Camera>(null)
+  const timeref = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // todo nothing
@@ -32,22 +33,33 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected, onClose }) => {
             console.log('删除缓存照片失败: ', err)
           })
       }
+      if (timeref.current) {
+        clearTimeout(timeref.current)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const scannrerRef = useRef(false)
+
   const handleBarcodeScanned = useRunOnJS(async (codes: Barcode[], frame: Frame) => {
+    if (scannrerRef.current) return // 已经扫码过，直接返回
+    scannrerRef.current = true
+
     if (!camera?.current) {
       console.log('No camera ref!')
       return
     }
     if (codes.length === 0) return
+
     setBarcodes(codes)
     try {
       const photo = await camera.current.takePhoto()
       setPhotoCachePath(photo.path)
       console.log('takephoto success: ', photo.path)
-      setIsActive(false)
+      timeref.current = setTimeout(() => {
+        setIsActive(false)
+      }, 300)
     } catch (error) {
       console.log('takephoto error: ', error)
       if (scannrerKey < 4) {
@@ -129,7 +141,6 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected, onClose }) => {
   return (
     <View style={{ flex: 1 }}>
       <Camera
-        key={scannrerKey}
         ref={camera}
         style={StyleSheet.absoluteFill}
         device={device}
@@ -137,6 +148,9 @@ const QRCodeScanner: React.FC<Props> = ({ onDetected, onClose }) => {
         photo={true}
         isActive={isActive}
       />
+      {/* {highlightsWithMeta.length && !isActive && (
+        <Image style={StyleSheet.absoluteFill} source={{ uri: 'file://' + photoCachePath! }} />
+      )} */}
 
       <CameraHighlightsWithMeta<Barcode>
         highlights={highlightsWithMeta}
